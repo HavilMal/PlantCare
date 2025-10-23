@@ -1,9 +1,0 @@
-package com.plantCare.plantcare.screens
-
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-
-@Composable
-fun ListScreen() {
-    Text("list screen")
-}

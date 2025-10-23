@@ -1,6 +1,5 @@
 package com.plantCare.plantcare
 
-import android.graphics.drawable.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -15,7 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.plantCare.plantcare.screens.CalendarScreen
 import com.plantCare.plantcare.screens.HomeScreen
-import com.plantCare.plantcare.screens.ListScreen
+import com.plantCare.plantcare.screens.listScreen.ListScreen
 import com.plantCare.plantcare.screens.SearchScreen
 import com.plantCare.plantcare.screens.SettingsScreen
 

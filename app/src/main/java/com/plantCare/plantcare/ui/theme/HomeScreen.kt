@@ -1,1 +1,0 @@
-package com.plantCare.plantcare.ui.theme
