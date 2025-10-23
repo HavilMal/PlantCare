@@ -12,7 +12,7 @@ fun App() {
     val navController = rememberNavController()
     Scaffold(
         topBar = {TopBar()},
-        bottomBar = { BottomBar() }
+        bottomBar = { BottomBar(navController) }
     ) {
         contentPadding -> AppNavHost(navController, Modifier.padding(contentPadding))
     }

@@ -1,57 +1,41 @@
 package com.plantCare.plantcare
 
-import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
 
 @Composable
-fun BottomBar() {
+fun BottomBar(controller: NavHostController) {
+    var current by rememberSaveable { mutableStateOf(Route.HOME) }
     NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = {
-                Icon(Icons.Filled.Home, "Home")
-            },
-            label = {Text("Home")}
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = {
-                Icon(Icons.Filled.Star, "Plants")
-            },
-            label = {Text("Plants")}
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = {
-                Icon(Icons.Filled.DateRange, "Calendar")
-            },
-            label = {Text("Calendar")}
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = {
-                Icon(Icons.Filled.Search, "Search")
-            },
-            label = {Text("Search")}
-        )
+        listOf(Route.HOME, Route.PLANT_LIST, Route.CALENDAR, Route.SEARCH).forEach { route ->
+            NavigationBarItem(
+                selected = current == route,
+                onClick = {
+                    controller.navigate(route.route)
+                    current = route
+                },
+                icon = {
+                    if (route.icon != null) {
+                        Icon(route.icon, route.label)
+                    } else {
+                        Icon(Icons.Filled.Star, route.label)
+                    }
+                },
+                label = { Text(route.label) }
+            )
+        }
+
     }
 
 }
