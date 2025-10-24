@@ -12,11 +12,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.plantCare.plantcare.screens.CalendarScreen
-import com.plantCare.plantcare.screens.HomeScreen
-import com.plantCare.plantcare.screens.listScreen.ListScreen
-import com.plantCare.plantcare.screens.SearchScreen
-import com.plantCare.plantcare.screens.SettingsScreen
+import com.plantCare.plantcare.ui.screens.CalendarScreen
+import com.plantCare.plantcare.ui.screens.HomeScreen
+import com.plantCare.plantcare.ui.screens.listScreen.ListScreen
+import com.plantCare.plantcare.ui.screens.SearchScreen
+import com.plantCare.plantcare.ui.screens.SettingsScreen
 
 enum class Route(
     val route: String,
