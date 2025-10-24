@@ -1,4 +1,4 @@
-package com.plantCare.plantcare.screens.listScreen
+package com.plantCare.plantcare.ui.screens.listScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

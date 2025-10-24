@@ -1,4 +1,4 @@
-package com.plantCare.plantcare.screens
+package com.plantCare.plantcare.ui.screens
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
