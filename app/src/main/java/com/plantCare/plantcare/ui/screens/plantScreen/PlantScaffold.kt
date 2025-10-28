@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.plantCare.plantcare.common.Content
 import com.plantCare.plantcare.common.NavigationController
+import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.ui.components.TopBar
 
 @Composable
@@ -24,7 +25,7 @@ fun PlantScaffold(content: Content) {
                 actionButton = {
                     IconButton(
                         onClick = {
-                            navController?.popBackStack()
+                            navController?.navigate(Route.PLANT_EDIT.route)
                         }
                     ) {
                         Icon(

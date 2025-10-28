@@ -10,10 +10,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import com.plantCare.plantcare.common.NavigationController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(text: String = "", actionButton: @Composable () -> Unit = {}) {
+    val navController = NavigationController.current
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -23,7 +25,9 @@ fun TopBar(text: String = "", actionButton: @Composable () -> Unit = {}) {
             Text(text)
         },
         navigationIcon = {
-            IconButton(onClick = { /* do something */ }) {
+            IconButton(onClick = {
+               navController?.popBackStack()
+            }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Localized description"
