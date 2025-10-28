@@ -19,6 +19,7 @@ import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.listScreen.ListScreen
 import com.plantCare.plantcare.ui.screens.SearchScreen
 import com.plantCare.plantcare.ui.screens.SettingsScreen
+import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
 
 enum class Route(
     val route: String,
@@ -61,7 +62,7 @@ fun AppNavHost(
         navigation(startDestination = Route.PLANT_LIST.route, route = "list_route") {
             composable(Route.PLANT_LIST.route) { ListScreen() }
             composable(Route.PLANT.route) { PlantScreen() }
-            composable(Route.PLANT_EDIT.route) { }
+            composable(Route.PLANT_EDIT.route) { PlantEditScreen() }
             composable(Route.NOTE.route) { }
             composable(Route.GALLERY.route) { }
             composable(Route.CAMERA.route) { }
