@@ -23,10 +23,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plantCare.plantcare.R
+import com.plantCare.plantcare.common.NavigationController
+import com.plantCare.plantcare.common.Route
+
 
 @Preview
 @Composable
 fun PlantCard() {
+    val navController = NavigationController.current
+
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -66,7 +71,9 @@ fun PlantCard() {
                     Text("Water")
                 }
                 Button(
-                    onClick = {}
+                    onClick = {
+                        navController?.navigate(Route.PLANT.route)
+                    }
                 ) {
                     Text("View")
                 }
