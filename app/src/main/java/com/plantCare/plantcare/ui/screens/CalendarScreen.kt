@@ -5,5 +5,7 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun CalendarScreen() {
-    Text("calendar screen")
+    MainScaffold {
+        Text("calendar screen")
+    }
 }

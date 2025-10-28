@@ -13,14 +13,14 @@ import androidx.compose.runtime.Composable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar() {
+fun TopBar(text: String = "", actionButton: @Composable () -> Unit = {}) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
-            Text("Small Top App Bar")
+            Text(text)
         },
         navigationIcon = {
             IconButton(onClick = { /* do something */ }) {
@@ -30,5 +30,6 @@ fun TopBar() {
                 )
             }
         },
+        actions = { actionButton() },
     )
 }

@@ -5,5 +5,7 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun SettingsScreen() {
-    Text("settings")
+    MainScaffold {
+        Text("settings")
+    }
 }

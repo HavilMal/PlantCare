@@ -51,30 +51,32 @@ fun PlantItem() {
 @Preview
 @Composable
 fun HomeScreen() {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxSize(),
-    ) {
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1F)
-            ) { }
-        }
-        item {
-            Text(
-                text = "Water today",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .wrapContentHeight(align = Alignment.CenterVertically),
-            )
-        }
-        items(10) { item ->
-            PlantItem()
+    MainScaffold {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+        ) {
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1F)
+                ) { }
+            }
+            item {
+                Text(
+                    text = "Water today",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .wrapContentHeight(align = Alignment.CenterVertically),
+                )
+            }
+            items(10) { item ->
+                PlantItem()
+            }
         }
     }
 }

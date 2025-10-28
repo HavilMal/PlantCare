@@ -48,13 +48,15 @@ fun CameraView() {
         rebindCameraProvider()
     }
 
-    AndroidView(
-        factory = { context ->
-            PreviewView(context).also {
-                previewUseCase.surfaceProvider = it.surfaceProvider
+    MainScaffold {
+        AndroidView(
+            factory = { context ->
+                PreviewView(context).also {
+                    previewUseCase.surfaceProvider = it.surfaceProvider
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
@@ -14,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.plantCare.plantcare.ui.screens.CalendarScreen
 import com.plantCare.plantcare.ui.screens.HomeScreen
+import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.listScreen.ListScreen
 import com.plantCare.plantcare.ui.screens.SearchScreen
 import com.plantCare.plantcare.ui.screens.SettingsScreen
@@ -40,15 +42,15 @@ enum class Route(
     CAMERA("camera", "Camera")
 }
 
+val NavigationController = staticCompositionLocalOf<NavHostController?> { null }
+
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    modifier: Modifier
 ) {
     NavHost(
         navController,
         startDestination = "main",
-        modifier = modifier
     ) {
 
         navigation(startDestination = Route.HOME.route, route="main") {
@@ -58,7 +60,7 @@ fun AppNavHost(
 
         navigation(startDestination = Route.PLANT_LIST.route, route = "list_route") {
             composable(Route.PLANT_LIST.route) { ListScreen() }
-            composable(Route.PLANT.route) {  }
+            composable(Route.PLANT.route) { PlantScreen() }
             composable(Route.PLANT_EDIT.route) { }
             composable(Route.NOTE.route) { }
             composable(Route.GALLERY.route) { }

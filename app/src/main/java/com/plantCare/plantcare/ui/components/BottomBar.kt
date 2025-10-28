@@ -15,19 +15,25 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
+import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 
 @Composable
-fun BottomBar(controller: NavHostController) {
-    val backStackEntry by controller.currentBackStackEntryAsState()
-    val current = backStackEntry?.destination?.route
+fun BottomBar() {
+    val controller = NavigationController.current
+
+    var current: String? = ""
+    if (controller != null) {
+        val backStackEntry by controller.currentBackStackEntryAsState()
+        current = backStackEntry?.destination?.route
+    }
 
     NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
         listOf(Route.HOME, Route.PLANT_LIST, Route.CALENDAR, Route.SEARCH).forEach { route ->
             NavigationBarItem(
                 selected = current == route.route,
                 onClick = {
-                    controller.navigate(
+                    controller?.navigate(
                         route = route.route,
                         navOptions = navOptions {
                             popUpTo(route.route) {
