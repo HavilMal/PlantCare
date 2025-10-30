@@ -1,9 +1,13 @@
 package com.plantCare.plantcare.ui.screens.plantEditScreen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -24,6 +28,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -90,21 +95,57 @@ fun PlantEditScreen() {
 
 
             Text("Watering schedule")
-            var expanded by remember { mutableStateOf(true) }
+            var selected by remember { mutableStateOf(Interval.WEEKLY) }
 
-            // todo
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Option 1") },
-                    onClick = { /* Do something... */ }
-                )
-                DropdownMenuItem(
-                    text = { Text("Option 2") },
-                    onClick = { /* Do something... */ }
-                )
+            IntervalDropdown(
+                modifier = Modifier.fillMaxWidth(),
+                selected = selected,
+                onSelect = { s ->
+                    selected = s
+                }
+            )
+
+            when (selected) {
+                Interval.WEEKLY -> {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        for (i in 1..7) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .width(48.dp)
+                                    .height(48.dp),
+                            ) {
+                                Text(i.toString())
+                            }
+                        }
+                    }
+                }
+
+                Interval.MONTHLY -> {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        for (j in 1..4) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                for (i in 1..7) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .width(48.dp)
+                                            .height(48.dp),
+                                    ) {
+                                        Text(i.toString())
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
