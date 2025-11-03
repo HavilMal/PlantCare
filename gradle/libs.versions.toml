@@ -14,6 +14,8 @@ navigationCompose = "2.9.5"
 cameraX = "1.4.0"
 material3 = "1.4.0"
 materialIconsExtended = "1.7.8"
+roomRuntime = "2.8.3"
+roomKtx = "2.8.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +43,8 @@ androidx-camera-video = { group = "androidx.camera", name = "camera-video", vers
 androidx-camera-extensions = { group = "androidx.camera", name = "camera-extensions", version.ref = "cameraX" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.5.0-alpha07" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
