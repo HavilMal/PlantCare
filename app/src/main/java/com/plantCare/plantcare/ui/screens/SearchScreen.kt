@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
+import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.common.WithPermission
 
 
@@ -48,7 +49,7 @@ fun CameraView() {
         rebindCameraProvider()
     }
 
-    MainScaffold {
+    MainScaffold(Route.CAMERA.label) {
         AndroidView(
             factory = { context ->
                 PreviewView(context).also {

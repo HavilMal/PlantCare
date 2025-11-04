@@ -11,8 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,6 +25,8 @@ import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.plantCare.plantcare.common.NavigationController
+import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.ui.screens.listScreen.PlantCard
 
 
@@ -51,10 +57,23 @@ fun PlantItem() {
 @Preview
 @Composable
 fun HomeScreen() {
-    MainScaffold {
+    val navController = NavigationController.current
+
+    MainScaffold(
+        label = Route.HOME.label,
+        actionButton = {
+            IconButton(
+                onClick = {
+                    navController?.navigate(Route.SETTINGS.route)
+                }
+            ) {
+                Icon(Icons.Default.Settings, "Settings")
+            }
+        }
+    ) { modifier ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
+            modifier = modifier
                 .padding(16.dp)
                 .fillMaxSize(),
         ) {
