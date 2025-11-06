@@ -160,36 +160,59 @@ import java.util.Date
 //}
 //
 
-
-@Entity(tableName = "testTable")
-data class TestTable(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val name: String
+@Entity
+data class User(
+    @PrimaryKey val uid: Int,
+    @ColumnInfo(name = "first_name") val firstName: String?,
+    @ColumnInfo(name = "last_name") val lastName: String?
 )
 
 @Dao
-interface TestDao{
+interface UserDao {
+    @Query("SELECT * FROM user")
+    fun getAll(): List<User>
+
+    @Query("SELECT * FROM user WHERE uid IN (:userIds)")
+    fun loadAllByIds(userIds: IntArray): List<User>
+
+    @Query("SELECT * FROM user WHERE first_name LIKE :first AND " +
+           "last_name LIKE :last LIMIT 1")
+    fun findByName(first: String, last: String): User
+
     @Insert
-    suspend fun insertTest(testTable: TestTable)
+    fun insertAll(vararg users: User)
+
+    @Delete
+    fun delete(user: User)
 }
 
-@Database(entities = [TestTable::class], version = 1)
+@Database(entities = [User::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun testDao(): TestDao
+    abstract fun userDao(): UserDao
 
     companion object {
+        private val DATABASE_NAME = "plant_care_db"
+        /*The value of a volatile variable will never be cached, and all writes and reads will be done to and from the main memory.
+        This helps make sure the value of INSTANCE is always up-to-date and the same for all execution threads.
+        It means that changes made by one thread to INSTANCE are visible to all other threads immediately.*/
         @Volatile
-        private var instance: AppDatabase? = null
-        private val LOCK = Any()
+        private var INSTANCE: AppDatabase? = null
 
-        fun getInstance(context: Context): AppDatabase {
-            return instance ?: synchronized(LOCK) {
-                instance ?: Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "your_db_name"
-                ).build().also { instance = it }
+        fun getInstance(context: Context): AppDatabase{
+            // only one thread of execution at a time can enter this block of code
+            synchronized(this) {
+                var instance = INSTANCE
+                if (instance == null) {
+                    instance = Room.databaseBuilder(
+                                        context = context.applicationContext,
+                                        klass = AppDatabase::class.java,
+                                        name = DATABASE_NAME
+                                    )
+//                        .fallbackToDestructiveMigration(false)
+                        .build()
+                    INSTANCE = instance
+                }
+                return instance
             }
         }
     }
