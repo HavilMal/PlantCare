@@ -14,9 +14,9 @@ import com.plantCare.plantcare.ui.screens.MainScaffold
 @Preview
 @Composable
 fun ListScreen() {
-    MainScaffold(Route.PLANT_LIST.label) {
+    MainScaffold(Route.PLANT_LIST.label) { modifier -> 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
