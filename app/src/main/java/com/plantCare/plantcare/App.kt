@@ -11,9 +11,7 @@ import com.plantCare.plantcare.model.AppDatabase
 
 
 @Composable
-fun App(application: Application) {
-
-
+fun App() {
     val context = LocalContext.current
     val db = AppDatabase.getInstance(context.applicationContext)
 
