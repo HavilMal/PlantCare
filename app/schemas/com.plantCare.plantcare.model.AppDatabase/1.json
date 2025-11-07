@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6832e4cf7c19f9b5d17c0b03f6f1c3bb",
+    "identityHash": "fddf4850e67a19e01028d3b93bae0350",
     "entities": [
       {
         "tableName": "plants",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `wateringSchedule` TEXT NOT NULL DEFAULT 'MONTHLY', `path` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `wateringSchedule` TEXT NOT NULL DEFAULT 'MONTHLY', `dirPath` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -40,8 +40,8 @@
             "defaultValue": "'MONTHLY'"
           },
           {
-            "fieldPath": "path",
-            "columnName": "path",
+            "fieldPath": "dirPath",
+            "columnName": "dirPath",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -137,7 +137,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6832e4cf7c19f9b5d17c0b03f6f1c3bb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fddf4850e67a19e01028d3b93bae0350')"
     ]
   }
 }

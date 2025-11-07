@@ -15,9 +15,7 @@ import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Update
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import java.util.Date
 
 class Converters {
@@ -47,7 +45,7 @@ data class Plant(
     val plantedOn: Date,
     @ColumnInfo(defaultValue = "MONTHLY")
     val wateringSchedule: WateringSchedule = WateringSchedule.MONTHLY,
-    val path: String
+    val dirPath: String
 )
 
 @Entity(
@@ -93,6 +91,8 @@ data class WateringEntry(
 interface PlantDao{
     @Query("SELECT * FROM plants")
     fun getPlants(): Flow<List<Plant>>
+    @Query("SELECT dirPath FROM plants WHERE id = :plantId")
+    fun getPlantDirPath(plantId: Long): String
     @Query("SELECT note FROM notes WHERE plant = :plantId")
     fun getPlantNotes(plantId: Long): Flow<List<String>>
     @Query("SELECT date FROM wateringHistory WHERE plant = :plantId")
@@ -112,12 +112,6 @@ interface PlantDao{
     @Update
     suspend fun updateNote(note: Note)
 }
-//@Dao
-//interface UserSettingsDao{
-//    @Update
-//    suspend fun updateUserSettings(userSettings: UserSettings)
-//}
-
 
 @Database(entities = [Plant::class, Note::class, WateringEntry::class], version = 1)
 @TypeConverters(Converters::class)
@@ -125,7 +119,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun plantDao(): PlantDao
 
     companion object {
-        private val DATABASE_NAME = "plant_care_db"
+        private const val DATABASE_NAME = "plant_care_db"
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
