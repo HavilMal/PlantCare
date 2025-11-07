@@ -3,14 +3,11 @@ package com.plantCare.plantcare.ui.screens.plantScreen
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
@@ -30,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -45,6 +43,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
+import com.plantCare.plantcare.common.NavigationController
+import com.plantCare.plantcare.common.Route
 
 
 // todo close on tap outside
@@ -55,12 +55,19 @@ fun PlantActionButton() {
     val listState = rememberLazyListState()
     val fabVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val focusRequester = remember { FocusRequester() }
+    val navController = NavigationController.current
+    
+    data class MenuItem (
+        val icon: ImageVector,
+        val label: String,
+        val route: Route,
+    )
 
     val items =
         listOf(
-            Icons.AutoMirrored.Filled.Message to "Note",
-            Icons.Filled.People to "Photo",
-            Icons.Filled.Contacts to "Image"
+            MenuItem(Icons.AutoMirrored.Filled.Message,"Note", Route.NOTE),
+            MenuItem(Icons.Filled.People, "Photo", Route.CAMERA),       // todo
+            MenuItem(Icons.Filled.Contacts, "Image", Route.GALLERY),    // todo
         )
 
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -140,9 +147,14 @@ fun PlantActionButton() {
                                 Modifier
                             }
                         ),
-                onClick = { fabMenuExpanded = false },
-                icon = { Icon(item.first, contentDescription = null) },
-                text = { Text(text = item.second) },
+                onClick = {
+                    fabMenuExpanded = false
+                    navController?.navigate(
+                        item.route.route
+                    )
+                },
+                icon = { Icon(item.icon, contentDescription = null) },
+                text = { Text(text = item.label) },
             )
         }
     }

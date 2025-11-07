@@ -22,6 +22,7 @@ fun PlantScaffold(content: Content) {
     Scaffold(
         topBar = {
             TopBar(
+                text = Route.PLANT.label,
                 actionButton = {
                     IconButton(
                         onClick = {

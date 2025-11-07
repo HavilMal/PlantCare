@@ -2,6 +2,7 @@ package com.plantCare.plantcare.ui.screens.plantScreen
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
@@ -22,6 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.plantCare.plantcare.R
+import com.plantCare.plantcare.common.NavigationController
+import com.plantCare.plantcare.common.Route
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,6 +48,8 @@ fun PlantScreen() {
         )
     }
 
+    val navController = NavigationController.current
+
     PlantScaffold { modifier ->
         Column(
             modifier = modifier.padding(16.dp),
@@ -63,7 +70,10 @@ fun PlantScreen() {
                 Image(
                     modifier = Modifier
                         .height(205.dp)
-                        .maskClip(MaterialTheme.shapes.extraLarge),
+                        .maskClip(MaterialTheme.shapes.extraLarge)
+                        .clickable {
+                            navController?.navigate(Route.GALLERY.route)
+                        },
                     painter = painterResource(id = item.imageResId),
                     contentDescription = item.contentDescription,
                     contentScale = ContentScale.Crop

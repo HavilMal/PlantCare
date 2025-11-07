@@ -1,24 +1,20 @@
-package com.plantCare.plantcare.ui.screens
+package com.plantCare.plantcare.ui.screens.galleryScreen
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.plantCare.plantcare.common.Content
-import com.plantCare.plantcare.ui.components.BottomBar
 import com.plantCare.plantcare.ui.components.TopBar
 
 @Composable
-fun MainScaffold(label: String, actionButton: @Composable () -> Unit = {}, content: Content) {
+fun GalleryScaffold(content: Content) {
     Scaffold(
         topBar = {
             TopBar(
-                text = label,
-                actionButton = actionButton,
+                text = "Gallery"
             )
-        },
-        bottomBar = { BottomBar() }
+        }
     ) { contentPadding ->
         content(Modifier.padding(contentPadding))
     }
