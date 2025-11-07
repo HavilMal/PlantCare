@@ -97,6 +97,8 @@ interface PlantDao{
     fun getPlantNotes(plantId: Long): Flow<List<String>>
     @Query("SELECT date FROM wateringHistory WHERE plant = :plantId")
     fun getPlantWateringHistory(plantId: Long): Flow<List<Date>>
+    @Query("DELETE FROM plants")
+    suspend fun deleteAllPlants()
     @Insert
     suspend fun insertPlant(plant: Plant): Long
     @Insert

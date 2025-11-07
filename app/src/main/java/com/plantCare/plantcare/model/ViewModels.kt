@@ -21,6 +21,9 @@ class PlantViewModel(private val repository: PlantRepository) : ViewModel() {
     fun deletePlant(plant: Plant) = viewModelScope.launch {
         repository.deletePlant(plant)
     }
+    fun deleteAllPlants() = viewModelScope.launch {
+        repository.deleteAllPlants()
+    }
 
     fun getAllPlants() : Flow<List<Plant>> {
         return repository.plantDao.getPlants()
@@ -28,6 +31,7 @@ class PlantViewModel(private val repository: PlantRepository) : ViewModel() {
     fun getPlantDirPath(plantId: Long): String {
         return repository.getPlantsDirPath(plantId)
     }
+
 }
 
 

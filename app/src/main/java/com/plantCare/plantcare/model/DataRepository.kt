@@ -18,7 +18,9 @@ class PlantRepository(private val appContext: Context, public val plantDao: Plan
     suspend fun deletePlant(plant: Plant) {
         plantDao.deletePlant(plant)
     }
-
+    suspend fun deleteAllPlants() {
+        plantDao.deleteAllPlants()
+    }
     fun getPlantsDirPath(plantId: Long) : String{
         return plantDao.getPlantDirPath(plantId)
     }

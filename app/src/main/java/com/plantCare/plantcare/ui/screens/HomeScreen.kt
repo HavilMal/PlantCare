@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -19,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
@@ -27,11 +30,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
+import com.plantCare.plantcare.model.Plant
+import com.plantCare.plantcare.model.PlantViewModel
 import com.plantCare.plantcare.ui.screens.listScreen.PlantCard
 
 
 @Composable
-fun PlantItem() {
+fun PlantItem(plant: Plant) {
     Row(
         modifier = Modifier
 //            .padding(16.dp)
@@ -40,7 +45,7 @@ fun PlantItem() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Plant name",
+            text = plant.name,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxHeight()
@@ -54,11 +59,10 @@ fun PlantItem() {
 
 // todo
 
-@Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(plantVM: PlantViewModel) {
     val navController = NavigationController.current
-
+    val plants by plantVM.getAllPlants().collectAsState(initial = emptyList())
     MainScaffold(
         label = Route.HOME.label,
         actionButton = {
@@ -93,8 +97,8 @@ fun HomeScreen() {
                         .wrapContentHeight(align = Alignment.CenterVertically),
                 )
             }
-            items(10) { item ->
-                PlantItem()
+            items(plants) { plant ->
+                PlantItem(plant)
             }
         }
     }
