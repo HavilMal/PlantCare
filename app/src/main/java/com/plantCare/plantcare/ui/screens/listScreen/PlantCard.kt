@@ -25,11 +25,11 @@ import androidx.compose.ui.unit.sp
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
+import com.plantCare.plantcare.model.Plant
 
 
-@Preview
 @Composable
-fun PlantCard() {
+fun PlantCard(plant: Plant) {
     val navController = NavigationController.current
 
     Card(
@@ -51,13 +51,13 @@ fun PlantCard() {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "Plant Name",
+                text = plant.name,
                 maxLines = 1,
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
             )
             Text(
-                text = "Plant description Plant description Plant description Plant description",
+                text = plant.description,
                 maxLines = 3,
                 minLines = 3,
             )

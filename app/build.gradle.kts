@@ -2,11 +2,23 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.androidx.room)
 }
+
+configurations.implementation {
+    exclude(group = "com.intellij", module = "annotations")
+}
+
+
 
 android {
     namespace = "com.plantCare.plantcare"
     compileSdk = 36
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 
     defaultConfig {
         applicationId = "com.plantCare.plantcare"
@@ -59,6 +71,17 @@ dependencies {
     implementation(libs.androidx.camera.extensions)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.annotations)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.7")
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.7")
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
