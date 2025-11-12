@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,13 +45,14 @@ fun YearMonth.getDayOfMonthStartingFromMonday(): List<LocalDate> {
 
 @Preview
 @Composable
-fun Calendar(modifier: Modifier = Modifier) {
+fun Calendar(
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(
+        initialFirstVisibleItemIndex = INITIAL_INDEX
+    ),
+) {
     val currentMonth = YearMonth.now()
 
-    val initialPosition = Int.MAX_VALUE / 2
-    val lazyListState = rememberLazyListState(
-        initialFirstVisibleItemIndex = initialPosition
-    )
     val flingBehavior = rememberSnapFlingBehavior(
         lazyListState = lazyListState,
         snapPosition = SnapPosition.Start,
@@ -74,7 +76,7 @@ fun Calendar(modifier: Modifier = Modifier) {
             items(
                 count = Int.MAX_VALUE,
             ) { index ->
-                val month = monthState.plusMonths((index - initialPosition).toLong())
+                val month = monthState.plusMonths((index - INITIAL_INDEX ).toLong())
                 Month(month)
             }
         }
