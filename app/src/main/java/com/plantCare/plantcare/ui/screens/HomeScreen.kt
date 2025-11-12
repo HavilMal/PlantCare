@@ -21,18 +21,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.model.Plant
-import com.plantCare.plantcare.model.PlantViewModel
-import com.plantCare.plantcare.ui.screens.listScreen.PlantCard
+import com.plantCare.plantcare.model.plantViewModel
 
 
 @Composable
@@ -60,9 +56,11 @@ fun PlantItem(plant: Plant) {
 // todo
 
 @Composable
-fun HomeScreen(plantVM: PlantViewModel) {
+fun HomeScreen() {
     val navController = NavigationController.current
-    val plants by plantVM.getAllPlants().collectAsState(initial = emptyList())
+    val plantVM = plantViewModel()
+    val plantsUiState = plantVM.uiState.collectAsState()
+
     MainScaffold(
         label = Route.HOME.label,
         actionButton = {
@@ -97,7 +95,7 @@ fun HomeScreen(plantVM: PlantViewModel) {
                         .wrapContentHeight(align = Alignment.CenterVertically),
                 )
             }
-            items(plants) { plant ->
+            items(plantsUiState.value.plants) { plant ->
                 PlantItem(plant)
             }
         }

@@ -39,8 +39,9 @@ enum class WateringSchedule{
 @Entity(tableName = "plants")
 data class Plant(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val name: String,
+    val description: String,
     val species: String,
     val plantedOn: Date,
     @ColumnInfo(defaultValue = "MONTHLY")

@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.plantCare.plantcare.model.AppRepository
 import com.plantCare.plantcare.model.PlantViewModel
 import com.plantCare.plantcare.ui.screens.CalendarScreen
 import com.plantCare.plantcare.ui.screens.HomeScreen
@@ -49,8 +50,7 @@ val NavigationController = staticCompositionLocalOf<NavHostController?> { null }
 
 @Composable
 fun AppNavHost(
-    navController: NavHostController,
-    plantVM: PlantViewModel
+    navController: NavHostController
 ) {
     NavHost(
         navController,
@@ -58,7 +58,7 @@ fun AppNavHost(
     ) {
 
         navigation(startDestination = Route.HOME.route, route="main") {
-            composable(Route.HOME.route) { HomeScreen(plantVM) }
+            composable(Route.HOME.route) { HomeScreen() }
             composable(Route.SETTINGS.route) { SettingsScreen() }
         }
 

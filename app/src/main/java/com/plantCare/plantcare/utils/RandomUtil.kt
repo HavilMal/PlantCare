@@ -1,6 +1,7 @@
 package com.plantCare.plantcare.utils
 
 import java.util.UUID
+import kotlin.random.Random
 
 object RandomUtil {
     fun genUUID(): UUID {
@@ -9,5 +10,9 @@ object RandomUtil {
 
     fun genUUIDString(): String {
         return genUUID().toString()
+    }
+
+    fun genBool(): Boolean {
+        return Random.nextBoolean()
     }
 }
