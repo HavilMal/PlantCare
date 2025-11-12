@@ -1,4 +1,4 @@
-package com.plantCare.plantcare.ui.screens
+package com.plantCare.plantcare.ui.screens.homeScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -59,7 +59,7 @@ fun PlantItem() {
 fun HomeScreen() {
     val navController = NavigationController.current
 
-    MainScaffold(
+    _root_ide_package_.com.plantCare.plantcare.ui.screens.MainScaffold(
         label = Route.HOME.label,
         actionButton = {
             IconButton(
