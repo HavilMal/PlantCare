@@ -42,6 +42,8 @@ fun CalendarScaffold(
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
 
+    val screenEdgeDistance = 72.dp
+
     Scaffold(
         topBar = {
             TopBar(text = "Calendar")
@@ -51,10 +53,10 @@ fun CalendarScaffold(
             AnimatedVisibility(
                 visible = showScrollButton,
                 enter = slideInHorizontally {
-                    with(density) {72.dp.roundToPx()}
+                    with(density) {screenEdgeDistance.roundToPx()}
                 },
                 exit = slideOutHorizontally {
-                    with(density) {72.dp.roundToPx()}
+                    with(density) {screenEdgeDistance.roundToPx()}
                 },
             ) {
                 FloatingActionButton(
