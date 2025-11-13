@@ -17,12 +17,19 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.plantCare.plantcare.common.getLocale
+import com.plantCare.plantcare.model.CalendarUiState
+import com.plantCare.plantcare.model.CalendarViewModel
+import com.plantCare.plantcare.model.MonthUiState
 import com.plantCare.plantcare.ui.theme.size
 import com.plantCare.plantcare.ui.theme.spacing
 import java.time.DayOfWeek
@@ -32,6 +39,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 
+// todo use pagination this wont work
 
 
 fun YearMonth.getDayOfMonthStartingFromMonday(): List<LocalDate> {
@@ -43,23 +51,29 @@ fun YearMonth.getDayOfMonthStartingFromMonday(): List<LocalDate> {
         .toList()
 }
 
-@Preview
 @Composable
 fun Calendar(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(
         initialFirstVisibleItemIndex = INITIAL_INDEX
     ),
+    calendarViewModel: CalendarViewModel,
 ) {
-    val currentMonth = YearMonth.now()
+    val state by calendarViewModel.calendarState.collectAsState()
 
     val flingBehavior = rememberSnapFlingBehavior(
         lazyListState = lazyListState,
         snapPosition = SnapPosition.Start,
     )
-    val monthState = remember { currentMonth }
 
-
+    LaunchedEffect(lazyListState) {
+        snapshotFlow { lazyListState.firstVisibleItemIndex }
+            .collect { index->
+                calendarViewModel.fetchCalendarDataIfNeeded(
+                    state.currentDate.plusMonths((index - INITIAL_INDEX ).toLong())
+                )
+            }
+    }
 
     Column(
         modifier = modifier
@@ -76,8 +90,13 @@ fun Calendar(
             items(
                 count = Int.MAX_VALUE,
             ) { index ->
-                val month = monthState.plusMonths((index - INITIAL_INDEX ).toLong())
-                Month(month)
+                val month = state.currentDate.plusMonths((index - INITIAL_INDEX ).toLong())
+                val monthUiState = state.months[month]
+                if (monthUiState != null) {
+                    Month(monthUiState)
+                } else {
+                    Text("loading")
+                }
             }
         }
     }
@@ -86,13 +105,13 @@ fun Calendar(
 
 @Composable
 fun Month(
-    month: YearMonth = YearMonth.now(),
+    monthUiState: MonthUiState
 ) {
 
-    val days = month.getDayOfMonthStartingFromMonday()
-    val monthString = month.month.getDisplayName(TextStyle.FULL_STANDALONE, getLocale())
+    val days = monthUiState.days
+    val monthString = monthUiState.monthDate.month.getDisplayName(TextStyle.FULL_STANDALONE, getLocale())
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(getLocale()) else it.toString() }
-    val yearString = month.year.toString()
+    val yearString = monthUiState.monthDate.year.toString()
     val weekStart = DayOfWeek.MONDAY
     var index = 0
 
@@ -112,7 +131,7 @@ fun Month(
         }
 
 
-        val offset = ((days.first().dayOfWeek.value - weekStart.value) + 7) % 7
+        val offset = ((days.first().date.dayOfWeek.value - weekStart.value) + 7) % 7
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,
@@ -122,7 +141,7 @@ fun Month(
                 Day("")
             }
             repeat(7 - offset) {
-                Day(days[index].dayOfMonth.toString())
+                Day(days[index].date.dayOfMonth.toString())
                 index++
             }
         }
@@ -134,7 +153,7 @@ fun Month(
             ) {
                 repeat(7) {
                     if (index < days.size) {
-                        Day(days[index].dayOfMonth.toString())
+                        Day(days[index].date.dayOfMonth.toString())
                     } else {
                         Day("")
                     }
@@ -152,7 +171,7 @@ fun WeekHeader() {
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
         DayOfWeek.entries.forEach { it ->
-            Day(it.getDisplayName(TextStyle.SHORT, Locale.getDefault()))
+            Day(it.getDisplayName(TextStyle.SHORT, getLocale()))
         }
     }
 }
