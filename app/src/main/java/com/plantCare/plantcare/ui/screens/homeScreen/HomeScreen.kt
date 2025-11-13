@@ -1,7 +1,6 @@
 package com.plantCare.plantcare.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,10 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.model.Plant
-import com.plantCare.plantcare.model.plantViewModel
+import com.plantCare.plantcare.model.PlantViewModel
 
 
 @Composable
@@ -53,13 +53,12 @@ fun PlantItem(plant: Plant) {
     }
 }
 
-// todo
-
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    viewModel: PlantViewModel = hiltViewModel()
+) {
     val navController = NavigationController.current
-    val plantVM = plantViewModel()
-    val plantsUiState = plantVM.uiState.collectAsState()
+    val plantsUiState = viewModel.uiState.collectAsState()
 
     MainScaffold(
         label = Route.HOME.label,

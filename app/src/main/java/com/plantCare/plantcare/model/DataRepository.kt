@@ -4,11 +4,16 @@ import android.content.Context
 import java.util.Date
 import com.plantCare.plantcare.utils.RandomUtil
 import com.plantCare.plantcare.utils.FileUtil
+import jakarta.inject.Inject
 import java.io.File
 
 
 const val PLANTS_DIR: String = "plants/"
-class PlantRepository(private val appContext: Context, public val plantDao: PlantDao) {
+
+class PlantRepository(
+    private val appContext: Context,
+    public val plantDao: PlantDao,
+) {
     suspend fun insertPlant(plant: Plant) {
         plantDao.insertPlant(plant)
     }
@@ -36,19 +41,9 @@ class PlantRepository(private val appContext: Context, public val plantDao: Plan
     }
 }
 
-
-
-
-
-
-
-
-
-
-
 class AppRepository(
-    val db: AppDatabase,
-    private val appContext: Context
+    db: AppDatabase,
+    appContext: Context
 ) {
     val plantDao = db.plantDao()
     val plantRepository = PlantRepository(appContext, plantDao)

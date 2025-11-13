@@ -7,17 +7,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.common.Route
-import com.plantCare.plantcare.model.plantViewModel
+import com.plantCare.plantcare.model.PlantViewModel
 import com.plantCare.plantcare.ui.screens.MainScaffold
 
-@Preview
 @Composable
-fun ListScreen() {
-    val plantVM = plantViewModel()
+fun ListScreen(
+    plantVM: PlantViewModel = hiltViewModel()
+) {
     val plantsUiState = plantVM.uiState.collectAsState()
     MainScaffold(Route.PLANT_LIST.label) { modifier -> 
         LazyColumn(
