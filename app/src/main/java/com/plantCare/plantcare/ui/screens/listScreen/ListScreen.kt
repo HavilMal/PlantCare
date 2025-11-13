@@ -10,14 +10,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.common.Route
-import com.plantCare.plantcare.model.PlantViewModel
 import com.plantCare.plantcare.ui.screens.MainScaffold
+import com.plantCare.plantcare.viewModel.ListViewModel
 
 @Composable
 fun ListScreen(
-    plantVM: PlantViewModel = hiltViewModel()
+    viewModel: ListViewModel = hiltViewModel()
 ) {
-    val plantsUiState = plantVM.uiState.collectAsState()
+    val plantsUiState = viewModel.listState.collectAsState()
     MainScaffold(Route.PLANT_LIST.label) { modifier -> 
         LazyColumn(
             modifier = modifier.fillMaxSize(),

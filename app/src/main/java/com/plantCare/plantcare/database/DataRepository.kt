@@ -1,10 +1,9 @@
-package com.plantCare.plantcare.model
+package com.plantCare.plantcare.database
 
 import android.content.Context
 import java.util.Date
 import com.plantCare.plantcare.utils.RandomUtil
 import com.plantCare.plantcare.utils.FileUtil
-import jakarta.inject.Inject
 import java.io.File
 
 
@@ -14,6 +13,7 @@ class PlantRepository(
     private val appContext: Context,
     public val plantDao: PlantDao,
 ) {
+
     suspend fun insertPlant(plant: Plant) {
         plantDao.insertPlant(plant)
     }
@@ -42,13 +42,8 @@ class PlantRepository(
 }
 
 class AppRepository(
-    db: AppDatabase,
-    appContext: Context
+    val plantRepository: PlantRepository
 ) {
-    val plantDao = db.plantDao()
-    val plantRepository = PlantRepository(appContext, plantDao)
-
-
     suspend fun seedDatabase() {
         plantRepository.deleteAllPlants()
         plantRepository.insertPlant("Kaktus Maksiu","Nazwa po moim zmarłym dziadku","Kaktus Kaktus")

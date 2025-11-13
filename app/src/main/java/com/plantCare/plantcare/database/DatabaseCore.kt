@@ -1,6 +1,5 @@
-package com.plantCare.plantcare.model
+package com.plantCare.plantcare.database
 
-import android.content.Context
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
@@ -12,7 +11,6 @@ import androidx.room.Database
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
@@ -120,26 +118,4 @@ interface PlantDao{
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun plantDao(): PlantDao
-
-    companion object {
-        private const val DATABASE_NAME = "plant_care_db"
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
-
-        fun getInstance(context: Context): AppDatabase{
-            synchronized(this) {
-                var instance = INSTANCE
-                if (instance == null) {
-                    instance = Room.databaseBuilder(
-                                        context = context.applicationContext,
-                                        klass = AppDatabase::class.java,
-                                        name = DATABASE_NAME
-                                    )
-                        .build()
-                    INSTANCE = instance
-                }
-                return instance
-            }
-        }
-    }
 }

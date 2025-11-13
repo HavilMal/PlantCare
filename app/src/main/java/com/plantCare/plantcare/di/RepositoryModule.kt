@@ -1,8 +1,9 @@
 package com.plantCare.plantcare.di
 
 import android.content.Context
-import com.plantCare.plantcare.model.PlantDao
-import com.plantCare.plantcare.model.PlantRepository
+import com.plantCare.plantcare.database.AppRepository
+import com.plantCare.plantcare.database.PlantDao
+import com.plantCare.plantcare.database.PlantRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,5 +24,13 @@ object RepositoryModule {
             appContext = context,
             plantDao = plantDao
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppRepository(
+        plantRepository: PlantRepository
+    ): AppRepository {
+        return AppRepository(plantRepository)
     }
 }

@@ -2,8 +2,8 @@ package com.plantCare.plantcare.di
 
 import android.content.Context
 import androidx.room.Room
-import com.plantCare.plantcare.model.AppDatabase
-import com.plantCare.plantcare.model.PlantDao
+import com.plantCare.plantcare.database.AppDatabase
+import com.plantCare.plantcare.database.PlantDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

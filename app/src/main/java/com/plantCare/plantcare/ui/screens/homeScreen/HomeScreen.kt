@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
-import com.plantCare.plantcare.model.Plant
-import com.plantCare.plantcare.model.PlantViewModel
+import com.plantCare.plantcare.database.Plant
+import com.plantCare.plantcare.viewModel.HomeViewModel
 
 
 @Composable
@@ -55,10 +55,10 @@ fun PlantItem(plant: Plant) {
 
 @Composable
 fun HomeScreen(
-    viewModel: PlantViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val navController = NavigationController.current
-    val plantsUiState = viewModel.uiState.collectAsState()
+    val plantsUiState = viewModel.homeState.collectAsState()
 
     MainScaffold(
         label = Route.HOME.label,
