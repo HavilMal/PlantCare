@@ -1,4 +1,4 @@
-package com.plantCare.plantcare.model
+package com.plantCare.plantcare.database
 
 import com.plantCare.plantcare.utils.RandomUtil
 import java.util.Date

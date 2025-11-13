@@ -1,4 +1,4 @@
-package com.plantCare.plantcare.model
+package com.plantCare.plantcare.database
 
 import android.content.Context
 import java.util.Date
@@ -8,7 +8,12 @@ import java.io.File
 
 
 const val PLANTS_DIR: String = "plants/"
-class PlantRepository(private val appContext: Context, public val plantDao: PlantDao) {
+
+class PlantRepository(
+    private val appContext: Context,
+    public val plantDao: PlantDao,
+) {
+
     suspend fun insertPlant(plant: Plant) {
         plantDao.insertPlant(plant)
     }
@@ -36,24 +41,9 @@ class PlantRepository(private val appContext: Context, public val plantDao: Plan
     }
 }
 
-
-
-
-
-
-
-
-
-
-
 class AppRepository(
-    val db: AppDatabase,
-    private val appContext: Context
+    val plantRepository: PlantRepository
 ) {
-    val plantDao = db.plantDao()
-    val plantRepository = PlantRepository(appContext, plantDao)
-
-
     suspend fun seedDatabase() {
         plantRepository.deleteAllPlants()
         plantRepository.insertPlant("Kaktus Maksiu","Nazwa po moim zmarłym dziadku","Kaktus Kaktus")

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.androidx.room)
+    id("com.google.dagger.hilt.android")
 }
 
 configurations.implementation {
@@ -77,10 +78,13 @@ dependencies {
     implementation(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
 
-    implementation("androidx.datastore:datastore-preferences:1.1.7")
-    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.7")
-    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.7")
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences.rxjava2)
+    implementation(libs.androidx.datastore.preferences.rxjava3)
 
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
