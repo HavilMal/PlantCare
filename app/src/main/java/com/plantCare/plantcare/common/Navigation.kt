@@ -18,6 +18,7 @@ import com.plantCare.plantcare.ui.screens.SearchScreen
 import com.plantCare.plantcare.ui.screens.galleryScreen.GalleryScreen
 import com.plantCare.plantcare.ui.screens.listScreen.ListScreen
 import com.plantCare.plantcare.ui.screens.noteScreen.NoteScreen
+import com.plantCare.plantcare.ui.screens.plantScreen.PlantCameraCaptureScreen
 import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.settingsScreen.SettingsScreen
@@ -66,7 +67,7 @@ fun AppNavHost(
             composable(Route.GALLERY.route) { GalleryScreen() }
             composable(Route.PLANT_EDIT.route) { PlantEditScreen() }
             composable(Route.NOTE.route) { NoteScreen() }
-            composable(Route.CAMERA.route) { }
+            composable(Route.CAMERA.route) { PlantCameraCaptureScreen()}
         }
 
 
