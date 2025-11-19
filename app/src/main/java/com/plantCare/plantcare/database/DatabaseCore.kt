@@ -14,17 +14,17 @@ import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import java.util.Date
+import java.time.LocalDate
 
 class Converters {
     @TypeConverter
-    fun timestampToDate(value: Long?): Date? {
-        return value?.let { Date(it) }
+    fun timestampToDate(value: Long?): LocalDate? {
+        return value?.let { LocalDate.ofEpochDay(value) }
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return date?.time
+    fun dateToTimestamp(date: LocalDate?): Long? {
+        return date?.toEpochDay()
     }
 }
 
@@ -41,7 +41,7 @@ data class Plant(
     val name: String,
     val description: String,
     val species: String,
-    val plantedOn: Date,
+    val plantedOn: LocalDate,
     @ColumnInfo(defaultValue = "MONTHLY")
     val wateringSchedule: WateringSchedule = WateringSchedule.MONTHLY,
     val dirPath: String
@@ -81,7 +81,7 @@ data class Note(
 )
 data class WateringEntry(
     val plant: Int,
-    val date: Date
+    val date: LocalDate
 )
 
 
@@ -95,7 +95,7 @@ interface PlantDao{
     @Query("SELECT note FROM notes WHERE plant = :plantId")
     fun getPlantNotes(plantId: Long): Flow<List<String>>
     @Query("SELECT date FROM wateringHistory WHERE plant = :plantId")
-    fun getPlantWateringHistory(plantId: Long): Flow<List<Date>>
+    fun getPlantWateringHistory(plantId: Long): Flow<List<LocalDate>>
     @Query("DELETE FROM plants")
     suspend fun deleteAllPlants()
     @Insert

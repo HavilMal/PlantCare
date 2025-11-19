@@ -18,7 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
-enum class Interval (
+enum class WateringInterval (
    val label: String,
 ) {
     WEEKLY("Weekly"),
@@ -28,8 +28,8 @@ enum class Interval (
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IntervalDropdown(
-    selected: Interval,
-    onSelect: (Interval) -> Unit,
+    selected: WateringInterval,
+    onSelect: (WateringInterval) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -52,7 +52,7 @@ fun IntervalDropdown(
         )
 
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            Interval.entries.forEach { option ->
+            WateringInterval.entries.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option.label, style = MaterialTheme.typography.bodyLarge) },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,

@@ -9,17 +9,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.plantCare.plantcare.common.Content
+import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.ui.components.TopBar
+import com.plantCare.plantcare.viewModel.PlantEditViewModel
 
 @Composable
-fun PlantEditScaffold(content: Content) {
+fun PlantEditScaffold(
+    plantEditViewModel: PlantEditViewModel,
+    content: Content,
+) {
+    val navController = NavigationController.current
     Scaffold(
         topBar = {
             TopBar(
                 text = "Edit Plant"
             ) {
                 IconButton(
-                    onClick = { /*todo*/ },
+                    onClick = {
+                        plantEditViewModel.savePlant()
+                        navController?.popBackStack()
+                              },
                 ) {
                     Icon(
                         Icons.Filled.Save, "Save"

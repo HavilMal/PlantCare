@@ -1,6 +1,5 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -13,7 +12,9 @@ import androidx.compose.ui.Modifier
 import com.plantCare.plantcare.common.Content
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
+import com.plantCare.plantcare.common.route
 import com.plantCare.plantcare.ui.components.TopBar
+import com.plantCare.plantcare.viewModel.EditMode
 
 @Composable
 fun PlantScaffold(content: Content) {
@@ -26,7 +27,7 @@ fun PlantScaffold(content: Content) {
                 actionButton = {
                     IconButton(
                         onClick = {
-                            navController?.navigate(Route.PLANT_EDIT.route)
+                            navController?.navigate(route(Route.PLANT_EDIT.route, EditMode.EDIT, 0))
                         }
                     ) {
                         Icon(

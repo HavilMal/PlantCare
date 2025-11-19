@@ -5,6 +5,7 @@ import java.util.Date
 import com.plantCare.plantcare.utils.RandomUtil
 import com.plantCare.plantcare.utils.FileUtil
 import java.io.File
+import java.time.LocalDate
 
 
 const val PLANTS_DIR: String = "plants/"
@@ -17,7 +18,7 @@ class PlantRepository(
     suspend fun insertPlant(plant: Plant) {
         plantDao.insertPlant(plant)
     }
-    suspend fun insertPlant(name: String, description: String,species: String,plantedOn: Date = Date(),  wateringSchedule: WateringSchedule = WateringSchedule.MONTHLY) {
+    suspend fun insertPlant(name: String, description: String, species: String, plantedOn: LocalDate = LocalDate.now(), wateringSchedule: WateringSchedule = WateringSchedule.MONTHLY) {
         val plantUUID = RandomUtil.genUUIDString()
         plantDao.insertPlant(Plant(name = name, description = description,species = species, plantedOn = plantedOn, wateringSchedule = wateringSchedule, dirPath = plantUUID))
         FileUtil.makeDir(appContext,"$PLANTS_DIR$plantUUID",true)

@@ -9,11 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.plantCare.plantcare.ui.screens.calendarScreen.CalendarScreen
-import com.plantCare.plantcare.ui.screens.HomeScreen
+import com.plantCare.plantcare.ui.screens.homeScreen.HomeScreen
 import com.plantCare.plantcare.ui.screens.SearchScreen
 import com.plantCare.plantcare.ui.screens.galleryScreen.GalleryScreen
 import com.plantCare.plantcare.ui.screens.listScreen.ListScreen
@@ -21,6 +23,7 @@ import com.plantCare.plantcare.ui.screens.noteScreen.NoteScreen
 import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.settingsScreen.SettingsScreen
+import com.plantCare.plantcare.viewModel.EditMode
 
 enum class Route(
     val route: String,
@@ -44,6 +47,10 @@ enum class Route(
     CAMERA("camera", "Camera")
 }
 
+fun route(vararg r: Any): String {
+    return r.joinToString(separator = "/") { it.toString() }
+}
+
 val NavigationController = staticCompositionLocalOf<NavHostController?> { null }
 
 @Composable
@@ -55,7 +62,7 @@ fun AppNavHost(
         startDestination = "main",
     ) {
 
-        navigation(startDestination = Route.HOME.route, route="main") {
+        navigation(startDestination = Route.HOME.route, route = "main") {
             composable(Route.HOME.route) { HomeScreen() }
             composable(Route.SETTINGS.route) { SettingsScreen() }
         }
@@ -64,7 +71,13 @@ fun AppNavHost(
             composable(Route.PLANT_LIST.route) { ListScreen() }
             composable(Route.PLANT.route) { PlantScreen() }
             composable(Route.GALLERY.route) { GalleryScreen() }
-            composable(Route.PLANT_EDIT.route) { PlantEditScreen() }
+            composable(
+                route = route(Route.PLANT_EDIT.route, "{mode}", "{id}"),
+                arguments = listOf(
+                    navArgument("mode") { type = NavType.EnumType(EditMode::class.java) },
+                    navArgument("id") { type = NavType.LongType }
+                )
+            ) { PlantEditScreen() }
             composable(Route.NOTE.route) { NoteScreen() }
             composable(Route.CAMERA.route) { }
         }

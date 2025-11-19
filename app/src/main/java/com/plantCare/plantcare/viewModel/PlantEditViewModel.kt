@@ -4,21 +4,24 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.PlantRepository
+import com.plantCare.plantcare.database.WateringSchedule
+import com.plantCare.plantcare.ui.screens.plantEditScreen.WateringInterval
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.LocalDate
 
 // todo in database there is no way to store it
-sealed class WATERING_SCHEDULE {
-    class WEEKLY(val onDays: List<DayOfWeek>): WATERING_SCHEDULE()
-    class MONTHLY(val onDays: List<Int>): WATERING_SCHEDULE()
-}
 
+
+enum class EditMode(
+) {
+    EDIT,
+    ADD,
+}
 
 data class PlantEditUiState(
     val isNewPlant: Boolean = false,
@@ -27,17 +30,19 @@ data class PlantEditUiState(
     val plantedOn: LocalDate = LocalDate.now(),
     val isIndoor: Boolean = false,
     val sensorName: String = "",
-    val scheduleType: WATERING_SCHEDULE = WATERING_SCHEDULE.MONTHLY(listOf()),
+    val interval: WateringInterval = WateringInterval.WEEKLY,
 )
 
 @HiltViewModel
 class PlantEditViewModel @Inject constructor(
-    private val repository: PlantRepository,
+    private val plantRepository: PlantRepository,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
-    // todo is new plant
-    private val plantEditFlow = MutableStateFlow(PlantEditUiState())
 
+    val mode: EditMode = savedStateHandle["mode"]!!
+    val id: Long = savedStateHandle["id"]!!
+
+    private val plantEditFlow = MutableStateFlow(PlantEditUiState(plantName = id.toString()))
     val plantEditState = plantEditFlow.asStateFlow()
 
     fun setIsIndoor(value: Boolean) {
@@ -48,10 +53,10 @@ class PlantEditViewModel @Inject constructor(
         }
     }
 
-    fun setSchedule(schedule: WATERING_SCHEDULE) {
+    fun setSchedule(schedule: WateringInterval) {
         viewModelScope.launch {
             plantEditFlow.update {
-                it.copy(scheduleType = schedule)
+                it.copy(interval = schedule)
             }
         }
     }
@@ -90,7 +95,20 @@ class PlantEditViewModel @Inject constructor(
 
     fun savePlant() {
         viewModelScope.launch {
-            // todo
+            when(mode) {
+                EditMode.ADD -> {plantRepository.insertPlant(
+                    name = plantEditState.value.plantName,
+                    description = "todo",
+                    species = plantEditState.value.species,
+                    plantedOn = plantEditState.value.plantedOn,
+                    wateringSchedule = when(plantEditState.value.interval) {
+                        WateringInterval.WEEKLY -> WateringSchedule.WEEKLY
+                        WateringInterval.MONTHLY -> WateringSchedule.MONTHLY
+                    }
+                )}
+                EditMode.EDIT -> {}
+
+            }
         }
     }
 }
