@@ -90,10 +90,12 @@ data class WateringEntry(
 interface PlantDao{
     @Query("SELECT * FROM plants")
     fun getPlants(): Flow<List<Plant>>
+    @Query("SELECT * FROM plants WHERE id = :plantId")
+    fun getPlant(plantId: Long): Flow<Plant?>
     @Query("SELECT dirPath FROM plants WHERE id = :plantId")
-    fun getPlantDirPath(plantId: Long): String
+    suspend fun getPlantDirPath(plantId: Long): String?
     @Query("SELECT note FROM notes WHERE plant = :plantId")
-    fun getPlantNotes(plantId: Long): Flow<List<String>>
+   fun getPlantNotes(plantId: Long): Flow<List<String>>
     @Query("SELECT date FROM wateringHistory WHERE plant = :plantId")
     fun getPlantWateringHistory(plantId: Long): Flow<List<Date>>
     @Query("DELETE FROM plants")

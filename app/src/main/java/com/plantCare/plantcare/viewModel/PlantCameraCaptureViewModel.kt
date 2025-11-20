@@ -20,7 +20,7 @@ class PlantCameraCaptureViewModel @Inject constructor(
     private val homeFlow = MutableStateFlow(HomeUiState())
     val homeState = homeFlow.asStateFlow()
 
-    suspend fun savePhoto(file: File?){
-        repository.addPlantPhoto(,file)
+    suspend fun savePhoto(file: File){
+        repository.addPlantPhoto(0,file)
     }
 }

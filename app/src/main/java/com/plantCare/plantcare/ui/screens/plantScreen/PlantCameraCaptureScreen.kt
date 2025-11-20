@@ -22,15 +22,16 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.plantCare.plantcare.common.WithPermission
 import com.plantCare.plantcare.utils.CameraCapture
 import com.plantCare.plantcare.viewModel.PlantCameraCaptureViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import java.io.File
 
 @Composable
 fun PlantCameraCaptureView(
-    viewModel: PlantCameraCaptureViewModel = hiltViewModel()
+    onPhotoCapture: (File?) -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Instance of the camera helper class
     val cameraCapture = remember {
         CameraCapture(context, lifecycleOwner)
     }
@@ -55,7 +56,7 @@ fun PlantCameraCaptureView(
         Button(
             onClick = {
                 cameraCapture.takePhoto { file ->
-                    null // i need to know what plant i am making photo for
+                    onPhotoCapture(file)
                 }
             },
             modifier = Modifier
@@ -68,8 +69,8 @@ fun PlantCameraCaptureView(
 }
 
 @Composable
-fun PlantCameraCaptureScreen() {
+fun PlantCameraCaptureScreen(onPhotoCapture: (File?) -> Unit) {
     WithPermission(permission = Manifest.permission.CAMERA) {
-       PlantCameraCaptureView()
+       PlantCameraCaptureView(onPhotoCapture)
     }
 }
