@@ -74,7 +74,7 @@ fun AppNavHost(
         startDestination = "main",
     ) {
 
-        navigation(startDestination = Route.HOME.route, route="main") {
+        navigation(startDestination = Route.HOME.route, route = "main") {
             composable(Route.HOME.route) { HomeScreen() }
             composable(Route.SETTINGS.route) { SettingsScreen() }
         }
@@ -85,27 +85,25 @@ fun AppNavHost(
             composable(
                 route = Route.PLANT.routeWithArgNames("plantId"),
                 arguments = listOf(
-                    navArgument("plantId") { type = NavType.LongType}
+                    navArgument("plantId") { type = NavType.LongType }
                 )
-            ) { backStackEntry ->
-                PlantScreen(  viewModel = hiltViewModel(backStackEntry))
+            ) {
+                PlantScreen()
             }
-//            composable(Route.GALLERY.route) { GalleryScreen() }
-
             composable(
                 route = Route.GALLERY.routeWithArgNames("plantId"),
                 arguments = listOf(
                     navArgument("plantId") { type = NavType.LongType }
                 )
             ) { backStackEntry ->
-                GalleryScreen(
-                    viewModel = hiltViewModel(backStackEntry)
-                )
+                GalleryScreen()
             }
 
             composable(Route.PLANT_EDIT.route) { PlantEditScreen() }
             composable(Route.NOTE.route) { NoteScreen() }
-            composable(Route.CAMERA.route) { PlantCameraCaptureScreen()}
+            composable(Route.CAMERA.route) { PlantCameraCaptureScreen(
+                onPhotoCapture = {}
+            ) }
         }
 
 
