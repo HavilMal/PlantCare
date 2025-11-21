@@ -6,8 +6,6 @@ import java.util.Date
 import com.plantCare.plantcare.utils.RandomUtil
 import com.plantCare.plantcare.utils.FileUtil
 import java.io.File
-import android.util.Log
-import androidx.compose.runtime.collectAsState
 
 const val PLANTS_DIR: String = "plants/"
 
@@ -39,14 +37,14 @@ class PlantRepository(
         FileUtil.deleteDir(appContext,PLANTS_DIR)
         plantDao.deleteAllPlants()
     }
-   suspend fun getPlantsDirPath(plantId: Long) : String? {
+   suspend fun getPlantsDirPath(plantId: Long?) : String? {
         return plantDao.getPlantDirPath(plantId)
     }
 
-    suspend fun addPlantPhoto(plantId: Long, photo: File) {
+    suspend fun addPlantPhoto(plantId: Long?, photo: File?) {
         val plantDir = getPlantsDirPath(plantId)
         val destFile = File(appContext.filesDir, "$PLANTS_DIR$plantDir/${PLANT_PHOTO_PREFIX}${genPlantPhotoId()}.jpg")
-        photo.copyTo(destFile, overwrite = true)
+        photo?.copyTo(destFile, overwrite = true)
     }
 
     suspend fun getPlantPhotos(plantId: Long) : List<File> {

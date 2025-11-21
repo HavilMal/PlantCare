@@ -93,7 +93,7 @@ interface PlantDao{
     @Query("SELECT * FROM plants WHERE id = :plantId")
     fun getPlant(plantId: Long): Flow<Plant?>
     @Query("SELECT dirPath FROM plants WHERE id = :plantId")
-    suspend fun getPlantDirPath(plantId: Long): String?
+    suspend fun getPlantDirPath(plantId: Long?): String?
     @Query("SELECT note FROM notes WHERE plant = :plantId")
    fun getPlantNotes(plantId: Long): Flow<List<String>>
     @Query("SELECT date FROM wateringHistory WHERE plant = :plantId")

@@ -60,14 +60,14 @@ fun PlantActionButton() {
     data class MenuItem (
         val icon: ImageVector,
         val label: String,
-        val route: Route,
+        val route: String,
     )
 
     val items =
         listOf(
-            MenuItem(Icons.AutoMirrored.Filled.Message,"Note", Route.NOTE),
-            MenuItem(Icons.Filled.People, "Photo", Route.CAMERA),       // todo
-            MenuItem(Icons.Filled.Contacts, "Image", Route.GALLERY),    // todo
+            MenuItem(Icons.AutoMirrored.Filled.Message,"Note", Route.NOTE.route),
+            MenuItem(Icons.Filled.People, "Photo", Route.CAMERA.route),       // todo
+            MenuItem(Icons.Filled.Contacts, "Image", Route.GALLERY.route),    // todo
         )
 
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -150,7 +150,7 @@ fun PlantActionButton() {
                 onClick = {
                     fabMenuExpanded = false
                     navController?.navigate(
-                        item.route.route
+                        item.route
                     )
                 },
                 icon = { Icon(item.icon, contentDescription = null) },

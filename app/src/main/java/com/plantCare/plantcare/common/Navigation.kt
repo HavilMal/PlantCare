@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
@@ -25,6 +26,7 @@ import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.settingsScreen.SettingsScreen
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.plantCare.plantcare.viewModel.PlantScreenViewModel
 
 enum class Route(
     val route: String,
@@ -101,9 +103,17 @@ fun AppNavHost(
 
             composable(Route.PLANT_EDIT.route) { PlantEditScreen() }
             composable(Route.NOTE.route) { NoteScreen() }
-            composable(Route.CAMERA.route) { PlantCameraCaptureScreen(
-                onPhotoCapture = {}
-            ) }
+//            composable(Route.CAMERA.route) { PlantCameraCaptureScreen(
+//                onPhotoCapture = {}
+//            ) }
+            composable(
+                route = Route.CAMERA.routeWithArgNames("plantId"),
+                arguments = listOf(
+                    navArgument("plantId") { type = NavType.LongType }
+                )
+            ) {
+                PlantCameraCaptureScreen()
+            }
         }
 
 
