@@ -71,7 +71,7 @@ fun PlantCard(plant: Plant) {
                 }
                 Button(
                     onClick = {
-                        navController?.navigate(Route.PLANT.route)
+                        navController?.navigate(Route.PLANT.routeWithArgs(plant.id))
                     }
                 ) {
                     Text("View")
