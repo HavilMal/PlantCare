@@ -20,10 +20,12 @@ import com.plantCare.plantcare.ui.screens.SearchScreen
 import com.plantCare.plantcare.ui.screens.galleryScreen.GalleryScreen
 import com.plantCare.plantcare.ui.screens.listScreen.ListScreen
 import com.plantCare.plantcare.ui.screens.noteScreen.NoteScreen
+import com.plantCare.plantcare.ui.screens.plantScreen.PlantCameraCaptureScreen
 import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.settingsScreen.SettingsScreen
 import com.plantCare.plantcare.viewModel.EditMode
+import androidx.hilt.navigation.compose.hiltViewModel
 
 enum class Route(
     val route: String,
@@ -44,7 +46,22 @@ enum class Route(
 
     NOTE("note", "Note"),
     GALLERY("gallery", "Gallery"),
-    CAMERA("camera", "Camera")
+    CAMERA("camera", "Camera");
+
+
+    fun routeWithArgs(vararg args: Any?): String {
+        return buildString {
+            append(route)
+            args.forEach { arg -> append("/$arg") }
+        }
+    }
+
+    fun routeWithArgNames(vararg names: String): String {
+        return buildString {
+            append(route)
+            names.forEach { name -> append("/{$name}") }
+        }
+    }
 }
 
 fun route(vararg r: Any): String {
@@ -73,8 +90,24 @@ fun AppNavHost(
 
         navigation(startDestination = Route.PLANT_LIST.route, route = "list_route") {
             composable(Route.PLANT_LIST.route) { ListScreen() }
-            composable(Route.PLANT.route) { PlantScreen() }
-            composable(Route.GALLERY.route) { GalleryScreen() }
+
+            composable(
+                route = Route.PLANT.routeWithArgNames("plantId"),
+                arguments = listOf(
+                    navArgument("plantId") { type = NavType.LongType }
+                )
+            ) {
+                PlantScreen()
+            }
+            composable(
+                route = Route.GALLERY.routeWithArgNames("plantId"),
+                arguments = listOf(
+                    navArgument("plantId") { type = NavType.LongType }
+                )
+            ) { backStackEntry ->
+                GalleryScreen()
+            }
+
             composable(
                 route = route(Route.PLANT_EDIT.route, "{mode}") + query("id", "id"),
                 arguments = listOf(
@@ -86,7 +119,9 @@ fun AppNavHost(
                 )
             ) { PlantEditScreen() }
             composable(Route.NOTE.route) { NoteScreen() }
-            composable(Route.CAMERA.route) { }
+            composable(Route.CAMERA.route) { PlantCameraCaptureScreen(
+                onPhotoCapture = {}
+            ) }
         }
 
 

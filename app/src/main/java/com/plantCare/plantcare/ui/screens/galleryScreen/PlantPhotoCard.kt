@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,7 +21,7 @@ import com.plantCare.plantcare.R
 
 @Preview
 @Composable
-fun PlantPhotoCard() {
+fun PlantPhotoCard(image: ImageBitmap) {
     Box(
         modifier = Modifier.clip(
             RoundedCornerShape(16.dp)
@@ -28,9 +29,9 @@ fun PlantPhotoCard() {
     ) {
         Image(
             modifier = Modifier.fillMaxWidth(),
-            painter = painterResource(id = R.drawable.sunflower),
             contentDescription = "photo",
             contentScale = ContentScale.Fit,
+            bitmap = image
         )
         Box(
             modifier = Modifier.fillMaxWidth(),
