@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import com.plantCare.plantcare.common.Content
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
+import com.plantCare.plantcare.common.query
 import com.plantCare.plantcare.common.route
 import com.plantCare.plantcare.ui.components.TopBar
 import com.plantCare.plantcare.viewModel.EditMode
@@ -27,7 +28,7 @@ fun PlantScaffold(content: Content) {
                 actionButton = {
                     IconButton(
                         onClick = {
-                            navController?.navigate(route(Route.PLANT_EDIT.route, EditMode.EDIT, 0))
+                            navController?.navigate(route(Route.PLANT_EDIT.route, EditMode.EDIT) + query("id", 0))
                         }
                     ) {
                         Icon(

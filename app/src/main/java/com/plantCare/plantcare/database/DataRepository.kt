@@ -31,6 +31,11 @@ class PlantRepository(
         FileUtil.deleteDir(appContext,PLANTS_DIR)
         plantDao.deleteAllPlants()
     }
+
+    suspend fun getPlant(plantId: Long): Plant {
+        return plantDao.getPlant(plantId)
+    }
+
     fun getPlantsDirPath(plantId: Long) : String{
         return plantDao.getPlantDirPath(plantId)
     }

@@ -51,6 +51,10 @@ fun route(vararg r: Any): String {
     return r.joinToString(separator = "/") { it.toString() }
 }
 
+fun query(argument: String, value: Any): String {
+    return "?${argument}={$value}"
+}
+
 val NavigationController = staticCompositionLocalOf<NavHostController?> { null }
 
 @Composable
@@ -72,10 +76,13 @@ fun AppNavHost(
             composable(Route.PLANT.route) { PlantScreen() }
             composable(Route.GALLERY.route) { GalleryScreen() }
             composable(
-                route = route(Route.PLANT_EDIT.route, "{mode}", "{id}"),
+                route = route(Route.PLANT_EDIT.route, "{mode}") + query("id", "id"),
                 arguments = listOf(
                     navArgument("mode") { type = NavType.EnumType(EditMode::class.java) },
-                    navArgument("id") { type = NavType.LongType }
+                    navArgument("id") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    }
                 )
             ) { PlantEditScreen() }
             composable(Route.NOTE.route) { NoteScreen() }

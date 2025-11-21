@@ -1,7 +1,10 @@
 package com.plantCare.plantcare.ui.screens.listScreen
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,12 +26,14 @@ fun PlantListScaffold(content: Content) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController?.navigate(route(Route.PLANT_EDIT.route, EditMode.ADD,))
+                    navController?.navigate(route(Route.PLANT_EDIT.route, EditMode.ADD))
                 }
-            ) { }
+            ) {
+                Icon(Icons.Default.Add, "Add plant")
+            }
         }
 
-    ) { contentPaddign ->
-        content(Modifier.padding(contentPaddign))
+    ) { contentPadding ->
+        content(Modifier.padding(contentPadding))
     }
 }

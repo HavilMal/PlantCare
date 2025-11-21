@@ -24,26 +24,39 @@ enum class EditMode(
 }
 
 data class PlantEditUiState(
-    val isNewPlant: Boolean = false,
+    val mode: EditMode,
     val plantName: String = "",
     val species: String = "",
     val plantedOn: LocalDate = LocalDate.now(),
     val isIndoor: Boolean = false,
     val sensorName: String = "",
     val interval: WateringInterval = WateringInterval.WEEKLY,
-)
+    )
 
 @HiltViewModel
 class PlantEditViewModel @Inject constructor(
     private val plantRepository: PlantRepository,
     savedStateHandle: SavedStateHandle
-): ViewModel() {
-
+) : ViewModel() {
     val mode: EditMode = savedStateHandle["mode"]!!
     val id: Long = savedStateHandle["id"]!!
-
-    private val plantEditFlow = MutableStateFlow(PlantEditUiState(plantName = id.toString()))
+    private val plantEditFlow = MutableStateFlow(PlantEditUiState(mode = mode))
     val plantEditState = plantEditFlow.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            if (mode == EditMode.EDIT) {
+                val plantEntry = plantRepository.getPlant(id)
+                plantEditFlow.update {
+                    it.copy(
+                        plantName = plantEntry.name,
+                        species = plantEntry.species,
+                        plantedOn = plantEntry.plantedOn,
+                    )
+                }
+            }
+        }
+    }
 
     fun setIsIndoor(value: Boolean) {
         viewModelScope.launch {
@@ -70,7 +83,7 @@ class PlantEditViewModel @Inject constructor(
     }
 
     fun setPlantedOn(date: LocalDate) {
-         viewModelScope.launch {
+        viewModelScope.launch {
             plantEditFlow.update {
                 it.copy(plantedOn = date)
             }
@@ -95,17 +108,20 @@ class PlantEditViewModel @Inject constructor(
 
     fun savePlant() {
         viewModelScope.launch {
-            when(mode) {
-                EditMode.ADD -> {plantRepository.insertPlant(
-                    name = plantEditState.value.plantName,
-                    description = "todo",
-                    species = plantEditState.value.species,
-                    plantedOn = plantEditState.value.plantedOn,
-                    wateringSchedule = when(plantEditState.value.interval) {
-                        WateringInterval.WEEKLY -> WateringSchedule.WEEKLY
-                        WateringInterval.MONTHLY -> WateringSchedule.MONTHLY
-                    }
-                )}
+            when (mode) {
+                EditMode.ADD -> {
+                    plantRepository.insertPlant(
+                        name = plantEditState.value.plantName,
+                        description = "todo",
+                        species = plantEditState.value.species,
+                        plantedOn = plantEditState.value.plantedOn,
+                        wateringSchedule = when (plantEditState.value.interval) {
+                            WateringInterval.WEEKLY -> WateringSchedule.WEEKLY
+                            WateringInterval.MONTHLY -> WateringSchedule.MONTHLY
+                        }
+                    )
+                }
+
                 EditMode.EDIT -> {}
 
             }
