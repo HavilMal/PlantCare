@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b8952ae0155904ee6fb6dce5bb7e72d6",
+    "identityHash": "0cb31dab14c1dd3af36cbd95ae5c4f0e",
     "entities": [
       {
         "tableName": "plants",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `wateringSchedule` TEXT NOT NULL DEFAULT 'MONTHLY', `dirPath` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `isIndoor` INTEGER NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `wateringSchedule` TEXT NOT NULL DEFAULT 'MONTHLY', `dirPath` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -24,6 +24,12 @@
             "fieldPath": "description",
             "columnName": "description",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isIndoor",
+            "columnName": "isIndoor",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -143,7 +149,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b8952ae0155904ee6fb6dce5bb7e72d6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0cb31dab14c1dd3af36cbd95ae5c4f0e')"
     ]
   }
 }

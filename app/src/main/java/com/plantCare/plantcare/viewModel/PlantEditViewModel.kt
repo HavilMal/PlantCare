@@ -14,9 +14,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-// todo in database there is no way to store it
-
-
 enum class EditMode(
 ) {
     EDIT,
@@ -25,13 +22,15 @@ enum class EditMode(
 
 data class PlantEditUiState(
     val mode: EditMode,
+    val isLoading: Boolean = true,
+    val loadingError: Boolean = false,
     val plantName: String = "",
     val species: String = "",
     val plantedOn: LocalDate = LocalDate.now(),
     val isIndoor: Boolean = false,
     val sensorName: String = "",
     val interval: WateringInterval = WateringInterval.WEEKLY,
-    )
+)
 
 @HiltViewModel
 class PlantEditViewModel @Inject constructor(
@@ -46,14 +45,20 @@ class PlantEditViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             if (mode == EditMode.EDIT) {
-                val plantEntry = plantRepository.getPlant(id)
-                plantEditFlow.update {
-                    it.copy(
-                        plantName = plantEntry.name,
-                        species = plantEntry.species,
-                        plantedOn = plantEntry.plantedOn,
-                    )
+                plantRepository.getPlant(id).collect { plant ->
+                    if (plant != null) {
+                        plantEditFlow.update {
+                            it.copy(
+                                isLoading = false,
+                                plantName = plant.name,
+                                species = plant.species,
+                                plantedOn = plant.plantedOn,
+                            )
+                        }
+                    }
                 }
+            } else {
+                plantEditFlow.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -107,23 +112,36 @@ class PlantEditViewModel @Inject constructor(
     }
 
     fun savePlant() {
-        viewModelScope.launch {
-            when (mode) {
-                EditMode.ADD -> {
-                    plantRepository.insertPlant(
-                        name = plantEditState.value.plantName,
-                        description = "todo",
-                        species = plantEditState.value.species,
-                        plantedOn = plantEditState.value.plantedOn,
-                        wateringSchedule = when (plantEditState.value.interval) {
-                            WateringInterval.WEEKLY -> WateringSchedule.WEEKLY
-                            WateringInterval.MONTHLY -> WateringSchedule.MONTHLY
-                        }
-                    )
+        if (!plantEditState.value.isLoading) {
+            viewModelScope.launch {
+                when (mode) {
+                    EditMode.ADD -> {
+                        plantRepository.insertPlant(
+                            name = plantEditState.value.plantName,
+                            description = "todo",
+                            species = plantEditState.value.species,
+                            plantedOn = plantEditState.value.plantedOn,
+                            wateringSchedule = when (plantEditState.value.interval) {
+                                WateringInterval.WEEKLY -> WateringSchedule.WEEKLY
+                                WateringInterval.MONTHLY -> WateringSchedule.MONTHLY
+                            }
+                        )
+                    }
+
+                    EditMode.EDIT -> {
+                        plantRepository.updatePlant(
+                            id,
+                            plantEditState.value.plantName,
+                            plantEditState.value.isIndoor,
+                            plantEditState.value.species,
+                            plantEditState.value.plantedOn,
+                            when (plantEditState.value.interval) {
+                                WateringInterval.WEEKLY -> WateringSchedule.WEEKLY
+                                WateringInterval.MONTHLY -> WateringSchedule.MONTHLY
+                            }
+                        )
+                    }
                 }
-
-                EditMode.EDIT -> {}
-
             }
         }
     }

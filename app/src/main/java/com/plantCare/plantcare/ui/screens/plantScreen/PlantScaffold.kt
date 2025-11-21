@@ -12,13 +12,16 @@ import androidx.compose.ui.Modifier
 import com.plantCare.plantcare.common.Content
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
-import com.plantCare.plantcare.common.query
-import com.plantCare.plantcare.common.route
+import com.plantCare.plantcare.common.addQuery
 import com.plantCare.plantcare.ui.components.TopBar
 import com.plantCare.plantcare.viewModel.EditMode
+import com.plantCare.plantcare.viewModel.PlantScreenUiState
 
 @Composable
-fun PlantScaffold(content: Content) {
+fun PlantScaffold(
+    state: PlantScreenUiState,
+    content: Content
+) {
     val navController = NavigationController.current
 
     Scaffold(
@@ -28,7 +31,11 @@ fun PlantScaffold(content: Content) {
                 actionButton = {
                     IconButton(
                         onClick = {
-                            navController?.navigate(route(Route.PLANT_EDIT.route, EditMode.EDIT) + query("id", 0))
+                            if (state.plant != null) {
+                                navController?.navigate(
+                                    Route.PLANT_EDIT.routeWithArgs(EditMode.EDIT)
+                                        .addQuery("id", state.plant.id))
+                            }
                         }
                     ) {
                         Icon(

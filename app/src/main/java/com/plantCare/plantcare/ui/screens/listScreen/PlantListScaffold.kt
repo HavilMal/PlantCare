@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import com.plantCare.plantcare.common.Content
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
-import com.plantCare.plantcare.common.route
+import com.plantCare.plantcare.common.addQuery
 import com.plantCare.plantcare.ui.components.BottomBar
 import com.plantCare.plantcare.ui.components.TopBar
 import com.plantCare.plantcare.viewModel.EditMode
@@ -26,7 +26,7 @@ fun PlantListScaffold(content: Content) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController?.navigate(route(Route.PLANT_EDIT.route, EditMode.ADD))
+                    navController?.navigate(Route.PLANT_EDIT.routeWithArgs( EditMode.ADD).addQuery("id", 0))
                 }
             ) {
                 Icon(Icons.Default.Add, "Add plant")

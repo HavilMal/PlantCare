@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.common
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -25,7 +26,6 @@ import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.settingsScreen.SettingsScreen
 import com.plantCare.plantcare.viewModel.EditMode
-import androidx.hilt.navigation.compose.hiltViewModel
 
 enum class Route(
     val route: String,
@@ -64,12 +64,10 @@ enum class Route(
     }
 }
 
-fun route(vararg r: Any): String {
-    return r.joinToString(separator = "/") { it.toString() }
-}
-
-fun query(argument: String, value: Any): String {
-    return "?${argument}={$value}"
+// DO NOT CHAIN
+fun String.addQuery(argument: String, value: Any): String {
+    Log.d("Navigation", "Navigation route: ${this + "?${argument}={$value}"}")
+    return this + "?${argument}=$value"
 }
 
 val NavigationController = staticCompositionLocalOf<NavHostController?> { null }
@@ -109,7 +107,7 @@ fun AppNavHost(
             }
 
             composable(
-                route = route(Route.PLANT_EDIT.route, "{mode}") + query("id", "id"),
+                route = Route.PLANT_EDIT.routeWithArgNames("mode").addQuery("id", "{id}"),
                 arguments = listOf(
                     navArgument("mode") { type = NavType.EnumType(EditMode::class.java) },
                     navArgument("id") {
@@ -119,9 +117,11 @@ fun AppNavHost(
                 )
             ) { PlantEditScreen() }
             composable(Route.NOTE.route) { NoteScreen() }
-            composable(Route.CAMERA.route) { PlantCameraCaptureScreen(
-                onPhotoCapture = {}
-            ) }
+            composable(Route.CAMERA.route) {
+                PlantCameraCaptureScreen(
+                    onPhotoCapture = {}
+                )
+            }
         }
 
 

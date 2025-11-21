@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.ui.screens.plantEditScreen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.common.getLocale
@@ -60,7 +62,12 @@ fun PlantEditScreen(
     val state by viewModel.plantEditState.collectAsState()
     var showDatePicker by remember { mutableStateOf(false) }
     val locale = getLocale()
-    val formatter = remember(locale) {DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)}
+    val formatter =
+        remember(locale) { DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale) }
+
+    if (state.loadingError) {
+        Toast.makeText(LocalContext.current, "Plant loading error", Toast.LENGTH_LONG)
+    }
 
     PlantEditScaffold(viewModel) { modifier ->
         Column(
@@ -122,7 +129,10 @@ fun PlantEditScreen(
                             index = index,
                             count = options.size,
                         ),
-                        onClick = { selectedIndex = index },
+                        onClick = {
+                            selectedIndex = index
+                            viewModel.setIsIndoor(index == 0)
+                        },
                         selected = selectedIndex == index,
                         label = { Text(label) }
                     )

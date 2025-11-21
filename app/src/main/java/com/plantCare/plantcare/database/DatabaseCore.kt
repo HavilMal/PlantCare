@@ -40,6 +40,7 @@ data class Plant(
     val id: Long = 0,
     val name: String,
     val description: String,
+    val isIndoor: Boolean,
     val species: String,
     val plantedOn: LocalDate,
     @ColumnInfo(defaultValue = "MONTHLY")
@@ -90,10 +91,12 @@ data class WateringEntry(
 interface PlantDao{
     @Query("SELECT * FROM plants")
     fun getPlants(): Flow<List<Plant>>
+    @Query("SELECT * FROM plants WHERE id = :plantId")
+    fun getPlant(plantId: Long): Flow<Plant>
     @Query("SELECT dirPath FROM plants WHERE id = :plantId")
     suspend fun getPlantDirPath(plantId: Long): String?
     @Query("SELECT note FROM notes WHERE plant = :plantId")
-   fun getPlantNotes(plantId: Long): Flow<List<String>>
+    fun getPlantNotes(plantId: Long): Flow<List<String>>
     @Query("SELECT date FROM wateringHistory WHERE plant = :plantId")
     fun getPlantWateringHistory(plantId: Long): Flow<List<LocalDate>>
     @Query("DELETE FROM plants")
