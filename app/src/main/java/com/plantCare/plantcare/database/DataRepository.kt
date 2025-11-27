@@ -8,6 +8,7 @@ import java.io.File
 import java.time.LocalDate
 
 import kotlinx.coroutines.flow.Flow
+import java.time.DayOfWeek
 
 const val PLANTS_DIR: String = "plants/"
 
@@ -31,7 +32,6 @@ class PlantRepository(
         description: String,
         species: String,
         plantedOn: LocalDate = LocalDate.now(),
-        wateringSchedule: WateringSchedule = WateringSchedule.MONTHLY,
         isIndoor: Boolean = true
     ): Long {
         val plantUUID = RandomUtil.genUUIDString()
@@ -41,9 +41,10 @@ class PlantRepository(
                 description = description,
                 species = species,
                 plantedOn = plantedOn,
-                wateringSchedule = wateringSchedule,
                 dirPath = plantUUID,
-                isIndoor = isIndoor
+                isIndoor = isIndoor,
+                createdOn = LocalDate.now(),
+                wateringInterval = WateringInterval.WEEK
             )
         )
         FileUtil.makeDir(appContext, "$PLANTS_DIR$plantUUID", true)
@@ -62,6 +63,20 @@ class PlantRepository(
 
     fun getPlant(plantId: Long): Flow<Plant?> {
         return plantDao.getPlant(plantId)
+    }
+
+    fun getSchedule(plantId: Long): Flow<List<WateringSchedule>> {
+        return plantDao.getWateringSchedule(plantId)
+    }
+
+    suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval) {
+        plantDao.getPlant(plantId).collect {
+            plantDao.updatePlant(it.copy(wateringInterval = interval))
+        }
+        plantDao.deleteScheduleForPlant(plantId)
+        days.forEach { it ->
+            plantDao.insertWateringSchedule(WateringSchedule(plantId, it))
+        }
     }
 
     suspend fun getPlantsDirPath(plantId: Long): String? {
@@ -85,26 +100,24 @@ class PlantRepository(
     }
 
     suspend fun updatePlant(
-        id: Long ,
+        id: Long,
         name: String? = null,
         isIndoor: Boolean? = null,
         species: String? = null,
         plantedOn: LocalDate? = null,
         wateringSchedule: WateringSchedule? = null,
     ) {
-        plantDao.getPlant(id).collect {
-            plant -> plantDao.updatePlant(
-            plant.copy(
-                id = id,
-                name = name ?: plant.name,
-                isIndoor = isIndoor ?: plant.isIndoor,
-                species = species ?: plant.species,
-                plantedOn = plantedOn ?: plant.plantedOn,
-                wateringSchedule = wateringSchedule ?: plant.wateringSchedule
+        plantDao.getPlant(id).collect { plant ->
+            plantDao.updatePlant(
+                plant.copy(
+                    id = id,
+                    name = name ?: plant.name,
+                    isIndoor = isIndoor ?: plant.isIndoor,
+                    species = species ?: plant.species,
+                    plantedOn = plantedOn ?: plant.plantedOn,
+                )
             )
-        )
         }
-
     }
 }
 

@@ -1,17 +1,21 @@
 package com.plantCare.plantcare.viewModel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.PlantRepository
-import com.plantCare.plantcare.database.WateringSchedule
-import com.plantCare.plantcare.ui.screens.plantEditScreen.WateringInterval
+import com.plantCare.plantcare.database.WateringInterval
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 enum class EditMode(
@@ -29,7 +33,8 @@ data class PlantEditUiState(
     val plantedOn: LocalDate = LocalDate.now(),
     val isIndoor: Boolean = false,
     val sensorName: String = "",
-    val interval: WateringInterval = WateringInterval.WEEKLY,
+    val interval: WateringInterval = WateringInterval.WEEK,
+    val selectedDays: Set<DayOfWeek> = setOf(),
 )
 
 @HiltViewModel
@@ -43,73 +48,87 @@ class PlantEditViewModel @Inject constructor(
     val plantEditState = plantEditFlow.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            if (mode == EditMode.EDIT) {
-                plantRepository.getPlant(id).collect { plant ->
+        if (mode == EditMode.EDIT) {
+            val combinedFlow = plantRepository.getPlant(id)
+                .combine(plantRepository.getSchedule(id)) { plant, schedule ->
+                    Pair(plant, schedule)
+                }
+
+            combinedFlow
+                .onEach { (plant, schedule) ->
                     if (plant != null) {
-                        plantEditFlow.update {
+                        plantEditFlow.update { it ->
+                            Log.d("viewModel", schedule.toString())
                             it.copy(
-                                isLoading = false,
                                 plantName = plant.name,
                                 species = plant.species,
                                 plantedOn = plant.plantedOn,
+                                selectedDays = schedule.map { it.day }.toSet(),
+                                interval = plant.wateringInterval,
+                                isLoading = false
                             )
                         }
                     }
                 }
-            } else {
+                .launchIn(viewModelScope)
+        } else {
+            viewModelScope.launch {
                 plantEditFlow.update { it.copy(isLoading = false) }
             }
         }
     }
 
     fun setIsIndoor(value: Boolean) {
-        viewModelScope.launch {
-            plantEditFlow.update {
-                it.copy(isIndoor = value)
-            }
+        plantEditFlow.update {
+            it.copy(isIndoor = value)
         }
     }
 
     fun setSchedule(schedule: WateringInterval) {
-        viewModelScope.launch {
-            plantEditFlow.update {
-                it.copy(interval = schedule)
-            }
+        plantEditFlow.update {
+            it.copy(interval = schedule)
         }
     }
 
     fun setPlantName(name: String) {
-        viewModelScope.launch {
-            plantEditFlow.update {
-                it.copy(plantName = name)
-            }
+        plantEditFlow.update {
+            it.copy(plantName = name)
         }
     }
 
     fun setPlantedOn(date: LocalDate) {
-        viewModelScope.launch {
-            plantEditFlow.update {
-                it.copy(plantedOn = date)
-            }
+        plantEditFlow.update {
+            it.copy(plantedOn = date)
         }
     }
 
     fun setSensorName(name: String) {
-        viewModelScope.launch {
-            plantEditFlow.update {
-                it.copy(sensorName = name)
-            }
+        plantEditFlow.update {
+            it.copy(sensorName = name)
         }
     }
 
     fun setSpecties(species: String) {
-        viewModelScope.launch {
-            plantEditFlow.update {
-                it.copy(species = species)
-            }
+        plantEditFlow.update {
+            it.copy(species = species)
         }
     }
+
+    fun setInterval(interval: WateringInterval) {
+        plantEditFlow.update {
+            it.copy(interval = interval)
+        }
+    }
+
+    fun selectDay(day: DayOfWeek) {
+        setSelectedDays(plantEditState.value.selectedDays + day)
+        Log.d("viewModel", plantEditState.value.selectedDays.toString())
+    }
+
+    fun unselectDay(day: DayOfWeek) {
+        setSelectedDays(plantEditState.value.selectedDays - day)
+    }
+
 
     fun savePlant() {
         if (!plantEditState.value.isLoading) {
@@ -121,11 +140,8 @@ class PlantEditViewModel @Inject constructor(
                             description = "todo",
                             species = plantEditState.value.species,
                             plantedOn = plantEditState.value.plantedOn,
-                            wateringSchedule = when (plantEditState.value.interval) {
-                                WateringInterval.WEEKLY -> WateringSchedule.WEEKLY
-                                WateringInterval.MONTHLY -> WateringSchedule.MONTHLY
-                            }
                         )
+
                     }
 
                     EditMode.EDIT -> {
@@ -135,14 +151,23 @@ class PlantEditViewModel @Inject constructor(
                             plantEditState.value.isIndoor,
                             plantEditState.value.species,
                             plantEditState.value.plantedOn,
-                            when (plantEditState.value.interval) {
-                                WateringInterval.WEEKLY -> WateringSchedule.WEEKLY
-                                WateringInterval.MONTHLY -> WateringSchedule.MONTHLY
-                            }
                         )
                     }
                 }
+
+                Log.d("saveSchedule", plantEditState.value.selectedDays.toString())
+                plantRepository.setSchedule(
+                    id,
+                    plantEditState.value.selectedDays,
+                    plantEditState.value.interval
+                )
             }
+        }
+    }
+
+    private fun setSelectedDays(days: Set<DayOfWeek>) {
+        plantEditFlow.update {
+            it.copy(selectedDays = days)
         }
     }
 }

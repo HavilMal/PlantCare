@@ -17,13 +17,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.plantCare.plantcare.database.WateringInterval
 
-enum class WateringInterval (
-   val label: String,
-) {
-    WEEKLY("Weekly"),
-    MONTHLY("Monthly"),
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
