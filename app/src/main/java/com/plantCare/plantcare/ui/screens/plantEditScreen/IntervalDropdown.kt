@@ -1,8 +1,5 @@
 package com.plantCare.plantcare.ui.screens.plantEditScreen
 
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -23,13 +20,12 @@ import com.plantCare.plantcare.database.WateringInterval
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IntervalDropdown(
-    selected: WateringInterval,
+    dropdownState: WateringInterval,
     onSelect: (WateringInterval) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
     var expanded by remember { mutableStateOf(false) }
-    val textFieldState = rememberTextFieldState(selected.label)
 
     ExposedDropdownMenuBox(
         modifier = modifier,
@@ -37,10 +33,11 @@ fun IntervalDropdown(
         onExpandedChange = { expanded = it }
     ) {
         OutlinedTextField(
+            value = dropdownState.label,
+            onValueChange = {},
             modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-            state = textFieldState,
             readOnly = true,
-            lineLimits = TextFieldLineLimits.SingleLine,
+            singleLine = true,
             label = { Text("Interval") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
@@ -52,7 +49,6 @@ fun IntervalDropdown(
                     text = { Text(option.label, style = MaterialTheme.typography.bodyLarge) },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                     onClick = {
-                        textFieldState.setTextAndPlaceCursorAtEnd(option.label)
                         expanded = false
                         onSelect(option)
                     },

@@ -2,19 +2,18 @@ package com.plantCare.plantcare.database
 
 import android.content.Context
 import com.plantCare.plantcare.R
-import com.plantCare.plantcare.utils.RandomUtil
 import com.plantCare.plantcare.utils.FileUtil
-import java.io.File
-import java.time.LocalDate
-
+import com.plantCare.plantcare.utils.RandomUtil
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 import java.time.DayOfWeek
+import java.time.LocalDate
 
 const val PLANTS_DIR: String = "plants/"
 
 class PlantRepository(
-    public val appContext: Context,
-    public val plantDao: PlantDao,
+    val appContext: Context,
+    val plantDao: PlantDao,
 ) {
     companion object {
         const val PLANT_PHOTO_PREFIX = "image-"
@@ -32,7 +31,8 @@ class PlantRepository(
         description: String,
         species: String,
         plantedOn: LocalDate = LocalDate.now(),
-        isIndoor: Boolean = true
+        isIndoor: Boolean = true,
+        wateringInterval: WateringInterval = WateringInterval.WEEK,
     ): Long {
         val plantUUID = RandomUtil.genUUIDString()
         val id = plantDao.insertPlant(
@@ -44,7 +44,7 @@ class PlantRepository(
                 dirPath = plantUUID,
                 isIndoor = isIndoor,
                 createdOn = LocalDate.now(),
-                wateringInterval = WateringInterval.WEEK
+                wateringInterval = wateringInterval
             )
         )
         FileUtil.makeDir(appContext, "$PLANTS_DIR$plantUUID", true)
@@ -62,7 +62,7 @@ class PlantRepository(
     }
 
     fun getPlant(plantId: Long): Flow<Plant?> {
-        return plantDao.getPlant(plantId)
+        return plantDao.getPlantFLow(plantId)
     }
 
     fun getSchedule(plantId: Long): Flow<List<WateringSchedule>> {
@@ -70,13 +70,7 @@ class PlantRepository(
     }
 
     suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval) {
-        plantDao.getPlant(plantId).collect {
-            plantDao.updatePlant(it.copy(wateringInterval = interval))
-        }
-        plantDao.deleteScheduleForPlant(plantId)
-        days.forEach { it ->
-            plantDao.insertWateringSchedule(WateringSchedule(plantId, it))
-        }
+        plantDao.setSchedule(plantId, days, interval)
     }
 
     suspend fun getPlantsDirPath(plantId: Long): String? {
@@ -105,9 +99,9 @@ class PlantRepository(
         isIndoor: Boolean? = null,
         species: String? = null,
         plantedOn: LocalDate? = null,
-        wateringSchedule: WateringSchedule? = null,
+        wateringInterval: WateringInterval? = null,
     ) {
-        plantDao.getPlant(id).collect { plant ->
+        plantDao.getPlantFLow(id).collect { plant ->
             plantDao.updatePlant(
                 plant.copy(
                     id = id,
@@ -115,6 +109,7 @@ class PlantRepository(
                     isIndoor = isIndoor ?: plant.isIndoor,
                     species = species ?: plant.species,
                     plantedOn = plantedOn ?: plant.plantedOn,
+                    wateringInterval = wateringInterval ?: plant.wateringInterval
                 )
             )
         }

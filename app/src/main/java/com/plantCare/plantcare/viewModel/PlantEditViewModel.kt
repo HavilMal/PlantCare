@@ -58,7 +58,7 @@ class PlantEditViewModel @Inject constructor(
                 .onEach { (plant, schedule) ->
                     if (plant != null) {
                         plantEditFlow.update { it ->
-                            Log.d("viewModel", schedule.toString())
+                            Log.d("plantEditLoad", plant.wateringInterval.toString())
                             it.copy(
                                 plantName = plant.name,
                                 species = plant.species,
@@ -122,7 +122,6 @@ class PlantEditViewModel @Inject constructor(
 
     fun selectDay(day: DayOfWeek) {
         setSelectedDays(plantEditState.value.selectedDays + day)
-        Log.d("viewModel", plantEditState.value.selectedDays.toString())
     }
 
     fun unselectDay(day: DayOfWeek) {
@@ -132,30 +131,35 @@ class PlantEditViewModel @Inject constructor(
 
     fun savePlant() {
         if (!plantEditState.value.isLoading) {
-            viewModelScope.launch {
-                when (mode) {
-                    EditMode.ADD -> {
+            when (mode) {
+                EditMode.ADD -> {
+                    viewModelScope.launch {
                         plantRepository.insertPlant(
                             name = plantEditState.value.plantName,
                             description = "todo",
                             species = plantEditState.value.species,
                             plantedOn = plantEditState.value.plantedOn,
+                            wateringInterval = plantEditState.value.interval,
                         )
-
                     }
 
-                    EditMode.EDIT -> {
+                }
+
+                EditMode.EDIT -> {
+                    viewModelScope.launch {
                         plantRepository.updatePlant(
                             id,
                             plantEditState.value.plantName,
-                            plantEditState.value.isIndoor,
-                            plantEditState.value.species,
-                            plantEditState.value.plantedOn,
+                            isIndoor = plantEditState.value.isIndoor,
+                            species = plantEditState.value.species,
+                            plantedOn = plantEditState.value.plantedOn,
+                            wateringInterval = plantEditState.value.interval,
                         )
                     }
                 }
+            }
 
-                Log.d("saveSchedule", plantEditState.value.selectedDays.toString())
+            viewModelScope.launch {
                 plantRepository.setSchedule(
                     id,
                     plantEditState.value.selectedDays,

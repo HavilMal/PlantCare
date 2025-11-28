@@ -30,7 +30,7 @@ class PlantScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.plantDao.getPlant(plantId).collect { plant ->
+            repository.plantDao.getPlantFLow(plantId).collect { plant ->
                 val photos = repository.getPlantPhotos(plantId)
                 stateFlow.value = PlantScreenUiState(images = photos, plant = plant)
             }

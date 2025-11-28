@@ -2,16 +2,18 @@ package com.plantCare.plantcare.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Dao
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.ForeignKey
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 import androidx.room.Database
 import androidx.room.Delete
+import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import androidx.room.Transaction
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import java.time.DayOfWeek
@@ -113,9 +115,10 @@ data class WateringSchedule(
 interface PlantDao {
     @Query("SELECT * FROM plants")
     fun getPlants(): Flow<List<Plant>>
-
     @Query("SELECT * FROM plants WHERE id = :plantId")
-    fun getPlant(plantId: Long): Flow<Plant>
+    suspend fun getPlant(plantId: Long): Plant
+    @Query("SELECT * FROM plants WHERE id = :plantId")
+    fun getPlantFLow(plantId: Long): Flow<Plant>
 
     @Query("SELECT dirPath FROM plants WHERE id = :plantId")
     suspend fun getPlantDirPath(plantId: Long): String?
@@ -132,7 +135,7 @@ interface PlantDao {
     @Query("DELETE FROM plants")
     suspend fun deleteAllPlants()
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWateringSchedule(schedule: WateringSchedule): Long
 
     @Query("DELETE FROM wateringSchedule WHERE plant = :plantId")
@@ -158,6 +161,17 @@ interface PlantDao {
 
     @Update
     suspend fun updateNote(note: Note)
+
+    @Transaction
+    suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval) {
+        getPlant(plantId).also {
+            updatePlant(it.copy(wateringInterval = interval))
+        }
+        deleteScheduleForPlant(plantId)
+        days.forEach { it ->
+            insertWateringSchedule(WateringSchedule(plantId, it))
+        }
+    }
 
 }
 
