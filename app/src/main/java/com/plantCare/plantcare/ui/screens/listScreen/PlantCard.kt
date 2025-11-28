@@ -1,6 +1,5 @@
 package com.plantCare.plantcare.ui.screens.listScreen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,10 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
@@ -37,8 +36,8 @@ fun PlantCard(plant: Plant) {
         ),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Image(
-            painter = painterResource(R.drawable.sunflower),
+        AsyncImage(
+            model = R.drawable.sunflower,
             contentDescription = "sunflower",
             contentScale = ContentScale.Crop,
             modifier = Modifier

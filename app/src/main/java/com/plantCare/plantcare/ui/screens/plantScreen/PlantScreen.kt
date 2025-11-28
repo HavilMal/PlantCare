@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.viewModel.PlantScreenViewModel
@@ -78,18 +79,15 @@ fun PlantScreen(
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) { i ->
                     val item = items[i]
-                    val bitmap = remember(item.imageFile) {
-                        BitmapFactory.decodeFile(item.imageFile.absolutePath)
-                    }
-                    Image(
+                    AsyncImage(
                         modifier = Modifier
                             .height(205.dp)
                             .maskClip(MaterialTheme.shapes.extraLarge)
                             .clickable {
                                 navController?.navigate(Route.GALLERY.routeWithArgs(uiState.plant?.id))
                             },
-                        bitmap = bitmap.asImageBitmap(),
                         contentDescription = item.contentDescription,
+                        model = File(item.imageFile.absolutePath),
                         contentScale = ContentScale.Crop
                     )
                 }
