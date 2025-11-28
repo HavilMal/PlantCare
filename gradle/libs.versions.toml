@@ -1,5 +1,6 @@
 [versions]
 agp = "8.13.0"
+coilCompose = "3.3.0"
 compose = "2.9.0"
 datastorePreferencesRxjava3 = "1.1.7"
 datastorePreferencesRxjava2 = "1.1.7"
@@ -31,6 +32,7 @@ calendar-compose = { module = "com.kizitonwose.calendar:compose", version.ref = 
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-datastore-preferences-rxjava2 = { module = "androidx.datastore:datastore-preferences-rxjava2", version.ref = "datastorePreferencesRxjava2" }
 androidx-datastore-preferences-rxjava3 = { module = "androidx.datastore:datastore-preferences-rxjava3", version.ref = "datastorePreferencesRxjava3" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltVersion" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
