@@ -18,7 +18,7 @@ fun ListScreen(
     viewModel: ListViewModel = hiltViewModel()
 ) {
     val plantsUiState = viewModel.listState.collectAsState()
-    MainScaffold(Route.PLANT_LIST.label) { modifier -> 
+    PlantListScaffold { modifier ->
         LazyColumn(
             modifier = modifier.fillMaxSize(),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 32.dp),

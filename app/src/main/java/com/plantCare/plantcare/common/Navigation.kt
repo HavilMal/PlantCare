@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.common
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -15,7 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.plantCare.plantcare.ui.screens.calendarScreen.CalendarScreen
-import com.plantCare.plantcare.ui.screens.HomeScreen
+import com.plantCare.plantcare.ui.screens.homeScreen.HomeScreen
 import com.plantCare.plantcare.ui.screens.SearchScreen
 import com.plantCare.plantcare.ui.screens.galleryScreen.GalleryScreen
 import com.plantCare.plantcare.ui.screens.listScreen.ListScreen
@@ -24,7 +25,7 @@ import com.plantCare.plantcare.ui.screens.plantScreen.PlantCameraCaptureScreen
 import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.settingsScreen.SettingsScreen
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.plantCare.plantcare.viewModel.EditMode
 
 enum class Route(
     val route: String,
@@ -63,6 +64,12 @@ enum class Route(
     }
 }
 
+// DO NOT CHAIN
+fun String.addQuery(argument: String, value: Any): String {
+    Log.d("Navigation", "Navigation route: ${this + "?${argument}={$value}"}")
+    return this + "?${argument}=$value"
+}
+
 val NavigationController = staticCompositionLocalOf<NavHostController?> { null }
 
 @Composable
@@ -99,11 +106,22 @@ fun AppNavHost(
                 GalleryScreen()
             }
 
-            composable(Route.PLANT_EDIT.route) { PlantEditScreen() }
+            composable(
+                route = Route.PLANT_EDIT.routeWithArgNames("mode").addQuery("id", "{id}"),
+                arguments = listOf(
+                    navArgument("mode") { type = NavType.EnumType(EditMode::class.java) },
+                    navArgument("id") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    }
+                )
+            ) { PlantEditScreen() }
             composable(Route.NOTE.route) { NoteScreen() }
-            composable(Route.CAMERA.route) { PlantCameraCaptureScreen(
-                onPhotoCapture = {}
-            ) }
+            composable(Route.CAMERA.route) {
+                PlantCameraCaptureScreen(
+                    onPhotoCapture = {}
+                )
+            }
         }
 
 

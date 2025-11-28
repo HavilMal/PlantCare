@@ -2,49 +2,49 @@ package com.plantCare.plantcare.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Dao
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.ForeignKey
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 import androidx.room.Database
 import androidx.room.Delete
+import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import androidx.room.Transaction
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import java.util.Date
+import java.time.DayOfWeek
+import java.time.LocalDate
 
 class Converters {
     @TypeConverter
-    fun timestampToDate(value: Long?): Date? {
-        return value?.let { Date(it) }
+    fun timestampToDate(value: Long?): LocalDate? {
+        return value?.let { LocalDate.ofEpochDay(value) }
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return date?.time
+    fun dateToTimestamp(date: LocalDate?): Long? {
+        return date?.toEpochDay()
     }
 }
 
 
-
-enum class WateringSchedule{
-    WEEKLY,
-    MONTHLY
-}
 @Entity(tableName = "plants")
 data class Plant(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
     val description: String,
+    val isIndoor: Boolean,
     val species: String,
-    val plantedOn: Date,
+    val plantedOn: LocalDate,
+    val createdOn: LocalDate,
     @ColumnInfo(defaultValue = "MONTHLY")
-    val wateringSchedule: WateringSchedule = WateringSchedule.MONTHLY,
-    val dirPath: String
+    val dirPath: String,
+    val wateringInterval: WateringInterval,
 )
 
 @Entity(
@@ -66,10 +66,9 @@ data class Note(
 )
 
 
-
 @Entity(
     tableName = "wateringHistory",
-    primaryKeys = ["plant","date"],
+    primaryKeys = ["plant", "date"],
     foreignKeys = [
         ForeignKey(
             entity = Plant::class,
@@ -81,42 +80,105 @@ data class Note(
 )
 data class WateringEntry(
     val plant: Int,
-    val date: Date
+    val date: LocalDate
+)
+
+enum class WateringInterval(
+    val label: String,
+    val interval: Int,
+) {
+    WEEK("Weekly", 7),
+    TWO_WEEKS("Two weeks", 14),
+    THREE_WEEKS("Three weeks", 21),
+    FOUR_WEEKS("Four Weeks", 28),
+}
+
+@Entity(
+    tableName = "wateringSchedule",
+    primaryKeys = ["plant", "day"],
+    foreignKeys = [
+        ForeignKey(
+            entity = Plant::class,
+            parentColumns = ["id"],
+            childColumns = ["plant"],
+            onDelete = ForeignKey.CASCADE,
+        )
+    ]
+)
+data class WateringSchedule(
+    val plant: Long,
+    val day: DayOfWeek,
 )
 
 
-
 @Dao
-interface PlantDao{
+interface PlantDao {
     @Query("SELECT * FROM plants")
     fun getPlants(): Flow<List<Plant>>
     @Query("SELECT * FROM plants WHERE id = :plantId")
-    fun getPlant(plantId: Long): Flow<Plant?>
+    suspend fun getPlant(plantId: Long): Plant
+    @Query("SELECT * FROM plants WHERE id = :plantId")
+    fun getPlantFLow(plantId: Long): Flow<Plant>
+
     @Query("SELECT dirPath FROM plants WHERE id = :plantId")
     suspend fun getPlantDirPath(plantId: Long): String?
+
     @Query("SELECT note FROM notes WHERE plant = :plantId")
-   fun getPlantNotes(plantId: Long): Flow<List<String>>
+    fun getPlantNotes(plantId: Long): Flow<List<String>>
+
     @Query("SELECT date FROM wateringHistory WHERE plant = :plantId")
-    fun getPlantWateringHistory(plantId: Long): Flow<List<Date>>
+    fun getPlantWateringHistory(plantId: Long): Flow<List<LocalDate>>
+
+    @Query("SELECT * FROM wateringSchedule WHERE plant = :plantId")
+    fun getWateringSchedule(plantId: Long): Flow<List<WateringSchedule>>
+
     @Query("DELETE FROM plants")
     suspend fun deleteAllPlants()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertWateringSchedule(schedule: WateringSchedule): Long
+
+    @Query("DELETE FROM wateringSchedule WHERE plant = :plantId")
+    suspend fun deleteScheduleForPlant(plantId: Long)
+
     @Insert
     suspend fun insertPlant(plant: Plant): Long
+
     @Insert
     suspend fun insertNote(note: Note): Long
+
     @Insert
     suspend fun insertWateringEntry(wateringEntry: WateringEntry): Long
+
     @Delete
     suspend fun deletePlant(plant: Plant)
+
     @Delete
     suspend fun deleteNote(note: Note)
+
     @Update
     suspend fun updatePlant(plant: Plant)
+
     @Update
     suspend fun updateNote(note: Note)
+
+    @Transaction
+    suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval) {
+        getPlant(plantId).also {
+            updatePlant(it.copy(wateringInterval = interval))
+        }
+        deleteScheduleForPlant(plantId)
+        days.forEach { it ->
+            insertWateringSchedule(WateringSchedule(plantId, it))
+        }
+    }
+
 }
 
-@Database(entities = [Plant::class, Note::class, WateringEntry::class], version = 1)
+@Database(
+    entities = [Plant::class, Note::class, WateringEntry::class, WateringSchedule::class],
+    version = 1
+)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun plantDao(): PlantDao
