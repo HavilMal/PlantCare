@@ -15,6 +15,7 @@ import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Update
+import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import kotlinx.coroutines.flow.Flow
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -108,6 +109,7 @@ enum class WateringInterval(
 data class WateringSchedule(
     val plant: Long,
     val day: DayOfWeek,
+    val startingDate: LocalDate,
 )
 
 
@@ -135,11 +137,21 @@ interface PlantDao {
     @Query("DELETE FROM plants")
     suspend fun deleteAllPlants()
 
+    @Query("SELECT * FROM wateringSchedule")
+    fun getWateringSchedules(): Flow<List<WateringSchedule>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWateringSchedule(schedule: WateringSchedule): Long
 
     @Query("DELETE FROM wateringSchedule WHERE plant = :plantId")
     suspend fun deleteScheduleForPlant(plantId: Long)
+
+    @Query("""
+        SELECT ws1.plant, ws1.day, ws1.startingDate, p1.wateringInterval
+        FROM wateringSchedule ws1 
+        INNER JOIN plants p1 ON ws1.plant = p1.id
+         """)
+    fun getPlantWateringSchedules(): Flow<List<PlantWateringSchedule>>
 
     @Insert
     suspend fun insertPlant(plant: Plant): Long
@@ -164,15 +176,14 @@ interface PlantDao {
 
     @Transaction
     suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval) {
-        getPlant(plantId).also {
-            updatePlant(it.copy(wateringInterval = interval))
-        }
+        val plant: Plant = getPlant(plantId)
+        updatePlant(plant.copy(wateringInterval = interval))
         deleteScheduleForPlant(plantId)
         days.forEach { it ->
-            insertWateringSchedule(WateringSchedule(plantId, it))
+            val startingDate = plant.createdOn.with(it)
+            insertWateringSchedule(WateringSchedule(plantId, it, startingDate))
         }
     }
-
 }
 
 @Database(

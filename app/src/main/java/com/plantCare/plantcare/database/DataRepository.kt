@@ -2,6 +2,7 @@ package com.plantCare.plantcare.database
 
 import android.content.Context
 import com.plantCare.plantcare.R
+import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.utils.FileUtil
 import com.plantCare.plantcare.utils.RandomUtil
 import kotlinx.coroutines.flow.Flow
@@ -67,6 +68,14 @@ class PlantRepository(
 
     fun getSchedule(plantId: Long): Flow<List<WateringSchedule>> {
         return plantDao.getWateringSchedule(plantId)
+    }
+
+    fun getSchedules(): Flow<List<WateringSchedule>> {
+        return plantDao.getWateringSchedules()
+    }
+
+    fun getPlantWateringSchedules(): Flow<List<PlantWateringSchedule>> {
+        return plantDao.getPlantWateringSchedules()
     }
 
     suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval) {

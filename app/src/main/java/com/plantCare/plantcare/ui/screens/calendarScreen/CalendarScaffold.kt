@@ -19,24 +19,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.kizitonwose.calendar.compose.CalendarState
 import com.plantCare.plantcare.common.Content
 import com.plantCare.plantcare.ui.components.BottomBar
 import com.plantCare.plantcare.ui.components.TopBar
 import kotlinx.coroutines.launch
+import java.time.YearMonth
 
 @Composable
 fun CalendarScaffold(
-    lazyListState: LazyListState,
-    content: Content
+    currentMonth: YearMonth,
+    calendarState: CalendarState,
+    content: Content,
 ) {
     val showScrollButton by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex != INITIAL_INDEX
+            calendarState.firstVisibleMonth.yearMonth > currentMonth || currentMonth > calendarState.lastVisibleMonth.yearMonth
         }
     }
     val isScrolledForward by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex > INITIAL_INDEX
+            currentMonth < calendarState.firstVisibleMonth.yearMonth
         }
     }
     val density = LocalDensity.current
@@ -62,7 +65,7 @@ fun CalendarScaffold(
                 FloatingActionButton(
                     onClick = {
                         coroutineScope.launch {
-                            lazyListState.animateScrollToItem(INITIAL_INDEX)
+                            calendarState.animateScrollToMonth(currentMonth)
                         }
                     }
                 ) {
