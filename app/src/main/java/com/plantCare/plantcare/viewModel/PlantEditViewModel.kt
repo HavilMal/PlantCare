@@ -58,7 +58,6 @@ class PlantEditViewModel @Inject constructor(
                 .onEach { (plant, schedule) ->
                     if (plant != null) {
                         plantEditFlow.update { it ->
-                            Log.d("plantEditLoad", plant.wateringInterval.toString())
                             it.copy(
                                 plantName = plant.name,
                                 species = plant.species,

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "458c73ea6b8b408e0ba72d310c57f8e0",
+    "identityHash": "43ec86404d41f50bcfd854b6172fe606",
     "entities": [
       {
         "tableName": "plants",
@@ -154,7 +154,7 @@
       },
       {
         "tableName": "wateringSchedule",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`plant` INTEGER NOT NULL, `day` TEXT NOT NULL, PRIMARY KEY(`plant`, `day`), FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`plant` INTEGER NOT NULL, `day` TEXT NOT NULL, `startingDate` INTEGER NOT NULL, PRIMARY KEY(`plant`, `day`), FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "plant",
@@ -166,6 +166,12 @@
             "fieldPath": "day",
             "columnName": "day",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startingDate",
+            "columnName": "startingDate",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -193,7 +199,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '458c73ea6b8b408e0ba72d310c57f8e0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '43ec86404d41f50bcfd854b6172fe606')"
     ]
   }
 }
