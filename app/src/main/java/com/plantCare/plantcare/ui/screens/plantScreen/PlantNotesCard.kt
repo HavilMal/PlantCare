@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.dp
 
 @Preview
 @Composable
-fun PlantNotesCard() {
+fun PlantNotesCard(modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),

@@ -29,6 +29,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
+import com.plantCare.plantcare.viewModel.EditMode
 import com.plantCare.plantcare.viewModel.PlantScreenViewModel
 import java.io.File
 
@@ -99,7 +100,9 @@ fun PlantScreen(
             }
 
             item {
-                PlantNotesCard()
+                PlantNotesCard(Modifier.clickable{
+                    navController?.navigate(Route.NOTE_LIST.routeWithArgs(uiState.plant?.id))
+                })
             }
 
             item {

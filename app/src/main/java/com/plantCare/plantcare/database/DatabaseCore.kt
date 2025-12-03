@@ -61,9 +61,10 @@ data class Plant(
 )
 data class Note(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val plant: Int,
-    val note: String
+    val id: Long = 0,
+    val plant: Long,
+    val title: String,
+    val note: String,
 )
 
 
@@ -125,9 +126,6 @@ interface PlantDao {
     @Query("SELECT dirPath FROM plants WHERE id = :plantId")
     suspend fun getPlantDirPath(plantId: Long): String?
 
-    @Query("SELECT note FROM notes WHERE plant = :plantId")
-    fun getPlantNotes(plantId: Long): Flow<List<String>>
-
     @Query("SELECT date FROM wateringHistory WHERE plant = :plantId")
     fun getPlantWateringHistory(plantId: Long): Flow<List<LocalDate>>
 
@@ -157,16 +155,10 @@ interface PlantDao {
     suspend fun insertPlant(plant: Plant): Long
 
     @Insert
-    suspend fun insertNote(note: Note): Long
-
-    @Insert
     suspend fun insertWateringEntry(wateringEntry: WateringEntry): Long
 
     @Delete
     suspend fun deletePlant(plant: Plant)
-
-    @Delete
-    suspend fun deleteNote(note: Note)
 
     @Update
     suspend fun updatePlant(plant: Plant)
@@ -193,4 +185,6 @@ interface PlantDao {
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun plantDao(): PlantDao
+
+    abstract fun notesDAO(): NotesDAO
 }

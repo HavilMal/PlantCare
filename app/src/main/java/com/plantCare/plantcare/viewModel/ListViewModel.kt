@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.viewModel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.Plant
@@ -17,7 +18,8 @@ data class ListUiState(
 
 @HiltViewModel
 class ListViewModel @Inject constructor(
-    plantRepository: PlantRepository
+    plantRepository: PlantRepository,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val listFlow = MutableStateFlow(ListUiState())
