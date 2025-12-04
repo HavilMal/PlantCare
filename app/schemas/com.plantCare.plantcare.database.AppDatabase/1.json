@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b8952ae0155904ee6fb6dce5bb7e72d6",
+    "identityHash": "09278174cbc751ff565637b4f215b136",
     "entities": [
       {
         "tableName": "plants",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `wateringSchedule` TEXT NOT NULL DEFAULT 'MONTHLY', `dirPath` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `isIndoor` INTEGER NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `createdOn` INTEGER NOT NULL, `dirPath` TEXT NOT NULL DEFAULT 'MONTHLY', `wateringInterval` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -27,6 +27,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "isIndoor",
+            "columnName": "isIndoor",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "species",
             "columnName": "species",
             "affinity": "TEXT",
@@ -39,15 +45,21 @@
             "notNull": true
           },
           {
-            "fieldPath": "wateringSchedule",
-            "columnName": "wateringSchedule",
+            "fieldPath": "createdOn",
+            "columnName": "createdOn",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dirPath",
+            "columnName": "dirPath",
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "'MONTHLY'"
           },
           {
-            "fieldPath": "dirPath",
-            "columnName": "dirPath",
+            "fieldPath": "wateringInterval",
+            "columnName": "wateringInterval",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -61,7 +73,7 @@
       },
       {
         "tableName": "notes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plant` INTEGER NOT NULL, `note` TEXT NOT NULL, FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plant` INTEGER NOT NULL, `title` TEXT NOT NULL, `note` TEXT NOT NULL, FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -73,6 +85,12 @@
             "fieldPath": "plant",
             "columnName": "plant",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -139,11 +157,55 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "wateringSchedule",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`plant` INTEGER NOT NULL, `day` TEXT NOT NULL, `startingDate` INTEGER NOT NULL, PRIMARY KEY(`plant`, `day`), FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "plant",
+            "columnName": "plant",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "day",
+            "columnName": "day",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startingDate",
+            "columnName": "startingDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "plant",
+            "day"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "plants",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "plant"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b8952ae0155904ee6fb6dce5bb7e72d6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '09278174cbc751ff565637b4f215b136')"
     ]
   }
 }

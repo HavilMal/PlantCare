@@ -1,12 +1,12 @@
 package com.plantCare.plantcare.common
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
@@ -16,17 +16,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.plantCare.plantcare.ui.screens.calendarScreen.CalendarScreen
-import com.plantCare.plantcare.ui.screens.HomeScreen
+import com.plantCare.plantcare.ui.screens.homeScreen.HomeScreen
 import com.plantCare.plantcare.ui.screens.SearchScreen
 import com.plantCare.plantcare.ui.screens.galleryScreen.GalleryScreen
 import com.plantCare.plantcare.ui.screens.listScreen.ListScreen
-import com.plantCare.plantcare.ui.screens.noteScreen.NoteScreen
+import com.plantCare.plantcare.ui.screens.noteEditScreen.NoteEditScreen
+import com.plantCare.plantcare.ui.screens.notesList.NoteListScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantCameraCaptureScreen
 import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.settingsScreen.SettingsScreen
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.plantCare.plantcare.viewModel.PlantScreenViewModel
+import com.plantCare.plantcare.viewModel.EditMode
 
 enum class Route(
     val route: String,
@@ -45,7 +45,8 @@ enum class Route(
     PLANT("plant", "Plant"),
     PLANT_EDIT("plant_edit", "Plant Edit"),
 
-    NOTE("note", "Note"),
+    NOTE_EDIT("note_edit", "Note"),
+    NOTE_LIST("note_list", "Note"),
     GALLERY("gallery", "Gallery"),
     CAMERA("camera", "Camera");
 
@@ -63,6 +64,15 @@ enum class Route(
             names.forEach { name -> append("/{$name}") }
         }
     }
+}
+
+// DO NOT CHAIN
+fun String.addQuery(argument: String, value: Any): String {
+    return this + "?${argument}=$value"
+}
+
+fun String.chainQuerry(argument: String, value: Any): String {
+    return this + "&${argument}=$value"
 }
 
 val NavigationController = staticCompositionLocalOf<NavHostController?> { null }
@@ -101,18 +111,44 @@ fun AppNavHost(
                 GalleryScreen()
             }
 
-            composable(Route.PLANT_EDIT.route) { PlantEditScreen() }
-            composable(Route.NOTE.route) { NoteScreen() }
-//            composable(Route.CAMERA.route) { PlantCameraCaptureScreen(
-//                onPhotoCapture = {}
-//            ) }
             composable(
-                route = Route.CAMERA.routeWithArgNames("plantId"),
+                route = Route.PLANT_EDIT.routeWithArgNames("mode").addQuery("plantId", "{plantId}").chainQuerry("noteId", "{noteId}"),
                 arguments = listOf(
-                    navArgument("plantId") { type = NavType.LongType }
+                    navArgument("mode") { type = NavType.EnumType(EditMode::class.java) },
+                    navArgument("plantId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
                 )
-            ) {
-                PlantCameraCaptureScreen()
+            ) { PlantEditScreen() }
+            composable(
+                route = Route.NOTE_LIST.routeWithArgNames("plantId"),
+                arguments = listOf(
+                    navArgument("plantId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { NoteListScreen() }
+            composable(
+                route = Route.NOTE_EDIT.routeWithArgNames("mode", "plantId").addQuery("noteId", "{noteId}"),
+                arguments = listOf(
+                    navArgument("mode") {
+                        type = NavType.EnumType(EditMode::class.java)
+                    },
+                    navArgument("plantId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
+                    navArgument("noteId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
+                )
+            ) { NoteEditScreen() }
+            composable(Route.CAMERA.route) {
+                PlantCameraCaptureScreen(
+                    onPhotoCapture = {}
+                )
             }
         }
 

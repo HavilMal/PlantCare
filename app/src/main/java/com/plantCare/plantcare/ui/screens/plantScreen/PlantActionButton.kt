@@ -45,19 +45,20 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
+import com.plantCare.plantcare.viewModel.EditMode
 
 
 // todo close on tap outside
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview
 @Composable
-fun PlantActionButton() {
+fun PlantActionButton(plantId: Long?) {
     val listState = rememberLazyListState()
     val fabVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val focusRequester = remember { FocusRequester() }
     val navController = NavigationController.current
-    
-    data class MenuItem (
+
+    data class MenuItem(
         val icon: ImageVector,
         val label: String,
         val route: String,
@@ -65,7 +66,11 @@ fun PlantActionButton() {
 
     val items =
         listOf(
-            MenuItem(Icons.AutoMirrored.Filled.Message,"Note", Route.NOTE.route),
+            MenuItem(
+                Icons.AutoMirrored.Filled.Message, "Note", Route.NOTE_EDIT.routeWithArgs(
+                    EditMode.ADD, plantId
+                )
+            ),
             MenuItem(Icons.Filled.People, "Photo", Route.CAMERA.route),       // todo
             MenuItem(Icons.Filled.Contacts, "Image", Route.GALLERY.route),    // todo
         )
@@ -108,45 +113,6 @@ fun PlantActionButton() {
     ) {
         items.forEachIndexed { i, item ->
             FloatingActionButtonMenuItem(
-                modifier =
-                    Modifier
-                        .semantics {
-                            isTraversalGroup = true
-                            // Add a custom a11y action to allow closing the menu when focusing
-                            // the last menu item, since the close button comes before the first
-                            // menu item in the traversal order.
-                            if (i == items.size - 1) {
-                                customActions =
-                                    listOf(
-                                        CustomAccessibilityAction(
-                                            label = "Close menu",
-                                            action = {
-                                                fabMenuExpanded = false
-                                                true
-                                            },
-                                        )
-                                    )
-                            }
-                        }
-                        .then(
-                            if (i == 0) {
-                                Modifier.onKeyEvent {
-                                    // Navigating back from the first item should go back to the
-                                    // FAB menu button.
-                                    if (
-                                        it.type == KeyEventType.KeyDown &&
-                                        (it.key == Key.DirectionUp ||
-                                                (it.isShiftPressed && it.key == Key.Tab))
-                                    ) {
-                                        focusRequester.requestFocus()
-                                        return@onKeyEvent true
-                                    }
-                                    return@onKeyEvent false
-                                }
-                            } else {
-                                Modifier
-                            }
-                        ),
                 onClick = {
                     fabMenuExpanded = false
                     navController?.navigate(

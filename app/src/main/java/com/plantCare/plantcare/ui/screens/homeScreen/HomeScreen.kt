@@ -1,4 +1,4 @@
-package com.plantCare.plantcare.ui.screens
+package com.plantCare.plantcare.ui.screens.homeScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -28,6 +28,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.database.Plant
+import com.plantCare.plantcare.ui.screens.MainScaffold
 import com.plantCare.plantcare.viewModel.HomeViewModel
 
 
