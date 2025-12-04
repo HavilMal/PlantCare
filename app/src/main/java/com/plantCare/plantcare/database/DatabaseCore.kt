@@ -121,7 +121,7 @@ interface PlantDao {
     @Query("SELECT * FROM plants WHERE id = :plantId")
     suspend fun getPlant(plantId: Long): Plant
     @Query("SELECT * FROM plants WHERE id = :plantId")
-    fun getPlantFLow(plantId: Long): Flow<Plant>
+    fun getPlantFlow(plantId: Long): Flow<Plant>
 
     @Query("SELECT dirPath FROM plants WHERE id = :plantId")
     suspend fun getPlantDirPath(plantId: Long): String?
