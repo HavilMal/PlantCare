@@ -34,7 +34,7 @@ fun PlantScaffold(
                             if (state.plant != null) {
                                 navController?.navigate(
                                     Route.PLANT_EDIT.routeWithArgs(EditMode.EDIT)
-                                        .addQuery("id", state.plant.id))
+                                        .addQuery("plantId", state.plant.id))
                             }
                         }
                     ) {
@@ -45,7 +45,7 @@ fun PlantScaffold(
                 }
             )
         },
-        floatingActionButton = { PlantActionButton() },
+        floatingActionButton = { PlantActionButton(state.plant?.id) },
         floatingActionButtonPosition = FabPosition.End
     ) { contentPadding ->
         content(Modifier.padding(contentPadding))

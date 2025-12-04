@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "43ec86404d41f50bcfd854b6172fe606",
+    "identityHash": "09278174cbc751ff565637b4f215b136",
     "entities": [
       {
         "tableName": "plants",
@@ -73,7 +73,7 @@
       },
       {
         "tableName": "notes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plant` INTEGER NOT NULL, `note` TEXT NOT NULL, FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `plant` INTEGER NOT NULL, `title` TEXT NOT NULL, `note` TEXT NOT NULL, FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -85,6 +85,12 @@
             "fieldPath": "plant",
             "columnName": "plant",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -199,7 +205,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '43ec86404d41f50bcfd854b6172fe606')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '09278174cbc751ff565637b4f215b136')"
     ]
   }
 }

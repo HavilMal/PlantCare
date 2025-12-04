@@ -2,6 +2,8 @@ package com.plantCare.plantcare.di
 
 import android.content.Context
 import com.plantCare.plantcare.database.AppRepository
+import com.plantCare.plantcare.database.NotesDAO
+import com.plantCare.plantcare.database.NotesRepository
 import com.plantCare.plantcare.database.PlantDao
 import com.plantCare.plantcare.database.PlantRepository
 import dagger.Module
@@ -14,6 +16,7 @@ import jakarta.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
+
     @Provides
     @Singleton
     fun providePlantRepository(
@@ -23,6 +26,16 @@ object RepositoryModule {
         return PlantRepository(
             appContext = context,
             plantDao = plantDao
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotesRepository(
+        notesDAO: NotesDAO
+    ): NotesRepository {
+        return NotesRepository(
+            notesDAO = notesDAO
         )
     }
 

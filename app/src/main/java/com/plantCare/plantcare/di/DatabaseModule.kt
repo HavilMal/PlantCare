@@ -3,6 +3,7 @@ package com.plantCare.plantcare.di
 import android.content.Context
 import androidx.room.Room
 import com.plantCare.plantcare.database.AppDatabase
+import com.plantCare.plantcare.database.NotesDAO
 import com.plantCare.plantcare.database.PlantDao
 import dagger.Module
 import dagger.Provides
@@ -31,4 +32,11 @@ object DatabaseModule {
     fun providePlantDao(database: AppDatabase): PlantDao {
          return database.plantDao()
     }
+
+    @Provides
+    @Singleton
+    fun provideNotesDAO(database: AppDatabase): NotesDAO {
+         return database.notesDAO()
+    }
+
 }

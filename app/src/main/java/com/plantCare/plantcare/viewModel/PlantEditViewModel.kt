@@ -1,6 +1,5 @@
 package com.plantCare.plantcare.viewModel
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,14 +42,14 @@ class PlantEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     val mode: EditMode = savedStateHandle["mode"]!!
-    val id: Long = savedStateHandle["id"]!!
+    val plantId: Long = savedStateHandle["plantId"]!!
     private val plantEditFlow = MutableStateFlow(PlantEditUiState(mode = mode))
     val plantEditState = plantEditFlow.asStateFlow()
 
     init {
         if (mode == EditMode.EDIT) {
-            val combinedFlow = plantRepository.getPlant(id)
-                .combine(plantRepository.getSchedule(id)) { plant, schedule ->
+            val combinedFlow = plantRepository.getPlant(plantId)
+                .combine(plantRepository.getSchedule(plantId)) { plant, schedule ->
                     Pair(plant, schedule)
                 }
 
@@ -147,7 +146,7 @@ class PlantEditViewModel @Inject constructor(
                 EditMode.EDIT -> {
                     viewModelScope.launch {
                         plantRepository.updatePlant(
-                            id,
+                            plantId,
                             plantEditState.value.plantName,
                             isIndoor = plantEditState.value.isIndoor,
                             species = plantEditState.value.species,
@@ -160,7 +159,7 @@ class PlantEditViewModel @Inject constructor(
 
             viewModelScope.launch {
                 plantRepository.setSchedule(
-                    id,
+                    plantId,
                     plantEditState.value.selectedDays,
                     plantEditState.value.interval
                 )

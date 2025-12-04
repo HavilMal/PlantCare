@@ -63,7 +63,7 @@ class PlantRepository(
     }
 
     fun getPlant(plantId: Long): Flow<Plant?> {
-        return plantDao.getPlantFLow(plantId)
+        return plantDao.getPlantFlow(plantId)
     }
 
     fun getSchedule(plantId: Long): Flow<List<WateringSchedule>> {
@@ -110,7 +110,7 @@ class PlantRepository(
         plantedOn: LocalDate? = null,
         wateringInterval: WateringInterval? = null,
     ) {
-        plantDao.getPlantFLow(id).collect { plant ->
+        plantDao.getPlantFlow(id).collect { plant ->
             plantDao.updatePlant(
                 plant.copy(
                     id = id,
