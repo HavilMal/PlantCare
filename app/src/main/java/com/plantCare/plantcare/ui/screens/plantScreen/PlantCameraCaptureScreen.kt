@@ -26,7 +26,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import java.io.File
 
 @Composable
-fun PlantCameraCaptureView() {
+fun PlantCameraCaptureView(onCapture: (File?) -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -54,7 +54,7 @@ fun PlantCameraCaptureView() {
         Button(
             onClick = {
                 cameraCapture.takePhoto { file ->
-                    { }
+                    onCapture(file)
                 }
             },
             modifier = Modifier
@@ -67,8 +67,8 @@ fun PlantCameraCaptureView() {
 }
 
 @Composable
-fun PlantCameraCaptureScreen() {
+fun PlantCameraCaptureScreen(onCapture: (File?) -> Unit) {
     WithPermission(permission = Manifest.permission.CAMERA) {
-       PlantCameraCaptureView()
+        PlantCameraCaptureView(onCapture)
     }
 }

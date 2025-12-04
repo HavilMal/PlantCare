@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -50,7 +51,6 @@ import com.plantCare.plantcare.viewModel.EditMode
 
 // todo close on tap outside
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Preview
 @Composable
 fun PlantActionButton(plantId: Long?) {
     val listState = rememberLazyListState()
@@ -63,7 +63,6 @@ fun PlantActionButton(plantId: Long?) {
         val label: String,
         val route: String,
     )
-
     val items =
         listOf(
             MenuItem(
@@ -71,10 +70,9 @@ fun PlantActionButton(plantId: Long?) {
                     EditMode.ADD, plantId
                 )
             ),
-            MenuItem(Icons.Filled.People, "Photo", Route.CAMERA.route),       // todo
+            MenuItem(Icons.Filled.People, "Photo", Route.CAMERA.routeWithArgs(plantId)),       // todo
             MenuItem(Icons.Filled.Contacts, "Image", Route.GALLERY.route),    // todo
         )
-
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     BackHandler(fabMenuExpanded) { fabMenuExpanded = false }

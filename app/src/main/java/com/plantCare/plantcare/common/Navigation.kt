@@ -145,10 +145,18 @@ fun AppNavHost(
                     },
                 )
             ) { NoteEditScreen() }
-            composable(Route.CAMERA.route) {
-                PlantCameraCaptureScreen(
-                    onPhotoCapture = {}
+
+            composable(
+                route = Route.CAMERA.routeWithArgNames("plantId"),
+                arguments = listOf(
+                    navArgument("plantId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    }
                 )
+            ) {
+                backStackEntry ->
+                PlantCameraCaptureScreen {}
             }
         }
 

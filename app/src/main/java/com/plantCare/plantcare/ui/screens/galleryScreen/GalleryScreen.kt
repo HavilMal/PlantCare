@@ -28,7 +28,6 @@ fun GalleryScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(uiState.images) { item ->
-                Log.d("lukas","displaying image = $item")
                 PlantPhotoCard(BitmapFactory.decodeFile(item.path).asImageBitmap())
             }
         }
