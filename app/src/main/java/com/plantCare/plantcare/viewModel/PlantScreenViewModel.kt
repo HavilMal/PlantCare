@@ -44,9 +44,10 @@ class PlantScreenViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val photos = plantRepository.getPlantPhotos(plantId)
-            stateFlow.update {
-                it.copy(images = photos)
+            plantRepository.getPlantPhotos(plantId).collect { photo ->
+                stateFlow.update {
+                    it.copy(images = photo)
+                }
             }
         }
 
@@ -58,4 +59,5 @@ class PlantScreenViewModel @Inject constructor(
             }
         }
     }
+
 }

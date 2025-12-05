@@ -156,10 +156,9 @@ fun AppNavHost(
                 )
             ) {
                 backStackEntry ->
-                PlantCameraCaptureScreen {}
+                PlantCameraCaptureScreen()
             }
         }
-
 
         composable(Route.CALENDAR.route) { CalendarScreen() }
         composable(Route.SEARCH.route) { SearchScreen() }

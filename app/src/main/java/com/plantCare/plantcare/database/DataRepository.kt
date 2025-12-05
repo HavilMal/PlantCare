@@ -1,6 +1,8 @@
 package com.plantCare.plantcare.database
 
 import android.content.Context
+import android.os.FileObserver
+import android.util.Log
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.utils.FileUtil
@@ -9,6 +11,9 @@ import kotlinx.coroutines.flow.Flow
 import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.math.abs
 
 const val PLANTS_DIR: String = "plants/"
 
@@ -83,23 +88,42 @@ class PlantRepository(
     }
 
     suspend fun getPlantsDirPath(plantId: Long): String? {
-        return plantDao.getPlantDirPath(plantId)
+        return "$PLANTS_DIR${plantDao.getPlantDirPath(plantId)}"
     }
 
     suspend fun addPlantPhoto(plantId: Long, photo: File) {
         val plantDir = getPlantsDirPath(plantId)
         val destFile = File(
             appContext.filesDir,
-            "$PLANTS_DIR$plantDir/${PLANT_PHOTO_PREFIX}${genPlantPhotoId()}.jpg"
+            "$plantDir/${PLANT_PHOTO_PREFIX}${genPlantPhotoId()}.jpg"
         )
         photo.copyTo(destFile, overwrite = true)
     }
 
-    suspend fun getPlantPhotos(plantId: Long): List<File> {
+    suspend fun getPlantPhotos(plantId: Long): Flow<List<File>> {
+//        val plantDir = getPlantsDirPath(plantId)
+//        return FileUtil.getFiles(appContext, "$PLANTS_DIR$plantDir").filter { file ->
+//            file.name.startsWith(PLANT_PHOTO_PREFIX)
+//        }
         val plantDir = getPlantsDirPath(plantId)
-        return FileUtil.getFiles(appContext, "$PLANTS_DIR$plantDir").filter { file ->
-            file.name.startsWith(PLANT_PHOTO_PREFIX)
+        val absDir = File(appContext.filesDir,plantDir)
+        val photoFlow = MutableStateFlow(
+            FileUtil.getFiles(appContext,plantDir)
+                .filter { it.name.startsWith(PLANT_PHOTO_PREFIX) }
+        )
+        val observer = object : FileObserver(
+            absDir,
+            CREATE or DELETE or MOVED_TO or MOVED_FROM
+        ) {
+            override fun onEvent(event: Int, path: String?) {
+                Log.d("lukas","File observer event")
+                val updated = FileUtil.getFiles(appContext, plantDir)
+                    .filter { it.name.startsWith(PLANT_PHOTO_PREFIX) }
+                photoFlow.tryEmit(updated)
+            }
         }
+        observer.startWatching()
+        return photoFlow
     }
 
     suspend fun updatePlant(

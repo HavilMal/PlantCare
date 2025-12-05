@@ -23,12 +23,20 @@ import com.plantCare.plantcare.common.WithPermission
 import com.plantCare.plantcare.utils.CameraCapture
 import com.plantCare.plantcare.viewModel.PlantCameraCaptureViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.plantCare.plantcare.common.NavigationController
+import com.plantCare.plantcare.database.Note
+import com.plantCare.plantcare.database.Plant
+import com.plantCare.plantcare.viewModel.PlantScreenViewModel
 import java.io.File
 
+
 @Composable
-fun PlantCameraCaptureView(onCapture: (File?) -> Unit) {
+fun PlantCameraCaptureView(
+    viewModel: PlantCameraCaptureViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val navController = NavigationController.current
 
     val cameraCapture = remember {
         CameraCapture(context, lifecycleOwner)
@@ -43,18 +51,18 @@ fun PlantCameraCaptureView(onCapture: (File?) -> Unit) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { ctx ->
                 PreviewView(ctx).also { previewView = it }
             }
         )
-
         Button(
             onClick = {
                 cameraCapture.takePhoto { file ->
-                    onCapture(file)
+                    viewModel.savePhoto(file)
+                    cameraCapture.stopCamera()
+                    navController?.popBackStack()
                 }
             },
             modifier = Modifier
@@ -67,8 +75,8 @@ fun PlantCameraCaptureView(onCapture: (File?) -> Unit) {
 }
 
 @Composable
-fun PlantCameraCaptureScreen(onCapture: (File?) -> Unit) {
+fun PlantCameraCaptureScreen() {
     WithPermission(permission = Manifest.permission.CAMERA) {
-        PlantCameraCaptureView(onCapture)
+        PlantCameraCaptureView()
     }
 }
