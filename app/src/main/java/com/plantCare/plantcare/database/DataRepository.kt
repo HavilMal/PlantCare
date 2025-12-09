@@ -90,6 +90,9 @@ class PlantRepository(
     suspend fun getPlantsDirPath(plantId: Long): String? {
         return "$PLANTS_DIR${plantDao.getPlantDirPath(plantId)}"
     }
+    fun getPlantsDirPath(plant: Plant) : String {
+        return "$PLANTS_DIR${plant.dirPath}"
+    }
 
     suspend fun addPlantPhoto(plantId: Long, photo: File) {
         val plantDir = getPlantsDirPath(plantId)
