@@ -20,7 +20,7 @@ class PlantApiRepository(private val plantService: PlantService) {
         val plants = response.getAsJsonArray("data")
         val result = mutableListOf<PlantSearchResult>()
 
-        for (i in 0..plants.size()) {
+        for (i in 0..<plants.size()) {
             val p: JsonObject = plants.get(i).asJsonObject
             result.add(PlantSearchResult(p["id"].asLong, p["common_name"].asString, p["scientific_name"].asString))
         }
