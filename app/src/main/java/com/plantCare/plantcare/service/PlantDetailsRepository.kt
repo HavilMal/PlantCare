@@ -81,6 +81,7 @@ class PlantDetailsRepository(
         val wateringUnit = r["watering_general_benchmark"].asJsonObject["unit"].asString
         val pruningMonths = r["pruning_month"].asJsonArray.map { it.asString }
         val soil = r["soil"].asJsonArray.map { it.asString }
+        val sunlight = r["sunlight"].asJsonArray.map { it.asString }
 
         val details = PlantDetails(
             id = plantId,
@@ -89,7 +90,7 @@ class PlantDetailsRepository(
             scientificName = r["scientific_name"].asString,
             wateringValue = wateringValue,
             wateringUnit = wateringUnit,
-            sunlight = r["sunlight"].asString,
+            sunlight = sunlight,
             pruningMonths = pruningMonths,
             soil = soil,
             description = r["description"].asString

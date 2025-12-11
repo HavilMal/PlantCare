@@ -76,6 +76,7 @@ data class Plant(
         )
     ]
 )
+// fruits / harvest
 data class PlantDetails(
     @PrimaryKey(autoGenerate = false)
     val id: Long,
@@ -84,7 +85,7 @@ data class PlantDetails(
     val scientificName: String,
     val wateringValue: String,
     val wateringUnit: String,
-    val sunlight: String,
+    val sunlight: List<String>,
     val pruningMonths: List<String>,
     val soil: List<String>,
     val description: String,

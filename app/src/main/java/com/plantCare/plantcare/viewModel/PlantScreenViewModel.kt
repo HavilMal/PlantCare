@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.Note
 import com.plantCare.plantcare.database.NotesRepository
 import com.plantCare.plantcare.database.Plant
+import com.plantCare.plantcare.database.PlantDetails
 import com.plantCare.plantcare.database.PlantRepository
+import com.plantCare.plantcare.service.PlantDetailsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,12 +23,14 @@ data class PlantScreenUiState(
     val images: List<File> = emptyList(),
     val notes: List<Note> = emptyList(),
     val plant: Plant? = null,
+    val plantDetails: PlantDetails? = null,
 )
 
 @HiltViewModel
 class PlantScreenViewModel @Inject constructor(
     private val plantRepository: PlantRepository,
     private val notesRepository: NotesRepository,
+    private val detailsRepository: PlantDetailsRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val plantId: Long = checkNotNull(savedStateHandle.get<Long>("plantId"))
@@ -59,8 +63,11 @@ class PlantScreenViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-
-
+            // fix: Cannot access database on the main thread since it may potentially lock the UI for a long period of time
+            val details = detailsRepository.getPlantDetails(plantId)
+            stateFlow.update {
+                it.copy(plantDetails = details)
+            }
         }
     }
 }
