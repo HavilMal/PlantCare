@@ -6,6 +6,8 @@ import com.plantCare.plantcare.database.NotesDAO
 import com.plantCare.plantcare.database.NotesRepository
 import com.plantCare.plantcare.database.PlantDao
 import com.plantCare.plantcare.database.PlantRepository
+import com.plantCare.plantcare.service.PlantApiRepository
+import com.plantCare.plantcare.service.PlantService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +39,16 @@ object RepositoryModule {
         return NotesRepository(
             notesDAO = notesDAO
         )
+    }
+
+    @Provides
+    @Singleton
+    fun providePlantApiRepository(
+        plantService: PlantService
+    ): PlantApiRepository {
+         return PlantApiRepository(
+             plantService = plantService
+         )
     }
 
     @Provides

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -91,6 +92,13 @@ fun PlantEditScreen(
                 label = { Text("Species") },
                 value = state.species,
                 onValueChange = viewModel::setSpecties,
+                trailingIcon = {
+                    IconButton(
+                        onClick = { viewModel.searchSpecies() }
+                    ) {
+                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                    }
+                }
             )
 
             // todo click on field

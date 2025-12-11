@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.database.WateringInterval
+import com.plantCare.plantcare.service.PlantApiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +40,7 @@ data class PlantEditUiState(
 @HiltViewModel
 class PlantEditViewModel @Inject constructor(
     private val plantRepository: PlantRepository,
+    private val plantApiRepository: PlantApiRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     val mode: EditMode = savedStateHandle["mode"]!!
@@ -164,6 +166,12 @@ class PlantEditViewModel @Inject constructor(
                     plantEditState.value.interval
                 )
             }
+        }
+    }
+
+    fun searchSpecies() {
+        viewModelScope.launch {
+            plantApiRepository.findPlant(plantEditState.value.species)
         }
     }
 
