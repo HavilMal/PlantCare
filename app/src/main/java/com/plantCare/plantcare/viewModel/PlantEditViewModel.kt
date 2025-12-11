@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.viewModel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -171,7 +172,8 @@ class PlantEditViewModel @Inject constructor(
 
     fun searchSpecies() {
         viewModelScope.launch {
-            plantApiRepository.findPlant(plantEditState.value.species)
+            val results = plantApiRepository.findPlant(plantEditState.value.species)
+            Log.d("searchSpecies", results.toString())
         }
     }
 
