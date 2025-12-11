@@ -47,6 +47,7 @@ class PlantScreenViewModel @Inject constructor(
 ) : ViewModel() {
     private val plantId: Long = checkNotNull(savedStateHandle.get<Long>("plantId"))
     private val stateFlow = MutableStateFlow(PlantScreenUiState())
+
     val uiState: StateFlow<PlantScreenUiState> = stateFlow
     private var plantImageObserver: FileObserver? = null
 

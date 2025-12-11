@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.compiler)
+    implementation(libs.androidx.preference.ktx)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.datastore.preferences)
@@ -96,4 +97,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 }

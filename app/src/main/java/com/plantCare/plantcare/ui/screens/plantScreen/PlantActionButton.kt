@@ -63,6 +63,7 @@ fun PlantActionButton(plantId: Long?) {
         val label: String,
         val route: String,
     )
+
     val items =
         listOf(
             MenuItem(
@@ -73,6 +74,7 @@ fun PlantActionButton(plantId: Long?) {
             MenuItem(Icons.Filled.People, "Photo", Route.CAMERA.routeWithArgs(plantId)),
             MenuItem(Icons.Filled.Contacts, "Image", Route.DEVICE_GALLERY.routeWithArgs(plantId))
         )
+
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     BackHandler(fabMenuExpanded) { fabMenuExpanded = false }

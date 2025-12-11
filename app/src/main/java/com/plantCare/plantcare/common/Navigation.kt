@@ -1,6 +1,5 @@
 package com.plantCare.plantcare.common
 
-import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -160,6 +159,44 @@ fun AppNavHost(
                 backStackEntry ->
                 PlantCameraCaptureScreen()
             }
+            composable(
+                route = Route.PLANT_EDIT.routeWithArgNames("mode").addQuery("plantId", "{plantId}").chainQuerry("noteId", "{noteId}"),
+                arguments = listOf(
+                    navArgument("mode") { type = NavType.EnumType(EditMode::class.java) },
+                    navArgument("plantId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
+                )
+            ) { PlantEditScreen() }
+            composable(
+                route = Route.NOTE_LIST.routeWithArgNames("plantId"),
+                arguments = listOf(
+                    navArgument("plantId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { NoteListScreen() }
+            composable(
+                route = Route.NOTE_EDIT.routeWithArgNames("mode", "plantId").addQuery("noteId", "{noteId}"),
+                arguments = listOf(
+                    navArgument("mode") {
+                        type = NavType.EnumType(EditMode::class.java)
+                    },
+                    navArgument("plantId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
+                    navArgument("noteId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
+                )
+            ) { NoteEditScreen() }
+            composable(Route.CAMERA.route) {
+                PlantCameraCaptureScreen()
+            }
+        }
 
             composable(
                 route = Route.DEVICE_GALLERY.routeWithArgNames("plantId"),
@@ -175,8 +212,6 @@ fun AppNavHost(
             }
         }
 
-        composable(Route.CALENDAR.route) { CalendarScreen() }
-        composable(Route.SEARCH.route) { SearchScreen() }
-    }
-
+//        composable(Route.CALENDAR.route) { CalendarScreen() }
+//        composable(Route.SEARCH.route) { SearchScreen() }
 }

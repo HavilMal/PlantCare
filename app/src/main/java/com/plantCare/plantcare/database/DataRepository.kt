@@ -1,8 +1,6 @@
 package com.plantCare.plantcare.database
 
 import android.content.Context
-import android.os.FileObserver
-import android.util.Log
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.utils.FileUtil
@@ -41,6 +39,7 @@ class PlantRepository(
         wateringInterval: WateringInterval = WateringInterval.WEEK,
     ): Long {
         val plantUUID = RandomUtil.genUUIDString()
+        FileUtil.makeDir(appContext, "$PLANTS_DIR$plantUUID", true)
         val id = plantDao.insertPlant(
             Plant(
                 name = name,
@@ -90,12 +89,15 @@ class PlantRepository(
     suspend fun getPlantsDirPath(plantId: Long): String? {
         return "$PLANTS_DIR${plantDao.getPlantDirPath(plantId)}"
     }
-    fun getPlantsDirPath(plant: Plant) : String {
+
+    fun getPlantsDirPath(plant: Plant): String {
         return "$PLANTS_DIR${plant.dirPath}"
     }
-    fun getPlantsImageDirPath(plantDirPath: String) : String {
-        return "${plantDirPath}/$PLANT_IMAGE_DIR_NAME"
+
+    fun getPlantsImageDirPath(plantDirPath: String): String {
+        return "$plantDirPath/$PLANT_IMAGE_DIR_NAME"
     }
+
     suspend fun addPlantPhoto(plantId: Long, photo: File) {
         val plantDir = getPlantsDirPath(plantId)
         val destFile = File(
@@ -104,9 +106,11 @@ class PlantRepository(
         )
         photo.copyTo(destFile, overwrite = true)
     }
-    fun deletePlantImage(file: File){
+
+    fun deletePlantImage(file: File) {
         FileUtil.delete(file)
     }
+
     suspend fun getPlantPhotos(plantId: Long): List<File> {
         return FileUtil.getFiles(appContext, "${getPlantsDirPath(plantId)}/$PLANT_IMAGE_DIR_NAME")
     }
@@ -135,7 +139,8 @@ class PlantRepository(
 }
 
 class AppRepository(
-    val plantRepository: PlantRepository
+    val plantRepository: PlantRepository,
+    val settingsRepository: SettingsRepository
 ) {
     suspend fun seedDatabase() {
         plantRepository.deleteAllPlants()
@@ -155,7 +160,6 @@ class AppRepository(
         plantRepository.insertPlant("Storczyk Tadek", "Fajny jest", "Storczyk")
     }
     suspend fun setDefaultSettings(){
-
+        settingsRepository.setDefault()
     }
-
 }
