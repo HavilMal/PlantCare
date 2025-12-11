@@ -70,8 +70,8 @@ fun PlantActionButton(plantId: Long?) {
                     EditMode.ADD, plantId
                 )
             ),
-            MenuItem(Icons.Filled.People, "Photo", Route.CAMERA.routeWithArgs(plantId)),       // todo
-            MenuItem(Icons.Filled.Contacts, "Image", Route.GALLERY.route),    // todo
+            MenuItem(Icons.Filled.People, "Photo", Route.CAMERA.routeWithArgs(plantId)),
+            MenuItem(Icons.Filled.Contacts, "Image", Route.DEVICE_GALLERY.routeWithArgs(plantId))
         )
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
 

@@ -24,6 +24,7 @@ import com.plantCare.plantcare.ui.screens.noteEditScreen.NoteEditScreen
 import com.plantCare.plantcare.ui.screens.notesList.NoteListScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantCameraCaptureScreen
 import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
+import com.plantCare.plantcare.ui.screens.plantScreen.DeviceGalleryScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen
 import com.plantCare.plantcare.ui.screens.settingsScreen.SettingsScreen
 import com.plantCare.plantcare.viewModel.EditMode
@@ -48,7 +49,8 @@ enum class Route(
     NOTE_EDIT("note_edit", "Note"),
     NOTE_LIST("note_list", "Note"),
     GALLERY("gallery", "Gallery"),
-    CAMERA("camera", "Camera");
+    CAMERA("camera", "Camera"),
+    DEVICE_GALLERY("deviceGallery", "deviceGallery");
 
 
     fun routeWithArgs(vararg args: Any?): String {
@@ -157,6 +159,19 @@ fun AppNavHost(
             ) {
                 backStackEntry ->
                 PlantCameraCaptureScreen()
+            }
+
+            composable(
+                route = Route.DEVICE_GALLERY.routeWithArgNames("plantId"),
+                arguments = listOf(
+                    navArgument("plantId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    }
+                )
+            ) {
+                backStackEntry ->
+                    DeviceGalleryScreen()
             }
         }
 

@@ -1,9 +1,13 @@
 package com.plantCare.plantcare.utils
 
 import android.content.Context
+import android.net.Uri
 import java.io.File
 import kotlin.io.deleteRecursively
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 object FileUtil {
     fun makeDir(context: Context, relativePath: String, makeParentDirs: Boolean = true): File {
         val dir = File(context.filesDir, relativePath)
@@ -42,17 +46,17 @@ object FileUtil {
         }
         return file
     }
+    suspend fun copyUriToFile(context: Context,uri: Uri): File =
+    withContext(Dispatchers.IO) {
+        val inputStream = context.contentResolver.openInputStream(uri)!!
+        val tempFile = File(context.cacheDir, "picked_${System.currentTimeMillis()}.jpg")
+        tempFile.outputStream().use { output ->
+            inputStream.copyTo(output)
+        }
+        tempFile
+    }
 
-//    fun deleteDir(dir: File){
-//        if(dir.exists() && dir.isDirectory) {
-//            dir.listFiles()?.forEach { file ->
-//                if (file.isDirectory) {
-//                    deleteDir(file)
-//                } else {
-//                    file.delete()
-//                }
-//            }
-//            dir.delete()
-//        }
-//    }
+    fun delete(file: File){
+        file.delete()
+    }
 }

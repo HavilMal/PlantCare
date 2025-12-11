@@ -29,12 +29,13 @@ class GalleryViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             repository.plantDao.getPlantFlow(plantId).collect { plant ->
-                repository.getPlantPhotos(plantId).collect {
-                    photo -> stateFlow.value = PlantScreenUiState(images = photo, plant = plant)
-                }
-//                stateFlow.value = PlantScreenUiState(images = photos, plant = plant)
+                val photos = repository.getPlantPhotos(plantId)
+                stateFlow.value = PlantScreenUiState(images = photos, plant = plant)
             }
 
         }
+    }
+    fun deletePlantImage(file: File){
+       repository.deletePlantImage(file)
     }
 }

@@ -19,9 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.plantCare.plantcare.R
 
-@Preview
+
 @Composable
-fun PlantPhotoCard(image: ImageBitmap) {
+fun PlantPhotoCard(image: ImageBitmap, onDelete: () -> Unit) {
     Box(
         modifier = Modifier.clip(
             RoundedCornerShape(16.dp)
@@ -38,7 +38,7 @@ fun PlantPhotoCard(image: ImageBitmap) {
             contentAlignment = Alignment.TopEnd,
         ) {
             IconButton(
-                onClick = {/*todo*/},
+                onClick = {onDelete()},
             ) {
                 Icon(Icons.Filled.Delete, "Save")
             }

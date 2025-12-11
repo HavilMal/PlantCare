@@ -15,18 +15,21 @@ import com.plantCare.plantcare.database.Note
 import com.plantCare.plantcare.database.NotesRepository
 import com.plantCare.plantcare.database.Plant
 import com.plantCare.plantcare.database.PlantRepository
-import com.plantCare.plantcare.database.PlantRepository.Companion.PLANT_PHOTO_PREFIX
 import com.plantCare.plantcare.utils.FileUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.abs
 
 
 data class PlantScreenUiState(
@@ -55,14 +58,15 @@ class PlantScreenViewModel @Inject constructor(
                 }
             }
         }
-
         viewModelScope.launch {
-            plantRepository.getPlantPhotos(plantId).collect { photo ->
-                stateFlow.update {
-                    it.copy(images = photo)
+            val plantDir = plantRepository.getPlantsDirPath(plantId)
+            if (plantDir != null) {
+                observePlantPhotos(context, plantDir).collect { images ->
+                    stateFlow.update { it.copy(images = images) }
                 }
             }
         }
+
 
         viewModelScope.launch {
             notesRepository.getPlantNotesFlow(plantId).collect { notes ->
@@ -71,33 +75,21 @@ class PlantScreenViewModel @Inject constructor(
                 }
             }
         }
-
-        viewModelScope.launch {
-            stateFlow.collect { state ->
-                if(state.plant != null){
-                    if (plantImageObserver != null) return@collect
-                    val plantDir = plantRepository.getPlantsDirPath(state.plant)
-                    Log.d("lukas","file observer init ${plantDir}")
-                    Log.d("lukas","file observer init ${File(plantDir).absolutePath}")
-                    plantImageObserver = object : FileObserver(
-                        File(context.filesDir,plantDir),
-                        CREATE or DELETE or MOVED_TO or MOVED_FROM or CLOSE_WRITE
-                    ) {
-
-                        override fun onEvent(event: Int, path: String?) {
-                            Log.d("lukas","file event occured")
-                            val updated = FileUtil.getFiles(context, plantDir)
-                                .filter { it.name.startsWith(PLANT_PHOTO_PREFIX) }
-
-                            stateFlow.update { it.copy(images = updated) }
-                        }
-                    }
-                    Log.d("lukas","file observer started watching $plantDir")
-                    plantImageObserver?.startWatching()
-                    Log.d("lukas","test file after")
-                    awaitCancellation()
-                }
+    }
+    fun observePlantPhotos(context: Context, plantDir: String): Flow<List<File>> = callbackFlow {
+        val imageDirPath = plantRepository.getPlantsImageDirPath(plantDir)
+        val initial = FileUtil.getFiles(context, imageDirPath)
+        trySend(initial)
+        val observer = object : FileObserver(File(context.filesDir, imageDirPath), CREATE or MOVED_TO or DELETE or MOVED_FROM) {
+            override fun onEvent(event: Int, path: String?) {
+                val updated = FileUtil.getFiles(context, imageDirPath)
+                trySend(updated)
             }
         }
+        observer.startWatching()
+        awaitClose { observer.stopWatching() }
+    }
+    override fun onCleared() {
+        plantImageObserver?.stopWatching()
     }
 }

@@ -29,6 +29,9 @@ fun GalleryScreen(
         ) {
             items(uiState.images) { item ->
                 PlantPhotoCard(BitmapFactory.decodeFile(item.path).asImageBitmap())
+                {
+                    viewModel.deletePlantImage(item)
+                }
             }
         }
     }
