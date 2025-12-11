@@ -46,6 +46,13 @@ data class Plant(
     @ColumnInfo(defaultValue = "MONTHLY")
     val dirPath: String,
     val wateringInterval: WateringInterval,
+    val tipsFetchedDate: LocalDate?,
+)
+
+@Entity(tableName = "plantTips")
+data class PlantTip(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
 )
 
 @Entity(
@@ -118,8 +125,10 @@ data class WateringSchedule(
 interface PlantDao {
     @Query("SELECT * FROM plants")
     fun getPlants(): Flow<List<Plant>>
+
     @Query("SELECT * FROM plants WHERE id = :plantId")
     suspend fun getPlant(plantId: Long): Plant
+
     @Query("SELECT * FROM plants WHERE id = :plantId")
     fun getPlantFlow(plantId: Long): Flow<Plant>
 
@@ -144,11 +153,13 @@ interface PlantDao {
     @Query("DELETE FROM wateringSchedule WHERE plant = :plantId")
     suspend fun deleteScheduleForPlant(plantId: Long)
 
-    @Query("""
+    @Query(
+        """
         SELECT ws1.plant, ws1.day, ws1.startingDate, p1.wateringInterval
         FROM wateringSchedule ws1 
         INNER JOIN plants p1 ON ws1.plant = p1.id
-         """)
+         """
+    )
     fun getPlantWateringSchedules(): Flow<List<PlantWateringSchedule>>
 
     @Insert

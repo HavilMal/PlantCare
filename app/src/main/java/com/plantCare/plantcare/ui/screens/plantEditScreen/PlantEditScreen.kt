@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -87,18 +86,15 @@ fun PlantEditScreen(
                 onValueChange = viewModel::setPlantName,
             )
 
-            OutlinedTextField(
+            SpeciesSearch(
+                queryString = state.species,
+                expanded = state.showSearchResults,
+                results = state.searchResults,
+                onSelect = { viewModel.setSelectedPlant(it) },
+                onQueryChange = viewModel::setSpeciesName,
+                onSearch = viewModel::searchSpecies,
+                onExpandedChange = { viewModel.setShowResults(it) },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Species") },
-                value = state.species,
-                onValueChange = viewModel::setSpecties,
-                trailingIcon = {
-                    IconButton(
-                        onClick = { viewModel.searchSpecies() }
-                    ) {
-                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
-                    }
-                }
             )
 
             // todo click on field
@@ -177,7 +173,7 @@ fun PlantEditScreen(
                 DayOfWeek.entries.forEach { dayOfWeek ->
                     ToggleButton(
                         checked = state.selectedDays.contains(dayOfWeek),
-                        onCheckedChange =  { it ->
+                        onCheckedChange = { it ->
                             if (it) {
                                 viewModel.selectDay(dayOfWeek)
                             } else {
@@ -188,7 +184,10 @@ fun PlantEditScreen(
                             .width(48.dp)
                             .height(48.dp),
                     ) {
-                        Text(dayOfWeek.getDisplayName(TextStyle.SHORT, getLocale()).first().uppercase())
+                        Text(
+                            dayOfWeek.getDisplayName(TextStyle.SHORT, getLocale()).first()
+                                .uppercase()
+                        )
                     }
 
                 }

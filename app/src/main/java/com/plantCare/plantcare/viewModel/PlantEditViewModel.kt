@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.database.WateringInterval
 import com.plantCare.plantcare.service.PlantApiRepository
+import com.plantCare.plantcare.service.PlantSearchResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,9 @@ data class PlantEditUiState(
     val sensorName: String = "",
     val interval: WateringInterval = WateringInterval.WEEK,
     val selectedDays: Set<DayOfWeek> = setOf(),
+    val showSearchResults: Boolean = false,
+    val searchResults: List<PlantSearchResult> = listOf(),
+    val selectedPlant: PlantSearchResult? = null,
 )
 
 @HiltViewModel
@@ -109,15 +113,27 @@ class PlantEditViewModel @Inject constructor(
         }
     }
 
-    fun setSpecties(species: String) {
+    fun setSpeciesName(species: String) {
         plantEditFlow.update {
             it.copy(species = species)
+        }
+    }
+
+    fun setSelectedPlant(plant: PlantSearchResult) {
+        plantEditFlow.update {
+            it.copy(selectedPlant = plant)
         }
     }
 
     fun setInterval(interval: WateringInterval) {
         plantEditFlow.update {
             it.copy(interval = interval)
+        }
+    }
+
+    fun setShowResults(expanded: Boolean) {
+        plantEditFlow.update {
+            it.copy(showSearchResults = expanded)
         }
     }
 
@@ -173,6 +189,12 @@ class PlantEditViewModel @Inject constructor(
     fun searchSpecies() {
         viewModelScope.launch {
             val results = plantApiRepository.findPlant(plantEditState.value.species)
+            plantEditFlow.update {
+                it.copy(
+                    showSearchResults = true,
+                    searchResults = results,
+                )
+            }
             Log.d("searchSpecies", results.toString())
         }
     }

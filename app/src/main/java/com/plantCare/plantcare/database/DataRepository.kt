@@ -45,7 +45,8 @@ class PlantRepository(
                 dirPath = plantUUID,
                 isIndoor = isIndoor,
                 createdOn = LocalDate.now(),
-                wateringInterval = wateringInterval
+                wateringInterval = wateringInterval,
+                tipsFetchedDate = null,
             )
         )
         FileUtil.makeDir(appContext, "$PLANTS_DIR$plantUUID", true)

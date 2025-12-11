@@ -10,6 +10,17 @@ data class PlantSearchResult(
     val scientificName: String,
 )
 
+data class PlantDetails(
+    val id: Long,
+    val commonName: String,
+    val scientificName: String,
+    val wateringValue: String,
+    val wateringUnit: String,
+    val sunlight: String,
+    val pruningMonths: List<String>,
+    val soil: List<String>,
+)
+
 class PlantApiRepository(private val plantService: PlantService) {
 
     // todo handle errors
@@ -28,7 +39,7 @@ class PlantApiRepository(private val plantService: PlantService) {
         return result
     }
 
-    suspend fun getPlantTips(plantApiId: Long) {
+    suspend fun getPlantDetails(plantApiId: Long) {
         val response = plantService.getPlantDetails(plantApiId)
 
     }

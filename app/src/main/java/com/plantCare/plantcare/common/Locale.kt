@@ -10,6 +10,10 @@ import java.util.Locale
 @Composable
 @ReadOnlyComposable
 fun getLocale(): Locale {
-  val configuration = LocalConfiguration.current
-  return ConfigurationCompat.getLocales(configuration).get(0) ?: LocaleListCompat.getDefault()[0]!!
+    val configuration = LocalConfiguration.current
+    return ConfigurationCompat.getLocales(configuration).get(0)
+        ?: LocaleListCompat.getDefault()[0]!!
 }
+
+fun String.capitalize(locale: Locale) =
+    this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
