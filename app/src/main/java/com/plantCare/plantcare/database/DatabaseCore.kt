@@ -1,11 +1,13 @@
 package com.plantCare.plantcare.database
 
+import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
@@ -15,8 +17,11 @@ import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Update
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import kotlinx.coroutines.flow.Flow
+import java.lang.reflect.Type
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -29,6 +34,17 @@ class Converters {
     @TypeConverter
     fun dateToTimestamp(date: LocalDate?): Long? {
         return date?.toEpochDay()
+    }
+
+    @TypeConverter
+    fun stringToArrayList(value: String): List<String> {
+        val listType: Type = object : TypeToken<ArrayList<String>>() {}.type
+        return Gson().fromJson(value, listType)
+    }
+
+    @TypeConverter
+    fun arrayListToString(list: List<String>): String {
+        return Gson().toJson(list)
     }
 }
 
@@ -46,13 +62,32 @@ data class Plant(
     @ColumnInfo(defaultValue = "MONTHLY")
     val dirPath: String,
     val wateringInterval: WateringInterval,
-    val tipsFetchedDate: LocalDate?,
+    val apiId: Long?
 )
 
-@Entity(tableName = "plantTips")
-data class PlantTip(
-    @PrimaryKey(autoGenerate = true)
+@Entity(
+    tableName = "plantDetails",
+    foreignKeys = [
+        ForeignKey(
+            entity = Plant::class,
+            parentColumns = ["id"],
+            childColumns = ["id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class PlantDetails(
+    @PrimaryKey(autoGenerate = false)
     val id: Long,
+    val updatedOn: LocalDate,
+    val commonName: String,
+    val scientificName: String,
+    val wateringValue: String,
+    val wateringUnit: String,
+    val sunlight: String,
+    val pruningMonths: List<String>,
+    val soil: List<String>,
+    val description: String,
 )
 
 @Entity(
@@ -62,7 +97,7 @@ data class PlantTip(
             entity = Plant::class,
             parentColumns = ["id"],
             childColumns = ["plant"],
-            onDelete = ForeignKey.NO_ACTION
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )
@@ -85,6 +120,9 @@ data class Note(
             childColumns = ["plant"],
             onDelete = ForeignKey.NO_ACTION
         )
+    ],
+    indices = [
+        Index(value = ["plant"])
     ]
 )
 data class WateringEntry(
@@ -147,6 +185,9 @@ interface PlantDao {
     @Query("SELECT * FROM wateringSchedule")
     fun getWateringSchedules(): Flow<List<WateringSchedule>>
 
+    @Query("SELECT apiId FROM plants WHERE id = :plantId")
+    fun getApiId(plantId: Long): Long?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWateringSchedule(schedule: WateringSchedule): Long
 
@@ -186,11 +227,20 @@ interface PlantDao {
             val startingDate = plant.createdOn.with(it)
             insertWateringSchedule(WateringSchedule(plantId, it, startingDate))
         }
+
+
+        Log.d("plantDao", "inserted schedule")
     }
 }
 
 @Database(
-    entities = [Plant::class, Note::class, WateringEntry::class, WateringSchedule::class],
+    entities = [
+        Plant::class,
+        Note::class,
+        WateringEntry::class,
+        WateringSchedule::class,
+        PlantDetails::class,
+    ],
     version = 1
 )
 @TypeConverters(Converters::class)
@@ -198,4 +248,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun plantDao(): PlantDao
 
     abstract fun notesDAO(): NotesDAO
+
+    abstract fun plantDetailsDAO(): PlantDetailsDao
 }

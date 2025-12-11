@@ -29,6 +29,7 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.getSelectedDate
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -63,11 +64,18 @@ fun PlantEditScreen(
     val state by viewModel.plantEditState.collectAsState()
     var showDatePicker by remember { mutableStateOf(false) }
     val locale = getLocale()
+    val context = LocalContext.current
     val formatter =
         remember(locale) { DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale) }
 
     if (state.loadingError) {
-        Toast.makeText(LocalContext.current, "Plant loading error", Toast.LENGTH_LONG)
+        Toast.makeText(context, "Plant loading error", Toast.LENGTH_LONG).show()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.toastMessage.collect {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
     }
 
     PlantEditScaffold(viewModel) { modifier ->
@@ -94,6 +102,7 @@ fun PlantEditScreen(
                 onQueryChange = viewModel::setSpeciesName,
                 onSearch = viewModel::searchSpecies,
                 onExpandedChange = { viewModel.setShowResults(it) },
+                isSearching = state.isSearching,
                 modifier = Modifier.fillMaxWidth(),
             )
 

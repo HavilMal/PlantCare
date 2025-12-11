@@ -1,7 +1,10 @@
 package com.plantCare.plantcare.ui.screens.plantEditScreen
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -18,12 +21,14 @@ import androidx.compose.ui.text.toUpperCase
 import com.plantCare.plantcare.common.capitalize
 import com.plantCare.plantcare.common.getLocale
 import com.plantCare.plantcare.service.PlantSearchResult
+import com.plantCare.plantcare.ui.theme.size
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpeciesSearch(
     queryString: String,
     expanded: Boolean,
+    isSearching: Boolean,
     results: List<PlantSearchResult>,
     onSelect: (PlantSearchResult) -> Unit,
     onQueryChange: (String) -> Unit,
@@ -44,18 +49,41 @@ fun SpeciesSearch(
             singleLine = true,
             label = { Text("Species") },
             trailingIcon = {
-                IconButton(
-                    onClick = { onSearch() }
-                ) {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                if (isSearching) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier.size(MaterialTheme.size.small)
+                    )
+                } else {
+                    IconButton(
+                        onClick = { onSearch() }
+                    ) {
+                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                    }
                 }
             },
         )
 
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
+            results.ifEmpty {
+                DropdownMenuItem(
+                    text = { Text("No results", style = MaterialTheme.typography.bodyLarge) },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    onClick = {
+                        onExpandedChange(false)
+                    },
+                )
+            }
+
             results.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.commonName.capitalize(getLocale()), style = MaterialTheme.typography.bodyLarge) },
+                    text = {
+                        Text(
+                            option.commonName.capitalize(getLocale()),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                     onClick = {
                         onExpandedChange(false)
