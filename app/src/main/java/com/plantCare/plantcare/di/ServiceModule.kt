@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.di
 
+import com.plantCare.plantcare.BuildConfig
 import com.plantCare.plantcare.service.PlantService
 import dagger.Module
 import dagger.Provides
@@ -30,7 +31,7 @@ object ServiceModule {
     @Singleton
     fun provideOkHttpClient(): OkHttpClient =
         OkHttpClient.Builder()
-            .addInterceptor(ApiKeyQueryInterceptor("todo")) // todo
+            .addInterceptor(ApiKeyQueryInterceptor(BuildConfig.PLANT_API_KEY))
             .build()
 
     @Provides
