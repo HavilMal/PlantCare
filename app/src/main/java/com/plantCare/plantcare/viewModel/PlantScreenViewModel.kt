@@ -57,5 +57,10 @@ class PlantScreenViewModel @Inject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+
+
+        }
     }
 }
