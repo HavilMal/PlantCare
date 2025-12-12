@@ -114,7 +114,7 @@ fun NoTips() {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            Text("No notes")
+            Text("No tips for this plant")
         }
     }
 }

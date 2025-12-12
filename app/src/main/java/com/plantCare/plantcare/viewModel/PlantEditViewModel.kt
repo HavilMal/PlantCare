@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.plantCare.plantcare.common.capitalize
 import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.database.WateringInterval
 import com.plantCare.plantcare.service.PlantDetailsRepository
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.util.Locale
 
 enum class EditMode(
 ) {
@@ -125,9 +127,9 @@ class PlantEditViewModel @Inject constructor(
         }
     }
 
-    fun setSelectedPlant(plant: PlantSearchResult) {
+    fun setSelectedPlant(plant: PlantSearchResult, locale: Locale) {
         plantEditFlow.update {
-            it.copy(selectedPlant = plant, species = plant.commonName)
+            it.copy(selectedPlant = plant, species = plant.commonName.capitalize(locale))
         }
     }
 

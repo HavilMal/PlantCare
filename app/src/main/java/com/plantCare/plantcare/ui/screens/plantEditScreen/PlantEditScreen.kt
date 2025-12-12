@@ -98,7 +98,7 @@ fun PlantEditScreen(
                 queryString = state.species,
                 expanded = state.showSearchResults,
                 results = state.searchResults,
-                onSelect = { viewModel.setSelectedPlant(it) },
+                onSelect = { viewModel.setSelectedPlant(it, locale) },
                 onQueryChange = viewModel::setSpeciesName,
                 onSearch = viewModel::searchSpecies,
                 onExpandedChange = { viewModel.setShowResults(it) },

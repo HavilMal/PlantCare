@@ -41,7 +41,7 @@ class PlantScreenViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             plantRepository.getPlant(plantId).collect { plant ->
-                stateFlow.update{
+                stateFlow.update {
                     it.copy(plant = plant)
                 }
             }
@@ -63,10 +63,10 @@ class PlantScreenViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            // fix: Cannot access database on the main thread since it may potentially lock the UI for a long period of time
-            val details = detailsRepository.getPlantDetails(plantId)
-            stateFlow.update {
-                it.copy(plantDetails = details)
+            detailsRepository.getPlantDetails(plantId).collect { details ->
+                stateFlow.update {
+                    it.copy(plantDetails = details)
+                }
             }
         }
     }

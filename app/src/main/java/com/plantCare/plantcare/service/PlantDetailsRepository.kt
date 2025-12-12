@@ -8,7 +8,12 @@ import com.plantCare.plantcare.database.PlantDetailsDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -28,10 +33,10 @@ class PlantDetailsRepository(
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     // todo handle errors
-    suspend fun findPlant(plantName: String): List<PlantSearchResult>?{
+    suspend fun findPlant(plantName: String): List<PlantSearchResult>? {
         val response: JsonObject
         try {
-             response = plantService.findPlant(plantName)
+            response = plantService.findPlant(plantName)
         } catch (_: Exception) {
             return null
         }
@@ -41,62 +46,85 @@ class PlantDetailsRepository(
 
         for (i in 0..<plants.size()) {
             val p: JsonObject = plants.get(i).asJsonObject
-            result.add(PlantSearchResult(p["id"].asLong, p["common_name"].asString, p["scientific_name"].asString))
+            result.add(
+                PlantSearchResult(
+                    p["id"].asLong,
+                    p["common_name"].asString,
+                    p["scientific_name"].asString
+                )
+            )
         }
 
         return result
     }
 
-    suspend fun getPlantDetails(plantId: Long): PlantDetails? {
-        val savedDetails = plantDetailsDao.getDetails(plantId)
-        if (savedDetails != null) {
-            val daysPassed = ChronoUnit.DAYS.between(savedDetails.updatedOn, LocalDate.now())
-            if (daysPassed > 31) {
-                repositoryScope.launch {
-                    updatePlantDetails(plantId)
+    fun getPlantDetails(plantId: Long): Flow<PlantDetails?> =
+        flow {
+            val savedDetails = plantDetailsDao.getDetails(plantId).first()
+            Log.d("plantDetails", "saved details: $savedDetails")
+
+            if (savedDetails != null) {
+                val daysPassed = ChronoUnit.DAYS.between(savedDetails.updatedOn, LocalDate.now())
+                if (daysPassed > 31) {
+                    updatePlantDetails(plantId).collect { details ->
+                        emit(details)
+                    }
                 }
+
+                emit(savedDetails)
+                return@flow
             }
 
-            return savedDetails
+            Log.d("plantDetails", "fetching saved details`")
+            updatePlantDetails(plantId).collect { details ->
+                Log.d("plantDetails", "fetched details: $details")
+                emit(details)
+            }
+            return@flow
         }
 
-        return updatePlantDetails(plantId)
-    }
+    fun updatePlantDetails(plantId: Long): Flow<PlantDetails?> =
+        flow {
+            val plantApiId = plantDao.getApiId(plantId)
 
-    suspend fun updatePlantDetails(plantId: Long): PlantDetails? {
-        val plantApiId = plantDao.getApiId(plantId)
+            Log.d("plantDetails", "plantApiId: $plantApiId")
+            if (plantApiId == null) {
+                emit(null)
+                return@flow
+            }
 
-        if (plantApiId == null) {
-            return null
-        }
+            val r: JsonObject
+            try {
+                Log.d("plantDetails", "calling api for details")
+                r = plantService.getPlantDetails(plantApiId)
+            } catch (e: Exception) {
+                emit(null)
+                Log.d("plantDetails", "failed to fetch: $e")
+                return@flow
+            }
 
-        val r: JsonObject
-        try {
-            r = plantService.getPlantDetails(plantApiId)
-        } catch (_: Exception) {
-            return null
-        }
+            val wateringValue = r["watering_general_benchmark"].asJsonObject["value"].asString
+            val wateringUnit = r["watering_general_benchmark"].asJsonObject["unit"].asString
+            val pruningMonths = r["pruning_month"].asJsonArray.map { it.asString }
+            val soil = r["soil"].asJsonArray.map { it.asString }
+            val sunlight = r["sunlight"].asJsonArray.map { it.asString }
 
-        val wateringValue = r["watering_general_benchmark"].asJsonObject["value"].asString
-        val wateringUnit = r["watering_general_benchmark"].asJsonObject["unit"].asString
-        val pruningMonths = r["pruning_month"].asJsonArray.map { it.asString }
-        val soil = r["soil"].asJsonArray.map { it.asString }
-        val sunlight = r["sunlight"].asJsonArray.map { it.asString }
+            val details = PlantDetails(
+                id = plantId,
+                updatedOn = LocalDate.now(),
+                commonName = r["common_name"].asString,
+                scientificName = r["scientific_name"].asString,
+                wateringValue = wateringValue,
+                wateringUnit = wateringUnit,
+                sunlight = sunlight,
+                pruningMonths = pruningMonths,
+                soil = soil,
+                description = r["description"].asString
+            )
 
-        val details = PlantDetails(
-            id = plantId,
-            updatedOn = LocalDate.now(),
-            commonName = r["common_name"].asString,
-            scientificName = r["scientific_name"].asString,
-            wateringValue = wateringValue,
-            wateringUnit = wateringUnit,
-            sunlight = sunlight,
-            pruningMonths = pruningMonths,
-            soil = soil,
-            description = r["description"].asString
-        )
-
-        plantDetailsDao.updateDetails(details)
-        return details
-    }
+            plantDetailsDao.updateDetails(details)
+            emit(details)
+            Log.d("plantDetails", "parsed details: $details")
+            return@flow
+        }.flowOn(Dispatchers.IO)
 }
