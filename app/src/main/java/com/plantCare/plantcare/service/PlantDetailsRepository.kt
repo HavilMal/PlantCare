@@ -29,6 +29,7 @@ class PlantDetailsRepository(
     private val plantDetailsDao: PlantDetailsDao,
     private val plantDao: PlantDao,
 ) {
+    private val apiIdLimit = 3000
     private val cacheDuration = 31
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -46,13 +47,15 @@ class PlantDetailsRepository(
 
         for (i in 0..<plants.size()) {
             val p: JsonObject = plants.get(i).asJsonObject
-            result.add(
-                PlantSearchResult(
-                    p["id"].asLong,
-                    p["common_name"].asString,
-                    p["scientific_name"].asString
+            if (p["id"].asLong <= apiIdLimit) {
+                result.add(
+                    PlantSearchResult(
+                        p["id"].asLong,
+                        p["common_name"].asString,
+                        p["scientific_name"].asString
+                    )
                 )
-            )
+            }
         }
 
         return result

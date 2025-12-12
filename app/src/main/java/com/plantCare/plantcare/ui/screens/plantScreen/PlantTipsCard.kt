@@ -127,16 +127,19 @@ data class Tip(
 fun detailsToTips(details: PlantDetails, locale: Locale): List<Tip> {
     val tips = mutableListOf<Tip>()
 
+   details.wateringValue.filter { it != '"' }.ifNotEmpty { value ->
     tips.add(
         Tip(
             "Watering",
-            "${details.commonName.capitalize(locale)} should be watered ${details.wateringValue} times a ${
+            "${details.commonName.capitalize(locale)} should be watered every $value ${
                 details.wateringUnit.lowercase(
                     locale
                 )
             }."
         )
     )
+   }
+
 
     listToStringWith(details.sunlight, "or").ifNotEmpty { sunlight ->
         tips.add(
