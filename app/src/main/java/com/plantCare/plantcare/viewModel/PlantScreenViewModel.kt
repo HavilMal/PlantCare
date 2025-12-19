@@ -24,6 +24,7 @@ data class PlantScreenUiState(
     val notes: List<Note> = emptyList(),
     val plant: Plant? = null,
     val plantDetails: PlantDetails? = null,
+    val dialogOpen: Boolean = false,
 )
 
 @HiltViewModel
@@ -67,6 +68,20 @@ class PlantScreenViewModel @Inject constructor(
                 stateFlow.update {
                     it.copy(plantDetails = details)
                 }
+            }
+        }
+    }
+
+    fun setDialogState(open: Boolean) {
+        stateFlow.update {
+            it.copy(dialogOpen = open)
+        }
+    }
+
+    fun deleteCurrentPlant() {
+        viewModelScope.launch {
+            uiState.value.plant?.let{ plant ->
+                plantRepository.deletePlant(plant)
             }
         }
     }

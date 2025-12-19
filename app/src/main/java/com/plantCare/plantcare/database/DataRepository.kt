@@ -112,18 +112,20 @@ class PlantRepository(
         wateringInterval: WateringInterval? = null,
         apiId: Long? = null,
     ) {
-        plantDao.getPlantFlow(id).collect { plant ->
-            plantDao.updatePlant(
-                plant.copy(
-                    id = id,
-                    name = name ?: plant.name,
-                    isIndoor = isIndoor ?: plant.isIndoor,
-                    species = species ?: plant.species,
-                    plantedOn = plantedOn ?: plant.plantedOn,
-                    wateringInterval = wateringInterval ?: plant.wateringInterval,
-                    apiId = apiId ?: plant.apiId,
+        plantDao.getPlantFlow(id).collect {
+            it?.let { plant ->
+                plantDao.updatePlant(
+                    plant.copy(
+                        id = id,
+                        name = name ?: plant.name,
+                        isIndoor = isIndoor ?: plant.isIndoor,
+                        species = species ?: plant.species,
+                        plantedOn = plantedOn ?: plant.plantedOn,
+                        wateringInterval = wateringInterval ?: plant.wateringInterval,
+                        apiId = apiId ?: plant.apiId,
+                    )
                 )
-            )
+            }
         }
     }
 }

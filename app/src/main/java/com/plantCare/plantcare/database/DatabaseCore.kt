@@ -169,7 +169,7 @@ interface PlantDao {
     suspend fun getPlant(plantId: Long): Plant
 
     @Query("SELECT * FROM plants WHERE id = :plantId")
-    fun getPlantFlow(plantId: Long): Flow<Plant>
+    fun getPlantFlow(plantId: Long): Flow<Plant?>
 
     @Query("SELECT dirPath FROM plants WHERE id = :plantId")
     suspend fun getPlantDirPath(plantId: Long): String?
@@ -228,9 +228,6 @@ interface PlantDao {
             val startingDate = plant.createdOn.with(it)
             insertWateringSchedule(WateringSchedule(plantId, it, startingDate))
         }
-
-
-        Log.d("plantDao", "inserted schedule")
     }
 }
 
