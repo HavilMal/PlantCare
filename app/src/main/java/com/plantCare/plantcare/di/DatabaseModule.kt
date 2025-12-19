@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.plantCare.plantcare.database.AppDatabase
 import com.plantCare.plantcare.database.NotesDAO
 import com.plantCare.plantcare.database.PlantDao
+import com.plantCare.plantcare.database.PlantDetailsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,13 +31,18 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun providePlantDao(database: AppDatabase): PlantDao {
-         return database.plantDao()
+        return database.plantDao()
     }
 
     @Provides
     @Singleton
     fun provideNotesDAO(database: AppDatabase): NotesDAO {
-         return database.notesDAO()
+        return database.notesDAO()
     }
 
+    @Provides
+    @Singleton
+    fun providePlantDetailsDAO(database: AppDatabase): PlantDetailsDao {
+        return database.plantDetailsDAO()
+    }
 }

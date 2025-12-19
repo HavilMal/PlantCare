@@ -107,7 +107,9 @@ fun PlantScreen(
             }
 
             item {
-                PlantTipsCard()
+                PlantTipsCard(
+                    details = uiState.plantDetails,
+                )
             }
         }
     }

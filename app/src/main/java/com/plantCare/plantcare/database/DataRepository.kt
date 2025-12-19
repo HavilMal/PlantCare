@@ -1,6 +1,7 @@
 package com.plantCare.plantcare.database
 
 import android.content.Context
+import android.util.Log
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.utils.FileUtil
@@ -23,10 +24,6 @@ class PlantRepository(
         }
     }
 
-    suspend fun insertPlant(plant: Plant) {
-        plantDao.insertPlant(plant)
-    }
-
     suspend fun insertPlant(
         name: String,
         description: String,
@@ -34,6 +31,7 @@ class PlantRepository(
         plantedOn: LocalDate = LocalDate.now(),
         isIndoor: Boolean = true,
         wateringInterval: WateringInterval = WateringInterval.WEEK,
+        apiId: Long? = null,
     ): Long {
         val plantUUID = RandomUtil.genUUIDString()
         val id = plantDao.insertPlant(
@@ -45,10 +43,13 @@ class PlantRepository(
                 dirPath = plantUUID,
                 isIndoor = isIndoor,
                 createdOn = LocalDate.now(),
-                wateringInterval = wateringInterval
+                wateringInterval = wateringInterval,
+                apiId = apiId,
             )
         )
         FileUtil.makeDir(appContext, "$PLANTS_DIR$plantUUID", true)
+
+        Log.d("plantRepository", "inserted plant")
         return id
     }
 
@@ -109,6 +110,7 @@ class PlantRepository(
         species: String? = null,
         plantedOn: LocalDate? = null,
         wateringInterval: WateringInterval? = null,
+        apiId: Long? = null,
     ) {
         plantDao.getPlantFlow(id).collect { plant ->
             plantDao.updatePlant(
@@ -118,7 +120,8 @@ class PlantRepository(
                     isIndoor = isIndoor ?: plant.isIndoor,
                     species = species ?: plant.species,
                     plantedOn = plantedOn ?: plant.plantedOn,
-                    wateringInterval = wateringInterval ?: plant.wateringInterval
+                    wateringInterval = wateringInterval ?: plant.wateringInterval,
+                    apiId = apiId ?: plant.apiId,
                 )
             )
         }

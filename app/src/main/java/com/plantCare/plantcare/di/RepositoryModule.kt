@@ -5,7 +5,10 @@ import com.plantCare.plantcare.database.AppRepository
 import com.plantCare.plantcare.database.NotesDAO
 import com.plantCare.plantcare.database.NotesRepository
 import com.plantCare.plantcare.database.PlantDao
+import com.plantCare.plantcare.database.PlantDetailsDao
 import com.plantCare.plantcare.database.PlantRepository
+import com.plantCare.plantcare.service.PlantDetailsRepository
+import com.plantCare.plantcare.service.PlantService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +40,20 @@ object RepositoryModule {
         return NotesRepository(
             notesDAO = notesDAO
         )
+    }
+
+    @Provides
+    @Singleton
+    fun providePlantDetailsRepository(
+        plantService: PlantService,
+        plantDetailsDao: PlantDetailsDao,
+        plantDao: PlantDao,
+    ): PlantDetailsRepository {
+         return PlantDetailsRepository(
+             plantService = plantService,
+             plantDetailsDao = plantDetailsDao,
+             plantDao = plantDao,
+         )
     }
 
     @Provides
