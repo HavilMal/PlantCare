@@ -64,8 +64,6 @@ class PlantDetailsRepository(
     fun getPlantDetails(plantId: Long): Flow<PlantDetails?> =
         flow {
             val savedDetails = plantDetailsDao.getDetails(plantId).first()
-            Log.d("plantDetails", "saved details: $savedDetails")
-
             if (savedDetails != null) {
                 val daysPassed = ChronoUnit.DAYS.between(savedDetails.updatedOn, LocalDate.now())
                 if (daysPassed > 31) {
@@ -78,9 +76,7 @@ class PlantDetailsRepository(
                 return@flow
             }
 
-            Log.d("plantDetails", "fetching saved details`")
             updatePlantDetails(plantId).collect { details ->
-                Log.d("plantDetails", "fetched details: $details")
                 emit(details)
             }
             return@flow
@@ -90,7 +86,6 @@ class PlantDetailsRepository(
         flow {
             val plantApiId = plantDao.getApiId(plantId)
 
-            Log.d("plantDetails", "plantApiId: $plantApiId")
             if (plantApiId == null) {
                 emit(null)
                 return@flow
@@ -98,11 +93,9 @@ class PlantDetailsRepository(
 
             val r: JsonObject
             try {
-                Log.d("plantDetails", "calling api for details")
                 r = plantService.getPlantDetails(plantApiId)
             } catch (e: Exception) {
                 emit(null)
-                Log.d("plantDetails", "failed to fetch: $e")
                 return@flow
             }
 
@@ -127,7 +120,6 @@ class PlantDetailsRepository(
 
             plantDetailsDao.updateDetails(details)
             emit(details)
-            Log.d("plantDetails", "parsed details: $details")
             return@flow
         }.flowOn(Dispatchers.IO)
 }

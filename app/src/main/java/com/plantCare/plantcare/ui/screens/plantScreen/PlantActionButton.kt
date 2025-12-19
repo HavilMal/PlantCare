@@ -50,7 +50,6 @@ import com.plantCare.plantcare.viewModel.EditMode
 
 // todo close on tap outside
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Preview
 @Composable
 fun PlantActionButton(plantId: Long?) {
     val listState = rememberLazyListState()
