@@ -9,16 +9,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.plantCare.plantcare.viewModel.GalleryViewModel
+
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.plantCare.plantcare.viewModel.PlantScreenViewModel
 
 @Preview
 @Composable
 fun GalleryScreen(
-    viewModel:  GalleryViewModel = hiltViewModel()
+    viewModel: PlantScreenViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -27,10 +27,10 @@ fun GalleryScreen(
             modifier = modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(uiState.images) { item ->
-                PlantPhotoCard(BitmapFactory.decodeFile(item.path).asImageBitmap())
+            items(uiState.media) { item ->
+                PlantMediaCard(item)
                 {
-                    viewModel.deletePlantImage(item)
+                    viewModel.deletePlantMedia(item)
                 }
             }
         }

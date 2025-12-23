@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +33,8 @@ import com.plantCare.plantcare.database.Plant
 import com.plantCare.plantcare.utils.FileUtil
 import com.plantCare.plantcare.viewModel.DeviceGalleryScreenViewModel
 import com.plantCare.plantcare.viewModel.PlantScreenViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -40,17 +43,25 @@ fun DeviceGalleryScreen(
     viewModel: DeviceGalleryScreenViewModel = hiltViewModel()
 ) {
     val navController = NavigationController.current
+    val scope = rememberCoroutineScope()
+
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia(maxItems = 50)
-    ) {uris ->
-        viewModel.saveImages(uris)
-        navController?.popBackStack()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            scope.launch {
+                viewModel.saveMedia(uris)
+                navController?.popBackStack()
+            }
+        } else {
+            navController?.popBackStack()
+        }
     }
 
     LaunchedEffect(Unit) {
         launcher.launch(
             PickVisualMediaRequest(
-                ActivityResultContracts.PickVisualMedia.ImageOnly
+                ActivityResultContracts.PickVisualMedia.ImageAndVideo
             )
         )
     }

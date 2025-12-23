@@ -23,7 +23,7 @@ class PlantCameraCaptureViewModel @Inject constructor(
     fun savePhoto(file: File?){
         viewModelScope.launch {
             if(file != null) {
-                repository.addPlantPhoto(plantId, file)
+                repository.addPlantMedia(plantId, file)
             }
         }
     }

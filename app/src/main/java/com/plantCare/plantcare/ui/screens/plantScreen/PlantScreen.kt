@@ -1,6 +1,7 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,21 +18,32 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.AsyncImage
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.database.Note
+import com.plantCare.plantcare.utils.FileUtil
+import com.plantCare.plantcare.utils.MediaUtil
 import com.plantCare.plantcare.viewModel.EditMode
 import com.plantCare.plantcare.viewModel.PlantScreenViewModel
+import kotlinx.coroutines.flow.filter
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,10 +56,9 @@ fun PlantScreen(
         val imageFile: File,
         val contentDescription: String
     )
-
     val uiState by viewModel.uiState.collectAsState()
 
-    val items = uiState.images.mapIndexed { index, file ->
+    val items = uiState.media.mapIndexed { index, file ->
         CarouselItem(
             id = index,
             imageFile = file,
@@ -81,17 +92,29 @@ fun PlantScreen(
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) { i ->
                     val item = items[i]
-                    AsyncImage(
-                        modifier = Modifier
-                            .height(205.dp)
-                            .maskClip(MaterialTheme.shapes.extraLarge)
-                            .clickable {
-                                navController?.navigate(Route.GALLERY.routeWithArgs(uiState.plant?.id))
-                            },
-                        contentDescription = item.contentDescription,
-                        model = File(item.imageFile.absolutePath),
-                        contentScale = ContentScale.Crop
-                    )
+                    val media = item.imageFile
+
+                    val bitmap = remember(media) {
+                        if (FileUtil.isVideo(media)) {
+                            MediaUtil.getImageRepresentationOfVideo(media)
+                        } else {
+                            BitmapFactory.decodeFile(media.absolutePath)
+                        }?.asImageBitmap()
+                    }
+
+                    bitmap?.let {
+                        Image(
+                            modifier = Modifier
+                                .height(205.dp)
+                                .maskClip(MaterialTheme.shapes.extraLarge)
+                                .clickable {
+                                    navController?.navigate(Route.GALLERY.routeWithArgs(uiState.plant?.id))
+                                },
+                            bitmap = it,
+                            contentDescription = item.contentDescription,
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
 

@@ -5,6 +5,7 @@ import android.net.Uri
 import java.io.File
 import kotlin.io.deleteRecursively
 import android.util.Log
+import android.webkit.MimeTypeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -46,17 +47,28 @@ object FileUtil {
         }
         return file
     }
-    suspend fun copyUriToFile(context: Context,uri: Uri): File =
-    withContext(Dispatchers.IO) {
-        val inputStream = context.contentResolver.openInputStream(uri)!!
-        val tempFile = File(context.cacheDir, "picked_${System.currentTimeMillis()}.jpg")
-        tempFile.outputStream().use { output ->
-            inputStream.copyTo(output)
+    suspend fun copyUriToFile(context: Context, uri: Uri): File = withContext(Dispatchers.IO) {
+        val contentResolver = context.contentResolver
+        val mimeType = contentResolver.getType(uri)
+        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "tmp"
+
+        val tempFile = File(context.cacheDir, "picked_${System.currentTimeMillis()}.$extension")
+
+        contentResolver.openInputStream(uri)?.use { inputStream ->
+            tempFile.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
         }
+
         tempFile
     }
 
     fun delete(file: File){
         file.delete()
+    }
+
+
+    fun isVideo(file: File) : Boolean {
+        return file.extension == "mp4"
     }
 }

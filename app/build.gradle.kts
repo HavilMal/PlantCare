@@ -77,6 +77,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.compiler)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.datastore.preferences)
