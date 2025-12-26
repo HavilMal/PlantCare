@@ -26,6 +26,8 @@ import coil3.compose.AsyncImage
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.common.addQuery
+import com.plantCare.plantcare.utils.FileUtil
+import com.plantCare.plantcare.utils.MediaUtil
 import com.plantCare.plantcare.viewModel.EditMode
 import com.plantCare.plantcare.viewModel.PlantScreenViewModel
 import java.io.File
@@ -43,7 +45,7 @@ fun PlantScreen(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    val items = uiState.images.mapIndexed { index, file ->
+    val items = uiState.media.mapIndexed { index, file ->
         CarouselItem(
             id = index,
             imageFile = file,
@@ -88,15 +90,23 @@ fun PlantScreen(
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) { i ->
                     val item = items[i]
+                    val file = item.imageFile
+
                     AsyncImage(
                         modifier = Modifier
                             .height(205.dp)
                             .maskClip(MaterialTheme.shapes.extraLarge)
                             .clickable {
-                                navController?.navigate(Route.GALLERY.routeWithArgs(uiState.plant?.id))
+                                navController?.navigate(
+                                    Route.GALLERY.routeWithArgs(uiState.plant?.id)
+                                )
                             },
                         contentDescription = item.contentDescription,
-                        model = File(item.imageFile.absolutePath),
+                        model = if (FileUtil.isVideo(file)) {
+                            MediaUtil.getImageRepresentationOfVideo(file)
+                        } else {
+                            file
+                        },
                         contentScale = ContentScale.Crop
                     )
                 }

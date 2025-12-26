@@ -9,6 +9,7 @@ import com.plantCare.plantcare.database.PlantDetailsDao
 import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.service.PlantDetailsRepository
 import com.plantCare.plantcare.service.PlantService
+import com.plantCare.plantcare.database.SettingsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,9 +59,17 @@ object RepositoryModule {
 
     @Provides
     @Singleton
+    fun provideSettingsRepository(
+        @ApplicationContext context: Context
+    ): SettingsRepository {
+        return SettingsRepository(context)
+    }
+    @Provides
+    @Singleton
     fun provideAppRepository(
-        plantRepository: PlantRepository
+        plantRepository: PlantRepository,
+        settingsRepository: SettingsRepository
     ): AppRepository {
-        return AppRepository(plantRepository)
+        return AppRepository(plantRepository,settingsRepository)
     }
 }

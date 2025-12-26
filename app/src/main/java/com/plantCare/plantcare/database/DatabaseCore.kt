@@ -9,13 +9,13 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.Insert
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 import androidx.room.Update
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -60,7 +60,6 @@ data class Plant(
     val plantedOn: LocalDate,
     val createdOn: LocalDate,
     @ColumnInfo(defaultValue = "MONTHLY")
-    val dirPath: String,
     val wateringInterval: WateringInterval,
     val apiId: Long?
 )
@@ -110,6 +109,22 @@ data class Note(
     val note: String,
 )
 
+@Entity(
+    tableName = "plantMedia",
+    primaryKeys = ["plant", "media"],
+    foreignKeys = [
+        ForeignKey(
+            entity = Plant::class,
+            parentColumns = ["id"],
+            childColumns = ["plant"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class PlantMedia(
+    val plant: Long,
+    val media: String // name of the file in media/
+)
 
 @Entity(
     tableName = "wateringHistory",
@@ -119,7 +134,7 @@ data class Note(
             entity = Plant::class,
             parentColumns = ["id"],
             childColumns = ["plant"],
-            onDelete = ForeignKey.NO_ACTION
+            onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [
@@ -171,9 +186,8 @@ interface PlantDao {
     @Query("SELECT * FROM plants WHERE id = :plantId")
     fun getPlantFlow(plantId: Long): Flow<Plant?>
 
-    @Query("SELECT dirPath FROM plants WHERE id = :plantId")
-    suspend fun getPlantDirPath(plantId: Long): String?
-
+    @Query("SELECT media FROM plantMedia WHERE plant = :plantId")
+    fun getPlantMediaFlow(plantId: Long): Flow<List<String>>
     @Query("SELECT date FROM wateringHistory WHERE plant = :plantId")
     fun getPlantWateringHistory(plantId: Long): Flow<List<LocalDate>>
 
@@ -182,6 +196,8 @@ interface PlantDao {
 
     @Query("DELETE FROM plants")
     suspend fun deleteAllPlants()
+    @Query("DELETE FROM plantMedia WHERE media = :media")
+    suspend fun deletePlantMedia(media: String)
 
     @Query("SELECT * FROM wateringSchedule")
     fun getWateringSchedules(): Flow<List<WateringSchedule>>
@@ -206,12 +222,18 @@ interface PlantDao {
 
     @Insert
     suspend fun insertPlant(plant: Plant): Long
+    @Insert
+    suspend fun insertPlantMedia(plantMedia: PlantMedia)
+    @Query("INSERT INTO plantMedia(plant, media) VALUES (:plantId, :mediaName)")
+    suspend fun insertPlantMedia(plantId: Long, mediaName: String)
 
     @Insert
     suspend fun insertWateringEntry(wateringEntry: WateringEntry): Long
 
     @Delete
     suspend fun deletePlant(plant: Plant)
+    @Delete
+    suspend fun deletePlantMedia(plantMedia: PlantMedia)
 
     @Update
     suspend fun updatePlant(plant: Plant)
@@ -238,6 +260,7 @@ interface PlantDao {
         WateringEntry::class,
         WateringSchedule::class,
         PlantDetails::class,
+        PlantMedia::class
     ],
     version = 1
 )
@@ -248,4 +271,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun notesDAO(): NotesDAO
 
     abstract fun plantDetailsDAO(): PlantDetailsDao
+
 }

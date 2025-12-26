@@ -1,6 +1,7 @@
 package com.plantCare.plantcare.di
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Room
 import com.plantCare.plantcare.database.AppDatabase
 import com.plantCare.plantcare.database.NotesDAO
@@ -11,6 +12,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.util.concurrent.Executors
 import javax.inject.Singleton
 
 const val DATABASE_NAME = "plant_care_db"
@@ -33,16 +35,16 @@ object DatabaseModule {
     fun providePlantDao(database: AppDatabase): PlantDao {
         return database.plantDao()
     }
-
-    @Provides
-    @Singleton
-    fun provideNotesDAO(database: AppDatabase): NotesDAO {
-        return database.notesDAO()
-    }
-
     @Provides
     @Singleton
     fun providePlantDetailsDAO(database: AppDatabase): PlantDetailsDao {
         return database.plantDetailsDAO()
     }
+
+    @Provides
+    @Singleton
+    fun provideNotesDAO(database: AppDatabase): NotesDAO {
+         return database.notesDAO()
+    }
+
 }

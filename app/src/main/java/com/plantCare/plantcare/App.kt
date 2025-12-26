@@ -18,6 +18,7 @@ fun App(
 
     LaunchedEffect(Unit) {
         viewModel.seedDatabase()
+//        viewModel.appRepository.setDefaultSettings()
     }
 
     val navController = rememberNavController()

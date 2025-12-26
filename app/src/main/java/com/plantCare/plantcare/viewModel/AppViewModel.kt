@@ -15,6 +15,6 @@ class AppViewModel @Inject constructor(
     suspend fun seedDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
             appRepository.seedDatabase()
-        }
+            }
     }
 }

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ec873cbf6f1d2d9e91a4d023cae9dd47",
+    "identityHash": "fe444d9d2735d67e05cc42194b811d3f",
     "entities": [
       {
         "tableName": "plants",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `isIndoor` INTEGER NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `createdOn` INTEGER NOT NULL, `dirPath` TEXT NOT NULL DEFAULT 'MONTHLY', `wateringInterval` TEXT NOT NULL, `apiId` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `isIndoor` INTEGER NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `createdOn` INTEGER NOT NULL, `wateringInterval` TEXT NOT NULL DEFAULT 'MONTHLY', `apiId` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -51,17 +51,11 @@
             "notNull": true
           },
           {
-            "fieldPath": "dirPath",
-            "columnName": "dirPath",
-            "affinity": "TEXT",
-            "notNull": true,
-            "defaultValue": "'MONTHLY'"
-          },
-          {
             "fieldPath": "wateringInterval",
             "columnName": "wateringInterval",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": true,
+            "defaultValue": "'MONTHLY'"
           },
           {
             "fieldPath": "apiId",
@@ -127,7 +121,7 @@
       },
       {
         "tableName": "wateringHistory",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`plant` INTEGER NOT NULL, `date` INTEGER NOT NULL, PRIMARY KEY(`plant`, `date`), FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`plant` INTEGER NOT NULL, `date` INTEGER NOT NULL, PRIMARY KEY(`plant`, `date`), FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "plant",
@@ -163,7 +157,7 @@
         "foreignKeys": [
           {
             "table": "plants",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "plant"
@@ -302,11 +296,49 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "plantMedia",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`plant` INTEGER NOT NULL, `media` TEXT NOT NULL, PRIMARY KEY(`plant`, `media`), FOREIGN KEY(`plant`) REFERENCES `plants`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "plant",
+            "columnName": "plant",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "media",
+            "columnName": "media",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "plant",
+            "media"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "plants",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "plant"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ec873cbf6f1d2d9e91a4d023cae9dd47')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe444d9d2735d67e05cc42194b811d3f')"
     ]
   }
 }

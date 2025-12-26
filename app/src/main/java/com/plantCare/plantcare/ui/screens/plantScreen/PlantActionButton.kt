@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -70,8 +71,8 @@ fun PlantActionButton(plantId: Long?) {
                     EditMode.ADD, plantId
                 )
             ),
-            MenuItem(Icons.Filled.People, "Photo", Route.CAMERA.route),       // todo
-            MenuItem(Icons.Filled.Contacts, "Image", Route.GALLERY.route),    // todo
+            MenuItem(Icons.Filled.People, "Camera", Route.CAMERA.routeWithArgs(plantId)),
+            MenuItem(Icons.Filled.Contacts, "Gallery", Route.DEVICE_GALLERY.routeWithArgs(plantId))
         )
 
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
