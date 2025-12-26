@@ -123,7 +123,7 @@ data class Note(
 )
 data class PlantMedia(
     val plant: Long,
-    val media: String
+    val media: String // name of the file in media/
 )
 
 @Entity(

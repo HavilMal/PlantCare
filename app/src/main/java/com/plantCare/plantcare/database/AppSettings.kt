@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 
@@ -57,6 +59,9 @@ class SettingsRepository(private val context: Context) {
             prefs[PreferencesKeys.LOCATION_LAT] = lat
             prefs[PreferencesKeys.LOCATION_LON] = lon
         }
+    }
+    suspend fun getLocation() : Pair<Double, Double> {
+        return location.first()
     }
 
     suspend fun setNotificationMode(setting: AppSettingNotificationMode) {

@@ -17,7 +17,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.viewModel.SettingsViewModel
-import com.plantCare.plantcare.utils.MapUtil.mapPinSelection
+import com.plantCare.plantcare.utils.MapUtil.MapUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
@@ -32,10 +36,11 @@ fun SettingsScreen(
 
     val settings = listOf(
         Setting("Location", uiState.location.toString()) {
-
-            mapPinSelection(context) { lat, lon ->
-                Log.d("lukas", "LAT = $lat, LON = $lon")
-                viewModel.setLocation(lat,lon)
+            CoroutineScope(Dispatchers.Main).launch {
+                val (lat, lon) = viewModel.settingsRepository.getLocation()
+                MapUtils.locationSelectionMap(context, lat, lon) { lat, lon ->
+                    viewModel.setLocation(lat, lon)
+                }
             }
         },
         Setting("Date format", uiState.dateFormat,{}),
