@@ -24,9 +24,7 @@ class PlantRepository(
             return System.currentTimeMillis().toString()
         }
     }
-    suspend fun insertPlant(plant: Plant) {
-        plantDao.insertPlant(plant)
-    }
+
     fun getPlantDirName(plantId: Long) : String{
         return plantId.toString()
     }
@@ -37,6 +35,7 @@ class PlantRepository(
         plantedOn: LocalDate = LocalDate.now(),
         isIndoor: Boolean = true,
         wateringInterval: WateringInterval = WateringInterval.WEEK,
+        apiId: Long? = null,
     ): Long {
         val id = plantDao.insertPlant(
             Plant(
@@ -46,7 +45,8 @@ class PlantRepository(
                 plantedOn = plantedOn,
                 isIndoor = isIndoor,
                 createdOn = LocalDate.now(),
-                wateringInterval = wateringInterval
+                wateringInterval = wateringInterval,
+                apiId = apiId,
             )
         )
         FileUtil.makeDir(appContext, "$PLANTS_DIR${getPlantDirName(id)}/$PLANT_MEDIA_DIR_NAME", true)
@@ -98,11 +98,9 @@ class PlantRepository(
     suspend fun addPlantMedia(plantId: Long, media: File) {
         val new_name = "${genPlantMediaId()}.${media.extension}"
         plantDao.insertPlantMedia(plantId,new_name)
-
-        val plantDir = getPlantsDirPath(plantId)
         val destFile = File(
             appContext.filesDir,
-            "$plantDir/${PLANT_MEDIA_DIR_NAME}/$new_name"
+            "${getPlantsMediaDirPath(plantId)}/$new_name"
         )
         media.copyTo(destFile, overwrite = true)
     }
@@ -128,18 +126,22 @@ class PlantRepository(
         species: String? = null,
         plantedOn: LocalDate? = null,
         wateringInterval: WateringInterval? = null,
+        apiId: Long? = null,
     ) {
-        plantDao.getPlantFlow(id).collect { plant ->
-            plantDao.updatePlant(
-                plant.copy(
-                    id = id,
-                    name = name ?: plant.name,
-                    isIndoor = isIndoor ?: plant.isIndoor,
-                    species = species ?: plant.species,
-                    plantedOn = plantedOn ?: plant.plantedOn,
-                    wateringInterval = wateringInterval ?: plant.wateringInterval
+        plantDao.getPlantFlow(id).collect {
+            it?.let { plant ->
+                plantDao.updatePlant(
+                    plant.copy(
+                        id = id,
+                        name = name ?: plant.name,
+                        isIndoor = isIndoor ?: plant.isIndoor,
+                        species = species ?: plant.species,
+                        plantedOn = plantedOn ?: plant.plantedOn,
+                        wateringInterval = wateringInterval ?: plant.wateringInterval,
+                        apiId = apiId ?: plant.apiId,
+                    )
                 )
-            )
+            }
         }
     }
 }
@@ -160,11 +162,13 @@ class AppRepository(
             R.drawable.cactus,
             "${System.currentTimeMillis()}.png"
         )
+
         plantRepository.addPlantMedia(id, cactusImageFile)
         plantRepository.addPlantMedia(id, cactusImageFile)
 
         plantRepository.insertPlant("Storczyk Tadek", "Fajny jest", "Storczyk")
     }
+
     suspend fun setDefaultSettings(){
         settingsRepository.setDefault()
     }

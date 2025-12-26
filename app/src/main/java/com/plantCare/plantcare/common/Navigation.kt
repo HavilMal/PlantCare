@@ -113,7 +113,8 @@ fun AppNavHost(
             }
 
             composable(
-                route = Route.PLANT_EDIT.routeWithArgNames("mode").addQuery("plantId", "{plantId}").chainQuerry("noteId", "{noteId}"),
+                route = Route.PLANT_EDIT.routeWithArgNames("mode").addQuery("plantId", "{plantId}")
+                    .chainQuerry("noteId", "{noteId}"),
                 arguments = listOf(
                     navArgument("mode") { type = NavType.EnumType(EditMode::class.java) },
                     navArgument("plantId") {
@@ -131,7 +132,8 @@ fun AppNavHost(
                 )
             ) { NoteListScreen() }
             composable(
-                route = Route.NOTE_EDIT.routeWithArgNames("mode", "plantId").addQuery("noteId", "{noteId}"),
+                route = Route.NOTE_EDIT.routeWithArgNames("mode", "plantId")
+                    .addQuery("noteId", "{noteId}"),
                 arguments = listOf(
                     navArgument("mode") {
                         type = NavType.EnumType(EditMode::class.java)
@@ -155,12 +157,12 @@ fun AppNavHost(
                         defaultValue = -1L
                     }
                 )
-            ) {
-                backStackEntry ->
+            ) { backStackEntry ->
                 PlantCameraCaptureScreen()
             }
             composable(
-                route = Route.PLANT_EDIT.routeWithArgNames("mode").addQuery("plantId", "{plantId}").chainQuerry("noteId", "{noteId}"),
+                route = Route.PLANT_EDIT.routeWithArgNames("mode").addQuery("plantId", "{plantId}")
+                    .chainQuerry("noteId", "{noteId}"),
                 arguments = listOf(
                     navArgument("mode") { type = NavType.EnumType(EditMode::class.java) },
                     navArgument("plantId") {
@@ -178,7 +180,8 @@ fun AppNavHost(
                 )
             ) { NoteListScreen() }
             composable(
-                route = Route.NOTE_EDIT.routeWithArgNames("mode", "plantId").addQuery("noteId", "{noteId}"),
+                route = Route.NOTE_EDIT.routeWithArgNames("mode", "plantId")
+                    .addQuery("noteId", "{noteId}"),
                 arguments = listOf(
                     navArgument("mode") {
                         type = NavType.EnumType(EditMode::class.java)
@@ -193,25 +196,22 @@ fun AppNavHost(
                     },
                 )
             ) { NoteEditScreen() }
-            composable(Route.CAMERA.route) {
-                PlantCameraCaptureScreen()
-            }
         }
 
-            composable(
-                route = Route.DEVICE_GALLERY.routeWithArgNames("plantId"),
-                arguments = listOf(
-                    navArgument("plantId") {
-                        type = NavType.LongType
-                        defaultValue = -1L
-                    }
-                )
-            ) {
-                backStackEntry ->
-                    DeviceGalleryScreen()
-            }
+        composable(
+            route = Route.DEVICE_GALLERY.routeWithArgNames("plantId"),
+            arguments = listOf(
+                navArgument("plantId") {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                }
+            )
+        ) { backStackEntry ->
+            DeviceGalleryScreen()
         }
 
-//        composable(Route.CALENDAR.route) { CalendarScreen() }
-//        composable(Route.SEARCH.route) { SearchScreen() }
+        composable(Route.CALENDAR.route) { CalendarScreen() }
+        composable(Route.SEARCH.route) { SearchScreen() }
+
+    }
 }
