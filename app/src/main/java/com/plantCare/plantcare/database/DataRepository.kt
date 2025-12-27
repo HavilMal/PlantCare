@@ -1,11 +1,13 @@
 package com.plantCare.plantcare.database
 
 import android.content.Context
+import android.util.Log
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.utils.FileUtil
 import com.plantCare.plantcare.utils.RandomUtil
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -17,16 +19,15 @@ class PlantRepository(
     val plantDao: PlantDao,
 ) {
     companion object {
-        const val PLANT_PHOTO_PREFIX = "image-"
-        fun genPlantPhotoId(): String {
+        const val PLANT_MEDIA_DIR_NAME = "media"
+        fun genPlantMediaId(): String {
             return System.currentTimeMillis().toString()
         }
     }
 
-    suspend fun insertPlant(plant: Plant) {
-        plantDao.insertPlant(plant)
+    fun getPlantDirName(plantId: Long) : String{
+        return plantId.toString()
     }
-
     suspend fun insertPlant(
         name: String,
         description: String,
@@ -34,26 +35,26 @@ class PlantRepository(
         plantedOn: LocalDate = LocalDate.now(),
         isIndoor: Boolean = true,
         wateringInterval: WateringInterval = WateringInterval.WEEK,
+        apiId: Long? = null,
     ): Long {
-        val plantUUID = RandomUtil.genUUIDString()
         val id = plantDao.insertPlant(
             Plant(
                 name = name,
                 description = description,
                 species = species,
                 plantedOn = plantedOn,
-                dirPath = plantUUID,
                 isIndoor = isIndoor,
                 createdOn = LocalDate.now(),
-                wateringInterval = wateringInterval
+                wateringInterval = wateringInterval,
+                apiId = apiId,
             )
         )
-        FileUtil.makeDir(appContext, "$PLANTS_DIR$plantUUID", true)
+        FileUtil.makeDir(appContext, "$PLANTS_DIR${getPlantDirName(id)}/$PLANT_MEDIA_DIR_NAME", true)
         return id
     }
 
     suspend fun deletePlant(plant: Plant) {
-        FileUtil.deleteDir(appContext, plantDao.getPlantDirPath(plant.id))
+        FileUtil.deleteDir(appContext, getPlantsDirPath(plant.id))
         plantDao.deletePlant(plant)
     }
 
@@ -82,24 +83,40 @@ class PlantRepository(
         plantDao.setSchedule(plantId, days, interval)
     }
 
-    suspend fun getPlantsDirPath(plantId: Long): String? {
-        return plantDao.getPlantDirPath(plantId)
+    fun getPlantsDirPath(plantId: Long): String {
+        return "$PLANTS_DIR${getPlantDirName(plantId)}"
     }
-
-    suspend fun addPlantPhoto(plantId: Long, photo: File) {
-        val plantDir = getPlantsDirPath(plantId)
+    fun getPlantsDirPath(plant: Plant): String {
+        return getPlantsDirPath(plant.id)
+    }
+    fun getPlantsMediaDirPath(plantDirPath: String?): String {
+        return "$plantDirPath/$PLANT_MEDIA_DIR_NAME"
+    }
+    fun getPlantsMediaDirPath(plantId: Long): String {
+        return getPlantsMediaDirPath(getPlantsDirPath(plantId))
+    }
+    suspend fun addPlantMedia(plantId: Long, media: File) {
+        val new_name = "${genPlantMediaId()}.${media.extension}"
+        plantDao.insertPlantMedia(plantId,new_name)
         val destFile = File(
             appContext.filesDir,
-            "$PLANTS_DIR$plantDir/${PLANT_PHOTO_PREFIX}${genPlantPhotoId()}.jpg"
+            "${getPlantsMediaDirPath(plantId)}/$new_name"
         )
-        photo.copyTo(destFile, overwrite = true)
+        media.copyTo(destFile, overwrite = true)
+    }
+    suspend fun deletePlantMedia(file: File) {
+        plantDao.deletePlantMedia(file.name)
+        FileUtil.delete(file)
     }
 
-    suspend fun getPlantPhotos(plantId: Long): List<File> {
-        val plantDir = getPlantsDirPath(plantId)
-        return FileUtil.getFiles(appContext, "$PLANTS_DIR$plantDir").filter { file ->
-            file.name.startsWith(PLANT_PHOTO_PREFIX)
-        }
+    fun getPlantMediaFlow(plantId: Long): Flow<List<File>> {
+        val plantMediaDirPath: String = getPlantsMediaDirPath(plantId)
+        return plantDao.getPlantMediaFlow(plantId)
+            .map { mediaNames ->
+                mediaNames.map { mediaName ->
+                    File(appContext.filesDir, "$plantMediaDirPath/$mediaName")
+                }
+            }
     }
 
     suspend fun updatePlant(
@@ -109,24 +126,29 @@ class PlantRepository(
         species: String? = null,
         plantedOn: LocalDate? = null,
         wateringInterval: WateringInterval? = null,
+        apiId: Long? = null,
     ) {
-        plantDao.getPlantFlow(id).collect { plant ->
-            plantDao.updatePlant(
-                plant.copy(
-                    id = id,
-                    name = name ?: plant.name,
-                    isIndoor = isIndoor ?: plant.isIndoor,
-                    species = species ?: plant.species,
-                    plantedOn = plantedOn ?: plant.plantedOn,
-                    wateringInterval = wateringInterval ?: plant.wateringInterval
+        plantDao.getPlantFlow(id).collect {
+            it?.let { plant ->
+                plantDao.updatePlant(
+                    plant.copy(
+                        id = id,
+                        name = name ?: plant.name,
+                        isIndoor = isIndoor ?: plant.isIndoor,
+                        species = species ?: plant.species,
+                        plantedOn = plantedOn ?: plant.plantedOn,
+                        wateringInterval = wateringInterval ?: plant.wateringInterval,
+                        apiId = apiId ?: plant.apiId,
+                    )
                 )
-            )
+            }
         }
     }
 }
 
 class AppRepository(
-    val plantRepository: PlantRepository
+    val plantRepository: PlantRepository,
+    val settingsRepository: SettingsRepository
 ) {
     suspend fun seedDatabase() {
         plantRepository.deleteAllPlants()
@@ -140,14 +162,14 @@ class AppRepository(
             R.drawable.cactus,
             "${System.currentTimeMillis()}.png"
         )
-        plantRepository.addPlantPhoto(id, cactusImageFile)
-        plantRepository.addPlantPhoto(id, cactusImageFile)
-        plantRepository.addPlantPhoto(id, cactusImageFile)
-        plantRepository.addPlantPhoto(id, cactusImageFile)
-        plantRepository.addPlantPhoto(id, cactusImageFile)
+
+        plantRepository.addPlantMedia(id, cactusImageFile)
+        plantRepository.addPlantMedia(id, cactusImageFile)
 
         plantRepository.insertPlant("Storczyk Tadek", "Fajny jest", "Storczyk")
     }
 
-
+    suspend fun setDefaultSettings(){
+        settingsRepository.setDefault()
+    }
 }

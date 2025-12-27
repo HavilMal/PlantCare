@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.androidx.room)
     id("com.google.dagger.hilt.android")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 configurations.implementation {
@@ -48,6 +49,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -76,6 +78,9 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.compiler)
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.datastore.preferences)
@@ -89,6 +94,13 @@ dependencies {
     implementation(libs.calendar.compose)
     implementation(libs.coil.compose)
 
+    implementation(libs.calendar.compose)
+    implementation(libs.coil.compose)
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -96,4 +108,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 }

@@ -17,9 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SettingsItem(name: String, description: String) {
+fun SettingsItem(name: String, description: String, onClick: () -> Unit ) {
     Column(
-        modifier = Modifier.clickable {},
+        modifier = Modifier.clickable {onClick()},
     ) {
         Row(
             modifier = Modifier

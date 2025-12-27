@@ -1,6 +1,9 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
 import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,57 +30,47 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.database.Note
 import com.plantCare.plantcare.database.Plant
+import com.plantCare.plantcare.utils.FileUtil
+import com.plantCare.plantcare.viewModel.DeviceGalleryScreenViewModel
 import com.plantCare.plantcare.viewModel.PlantScreenViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 
 
 @Composable
-fun PlantCameraCaptureView(
-    viewModel: PlantCameraCaptureViewModel = hiltViewModel()
+fun DeviceGalleryScreen(
+    viewModel: DeviceGalleryScreenViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val navController = NavigationController.current
+    val scope = rememberCoroutineScope()
 
-    val cameraCapture = remember {
-        CameraCapture(context, lifecycleOwner)
-    }
-
-    var previewView by remember { mutableStateOf<PreviewView?>(null) }
-
-    LaunchedEffect(previewView) {
-        previewView?.let { view ->
-            cameraCapture.startCamera(view)
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { ctx ->
-                PreviewView(ctx).also { previewView = it }
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia(maxItems = 50)
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            scope.launch {
+                viewModel.saveMedia(uris)
+                navController?.popBackStack()
             }
-        )
-        Button(
-            onClick = {
-                cameraCapture.takePhoto { file ->
-                    viewModel.savePhoto(file)
-                    cameraCapture.stopCamera()
-                    navController?.popBackStack()
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(32.dp)
-        ) {
-            Text("Take Photo")
+        } else {
+            navController?.popBackStack()
         }
     }
-}
 
-@Composable
-fun PlantCameraCaptureScreen() {
-    WithPermission(permission = Manifest.permission.CAMERA) {
-        PlantCameraCaptureView()
+    LaunchedEffect(Unit) {
+        launcher.launch(
+            PickVisualMediaRequest(
+                ActivityResultContracts.PickVisualMedia.ImageAndVideo
+            )
+        )
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Opening gallery…")
     }
 }

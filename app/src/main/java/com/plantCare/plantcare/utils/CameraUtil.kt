@@ -10,6 +10,8 @@ import androidx.camera.lifecycle.awaitInstance
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class CameraCapture(
@@ -19,27 +21,29 @@ class CameraCapture(
     private var imageCapture: ImageCapture? = null
     private var cameraProvider: ProcessCameraProvider? = null
 
-    suspend fun startCamera(previewView: PreviewView) {
-        cameraProvider = ProcessCameraProvider.awaitInstance(context)
+    suspend fun startCamera(previewView: PreviewView) = withContext(Dispatchers.Main) {
+        val cameraProvider = ProcessCameraProvider.awaitInstance(context)
 
         val preview = Preview.Builder().build().also {
             it.setSurfaceProvider(previewView.surfaceProvider)
         }
 
-        imageCapture = ImageCapture.Builder()
+        val imageCapture = ImageCapture.Builder()
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
             .build()
 
-        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-        cameraProvider?.unbindAll()
-        cameraProvider?.bindToLifecycle(
+        cameraProvider.unbindAll()
+        cameraProvider.bindToLifecycle(
             lifecycleOwner,
-            cameraSelector,
+            CameraSelector.DEFAULT_BACK_CAMERA,
             preview,
             imageCapture
         )
+
+        this@CameraCapture.imageCapture = imageCapture
+        this@CameraCapture.cameraProvider = cameraProvider
     }
+
 
     fun takePhoto(onResult: (File?) -> Unit) {
         val capture = imageCapture ?: return onResult(null)
