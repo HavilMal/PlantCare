@@ -1,6 +1,7 @@
 package com.plantCare.plantcare.viewModel
 
-import android.util.Log
+import android.Manifest
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,8 @@ import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.database.WateringInterval
 import com.plantCare.plantcare.service.PlantDetailsRepository
 import com.plantCare.plantcare.service.PlantSearchResult
+import com.plantCare.plantcare.service.SensorService
+import com.plantCare.plantcare.ui.screens.plantEditScreen.SensorButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,8 +19,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -38,19 +43,20 @@ data class PlantEditUiState(
     val species: String = "",
     val plantedOn: LocalDate = LocalDate.now(),
     val isIndoor: Boolean = false,
-    val sensorName: String = "",
     val interval: WateringInterval = WateringInterval.WEEK,
     val selectedDays: Set<DayOfWeek> = setOf(),
     val showSearchResults: Boolean = false,
     val isSearching: Boolean = false,
     val searchResults: List<PlantSearchResult> = listOf(),
     val selectedPlant: PlantSearchResult? = null,
+    val sensorButtonState: SensorButtonState = SensorButtonState.ADD_SENSOR,
 )
 
 @HiltViewModel
 class PlantEditViewModel @Inject constructor(
     private val plantRepository: PlantRepository,
     private val plantDetailsRepository: PlantDetailsRepository,
+    private val sensorService: SensorService,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     val mode: EditMode = savedStateHandle["mode"]!!
@@ -115,9 +121,29 @@ class PlantEditViewModel @Inject constructor(
         }
     }
 
-    fun setSensorName(name: String) {
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
+    fun scanForSensors() {
         plantEditFlow.update {
-            it.copy(sensorName = name)
+            it.copy(sensorButtonState = SensorButtonState.SCANNING)
+        }
+
+        viewModelScope.launch {
+            val device = sensorService.scanForSensor().first()
+            if (device == null) {
+                plantEditFlow.update {
+                    it.copy(sensorButtonState = SensorButtonState.ADD_SENSOR)
+                }
+            } else {
+                plantEditFlow.update {
+                    it.copy(sensorButtonState = SensorButtonState.REMOVE_SENSOR)
+                }
+            }
+        }
+    }
+
+    fun removeSensor() {
+        plantEditFlow.update {
+            it.copy(sensorButtonState = SensorButtonState.ADD_SENSOR)
         }
     }
 
@@ -155,7 +181,7 @@ class PlantEditViewModel @Inject constructor(
     }
 
     fun setIsSearching(isSearching: Boolean) {
-         plantEditFlow.update {
+        plantEditFlow.update {
             it.copy(isSearching = isSearching)
         }
     }

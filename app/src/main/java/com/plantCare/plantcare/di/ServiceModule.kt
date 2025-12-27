@@ -1,10 +1,13 @@
 package com.plantCare.plantcare.di
 
+import android.content.Context
 import com.plantCare.plantcare.BuildConfig
 import com.plantCare.plantcare.service.PlantService
+import com.plantCare.plantcare.service.SensorService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jakarta.inject.Singleton
 import okhttp3.Interceptor
@@ -47,4 +50,10 @@ object ServiceModule {
     @Singleton
     fun provideApiService(retrofit: Retrofit): PlantService=
         retrofit.create(PlantService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideSensorService(@ApplicationContext context: Context): SensorService =
+        SensorService(context)
+
 }

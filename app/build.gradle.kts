@@ -109,5 +109,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    implementation(libs.accompanist.permissions)
     implementation("org.osmdroid:osmdroid-android:6.1.20")
 }

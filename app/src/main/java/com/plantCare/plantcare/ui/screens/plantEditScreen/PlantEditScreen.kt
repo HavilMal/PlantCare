@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.ui.screens.plantEditScreen
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,10 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.plantCare.plantcare.common.getLocale
 import com.plantCare.plantcare.viewModel.PlantEditViewModel
 import java.text.SimpleDateFormat
@@ -56,7 +55,8 @@ fun convertMillisToDate(millis: Long): String {
     return formatter.format(Date(millis))
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@SuppressLint("MissingPermission")
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun PlantEditScreen(
     viewModel: PlantEditViewModel = hiltViewModel()
@@ -155,15 +155,11 @@ fun PlantEditScreen(
 
             Text("Sensor")
 
-            Button(
-                onClick = { /*todo*/ },
-                modifier = Modifier.fillMaxWidth(),
-                shape = ButtonDefaults.squareShape
-            ) {
-                Icon(Icons.Filled.Add, "Add Sensor")
-                Text("Add Sensor")
-            }
-
+            SensorButton(
+                state = state.sensorButtonState,
+                onScanForSensor = { viewModel.scanForSensors() },
+                onRemoveSensor = { viewModel.removeSensor() },
+            )
 
             Text("Watering schedule")
 
