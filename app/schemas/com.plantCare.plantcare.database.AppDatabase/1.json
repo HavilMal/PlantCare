@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fe444d9d2735d67e05cc42194b811d3f",
+    "identityHash": "cb74644b5e6a05afe8fdf91c3808a3c0",
     "entities": [
       {
         "tableName": "plants",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `isIndoor` INTEGER NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `createdOn` INTEGER NOT NULL, `wateringInterval` TEXT NOT NULL DEFAULT 'MONTHLY', `apiId` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `isIndoor` INTEGER NOT NULL, `species` TEXT NOT NULL, `plantedOn` INTEGER NOT NULL, `createdOn` INTEGER NOT NULL, `wateringInterval` TEXT NOT NULL DEFAULT 'MONTHLY', `apiId` INTEGER, `sensorAddress` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -61,6 +61,11 @@
             "fieldPath": "apiId",
             "columnName": "apiId",
             "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "sensorAddress",
+            "columnName": "sensorAddress",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -338,7 +343,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe444d9d2735d67e05cc42194b811d3f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cb74644b5e6a05afe8fdf91c3808a3c0')"
     ]
   }
 }

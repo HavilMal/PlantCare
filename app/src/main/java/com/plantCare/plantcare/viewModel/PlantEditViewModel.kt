@@ -1,6 +1,7 @@
 package com.plantCare.plantcare.viewModel
 
 import android.Manifest
+import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -22,7 +23,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -50,6 +50,7 @@ data class PlantEditUiState(
     val searchResults: List<PlantSearchResult> = listOf(),
     val selectedPlant: PlantSearchResult? = null,
     val sensorButtonState: SensorButtonState = SensorButtonState.ADD_SENSOR,
+    val sensorAddress: String? = null,
 )
 
 @HiltViewModel
@@ -84,7 +85,13 @@ class PlantEditViewModel @Inject constructor(
                                 plantedOn = plant.plantedOn,
                                 selectedDays = schedule.map { it.day }.toSet(),
                                 interval = plant.wateringInterval,
-                                isLoading = false
+                                isLoading = false,
+                                sensorAddress = plant.sensorAddress,
+                                sensorButtonState = if (plant.sensorAddress == null) {
+                                    SensorButtonState.ADD_SENSOR
+                                } else {
+                                    SensorButtonState.REMOVE_SENSOR
+                                }
                             )
                         }
                     }
@@ -124,6 +131,7 @@ class PlantEditViewModel @Inject constructor(
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun scanForSensors() {
         plantEditFlow.update {
+            Log.d("sensorScan", "update for scan")
             it.copy(sensorButtonState = SensorButtonState.SCANNING)
         }
 
@@ -131,12 +139,19 @@ class PlantEditViewModel @Inject constructor(
             val device = sensorService.scanForSensor().first()
             if (device == null) {
                 plantEditFlow.update {
-                    it.copy(sensorButtonState = SensorButtonState.ADD_SENSOR)
+                    it.copy(
+                        sensorButtonState = SensorButtonState.ADD_SENSOR,
+                        sensorAddress = null,
+                    )
                 }
             } else {
                 plantEditFlow.update {
-                    it.copy(sensorButtonState = SensorButtonState.REMOVE_SENSOR)
+                    it.copy(
+                        sensorButtonState = SensorButtonState.REMOVE_SENSOR,
+                        sensorAddress = device.address,
+                    )
                 }
+                Log.d("sensorScan", "Address state: ${device.address}")
             }
         }
     }
@@ -188,6 +203,7 @@ class PlantEditViewModel @Inject constructor(
 
 
     fun savePlant() {
+        Log.d("sensorScan", "saving")
         if (!plantEditState.value.isLoading) {
             when (mode) {
                 EditMode.ADD -> {
@@ -201,6 +217,8 @@ class PlantEditViewModel @Inject constructor(
                             wateringInterval = plantEditState.value.interval,
                             apiId = plantEditState.value.selectedPlant?.id
                         )
+
+                        plantRepository.setSensorAddress(id, plantEditState.value.sensorAddress)
 
                         plantRepository.setSchedule(
                             id,
@@ -222,6 +240,8 @@ class PlantEditViewModel @Inject constructor(
                             wateringInterval = plantEditState.value.interval,
                             apiId = plantEditState.value.selectedPlant?.id
                         )
+
+                        plantRepository.setSensorAddress(plantId, plantEditState.value.sensorAddress)
 
                         plantRepository.setSchedule(
                             plantId,

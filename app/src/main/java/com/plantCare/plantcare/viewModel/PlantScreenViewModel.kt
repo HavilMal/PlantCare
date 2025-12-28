@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.viewModel
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.FileObserver
 import android.util.Log
@@ -12,10 +13,12 @@ import com.plantCare.plantcare.database.Plant
 import com.plantCare.plantcare.database.PlantDetails
 import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.service.PlantDetailsRepository
+import com.plantCare.plantcare.service.SensorService
 import com.plantCare.plantcare.utils.FileUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,22 +37,36 @@ data class PlantScreenUiState(
     val dialogOpen: Boolean = false,
 )
 
+@SuppressLint("MissingPermission")
 @HiltViewModel
 class PlantScreenViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     val plantRepository: PlantRepository,
     private val notesRepository: NotesRepository,
     private val detailsRepository: PlantDetailsRepository,
-    savedStateHandle: SavedStateHandle
+    private val sensorService: SensorService,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val plantId: Long = checkNotNull(savedStateHandle.get<Long>("plantId"))
     private val stateFlow = MutableStateFlow(PlantScreenUiState())
     val uiState: StateFlow<PlantScreenUiState> = stateFlow
+    var sensorJob: Job? = null
     init {
         viewModelScope.launch {
             plantRepository.getPlant(plantId).collect { plant ->
                 stateFlow.update {
                     it.copy(plant = plant)
+                }
+
+                val address = plant?.sensorAddress ?: return@collect
+                sensorJob?.cancel()
+                sensorJob = viewModelScope.launch {
+                    sensorService.getSensorDataFlow(address).collect { data->
+                        stateFlow.update {
+                            Log.d("sensorData", "${data?.humidity}")
+                            it.copy()
+                        }
+                    }
                 }
             }
         }

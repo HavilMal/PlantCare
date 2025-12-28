@@ -7,6 +7,7 @@ import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.utils.FileUtil
 import com.plantCare.plantcare.utils.RandomUtil
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.File
 import java.time.DayOfWeek
@@ -25,9 +26,10 @@ class PlantRepository(
         }
     }
 
-    fun getPlantDirName(plantId: Long) : String{
+    fun getPlantDirName(plantId: Long): String {
         return plantId.toString()
     }
+
     suspend fun insertPlant(
         name: String,
         description: String,
@@ -36,6 +38,7 @@ class PlantRepository(
         isIndoor: Boolean = true,
         wateringInterval: WateringInterval = WateringInterval.WEEK,
         apiId: Long? = null,
+        sensorAddress: String? = null,
     ): Long {
         val id = plantDao.insertPlant(
             Plant(
@@ -47,9 +50,14 @@ class PlantRepository(
                 createdOn = LocalDate.now(),
                 wateringInterval = wateringInterval,
                 apiId = apiId,
+                sensorAddress = sensorAddress
             )
         )
-        FileUtil.makeDir(appContext, "$PLANTS_DIR${getPlantDirName(id)}/$PLANT_MEDIA_DIR_NAME", true)
+        FileUtil.makeDir(
+            appContext,
+            "$PLANTS_DIR${getPlantDirName(id)}/$PLANT_MEDIA_DIR_NAME",
+            true
+        )
         return id
     }
 
@@ -86,24 +94,29 @@ class PlantRepository(
     fun getPlantsDirPath(plantId: Long): String {
         return "$PLANTS_DIR${getPlantDirName(plantId)}"
     }
+
     fun getPlantsDirPath(plant: Plant): String {
         return getPlantsDirPath(plant.id)
     }
+
     fun getPlantsMediaDirPath(plantDirPath: String?): String {
         return "$plantDirPath/$PLANT_MEDIA_DIR_NAME"
     }
+
     fun getPlantsMediaDirPath(plantId: Long): String {
         return getPlantsMediaDirPath(getPlantsDirPath(plantId))
     }
+
     suspend fun addPlantMedia(plantId: Long, media: File) {
         val new_name = "${genPlantMediaId()}.${media.extension}"
-        plantDao.insertPlantMedia(plantId,new_name)
+        plantDao.insertPlantMedia(plantId, new_name)
         val destFile = File(
             appContext.filesDir,
             "${getPlantsMediaDirPath(plantId)}/$new_name"
         )
         media.copyTo(destFile, overwrite = true)
     }
+
     suspend fun deletePlantMedia(file: File) {
         plantDao.deletePlantMedia(file.name)
         FileUtil.delete(file)
@@ -119,6 +132,11 @@ class PlantRepository(
             }
     }
 
+    suspend fun setSensorAddress(id: Long, address: String?) {
+        Log.d("sensorScan", "id: $id address: $address")
+        plantDao.updateSensorAddress(id, address)
+    }
+
     suspend fun updatePlant(
         id: Long,
         name: String? = null,
@@ -127,21 +145,21 @@ class PlantRepository(
         plantedOn: LocalDate? = null,
         wateringInterval: WateringInterval? = null,
         apiId: Long? = null,
+        sensorAddress: String? = null,
     ) {
-        plantDao.getPlantFlow(id).collect {
-            it?.let { plant ->
-                plantDao.updatePlant(
-                    plant.copy(
-                        id = id,
-                        name = name ?: plant.name,
-                        isIndoor = isIndoor ?: plant.isIndoor,
-                        species = species ?: plant.species,
-                        plantedOn = plantedOn ?: plant.plantedOn,
-                        wateringInterval = wateringInterval ?: plant.wateringInterval,
-                        apiId = apiId ?: plant.apiId,
-                    )
+        plantDao.getPlantFlow(id).first()?.let { plant ->
+            plantDao.updatePlant(
+                plant.copy(
+                    id = id,
+                    name = name ?: plant.name,
+                    isIndoor = isIndoor ?: plant.isIndoor,
+                    species = species ?: plant.species,
+                    plantedOn = plantedOn ?: plant.plantedOn,
+                    wateringInterval = wateringInterval ?: plant.wateringInterval,
+                    apiId = apiId ?: plant.apiId,
+                    sensorAddress = sensorAddress ?: plant.sensorAddress,
                 )
-            }
+            )
         }
     }
 }
@@ -169,7 +187,7 @@ class AppRepository(
         plantRepository.insertPlant("Storczyk Tadek", "Fajny jest", "Storczyk")
     }
 
-    suspend fun setDefaultSettings(){
+    suspend fun setDefaultSettings() {
         settingsRepository.setDefault()
     }
 }

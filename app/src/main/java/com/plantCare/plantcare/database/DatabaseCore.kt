@@ -61,7 +61,8 @@ data class Plant(
     val createdOn: LocalDate,
     @ColumnInfo(defaultValue = "MONTHLY")
     val wateringInterval: WateringInterval,
-    val apiId: Long?
+    val apiId: Long?,
+    val sensorAddress: String?,
 )
 
 @Entity(
@@ -220,6 +221,8 @@ interface PlantDao {
     )
     fun getPlantWateringSchedules(): Flow<List<PlantWateringSchedule>>
 
+    @Query("UPDATE plants SET sensorAddress = :address WHERE id = :plantId")
+    suspend fun updateSensorAddress(plantId: Long, address: String?)
     @Insert
     suspend fun insertPlant(plant: Plant): Long
     @Insert
@@ -240,6 +243,7 @@ interface PlantDao {
 
     @Update
     suspend fun updateNote(note: Note)
+
 
     @Transaction
     suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval) {
