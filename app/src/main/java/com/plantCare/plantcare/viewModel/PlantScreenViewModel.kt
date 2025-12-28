@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionState
 import com.plantCare.plantcare.database.Note
 import com.plantCare.plantcare.database.NotesRepository
 import com.plantCare.plantcare.database.Plant
@@ -45,21 +48,12 @@ class PlantScreenViewModel @Inject constructor(
     private val stateFlow = MutableStateFlow(PlantScreenUiState())
     val uiState: StateFlow<PlantScreenUiState> = stateFlow
     var sensorJob: Job? = null
+
     init {
         viewModelScope.launch {
             plantRepository.getPlant(plantId).collect { plant ->
                 stateFlow.update {
                     it.copy(plant = plant)
-                }
-
-                val address = plant?.sensorAddress ?: return@collect
-                sensorJob?.cancel()
-                sensorJob = viewModelScope.launch {
-                    sensorService.getSensorDataFlow(address).collect { data->
-                        stateFlow.update {
-                            it.copy(sensorData = data)
-                        }
-                    }
                 }
             }
         }
@@ -89,7 +83,7 @@ class PlantScreenViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            sensorService.getBluetoothStateFlow().collect { state->
+            sensorService.getBluetoothStateFlow().collect { state ->
                 stateFlow.update {
                     it.copy(bluetoothOn = state)
                 }
@@ -105,19 +99,37 @@ class PlantScreenViewModel @Inject constructor(
 
     fun deleteCurrentPlant() {
         viewModelScope.launch {
-            uiState.value.plant?.let{ plant ->
+            uiState.value.plant?.let { plant ->
                 plantRepository.deletePlant(plant)
             }
         }
         viewModelScope.launch {
             plantRepository.getPlantMediaFlow(plantId).collect { media ->
-                stateFlow.update{
+                stateFlow.update {
                     it.copy(media = media)
                 }
             }
         }
     }
-    suspend fun deletePlantMedia(file: File){
+
+    fun getSensorData() {
+        val address = uiState.value.plant?.sensorAddress ?: return
+        sensorJob?.cancel()
+        sensorJob = viewModelScope.launch {
+            sensorService.getSensorDataFlow(address).collect { data ->
+                stateFlow.update {
+                    it.copy(sensorData = data)
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalPermissionsApi::class)
+    fun requestPermissions(permissionState: MultiplePermissionsState) {
+        permissionState.launchMultiplePermissionRequest()
+    }
+
+    suspend fun deletePlantMedia(file: File) {
         plantRepository.deletePlantMedia(file)
     }
 }

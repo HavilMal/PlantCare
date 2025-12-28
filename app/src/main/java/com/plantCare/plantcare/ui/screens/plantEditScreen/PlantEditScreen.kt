@@ -41,19 +41,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.plantCare.plantcare.common.getLocale
 import com.plantCare.plantcare.viewModel.PlantEditViewModel
-import java.text.SimpleDateFormat
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
-import java.util.Date
-
-@Composable
-fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("MM/dd/yyyy", getLocale())
-    return formatter.format(Date(millis))
-}
 
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalPermissionsApi::class)

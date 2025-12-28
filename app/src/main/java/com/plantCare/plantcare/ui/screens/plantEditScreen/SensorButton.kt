@@ -49,15 +49,12 @@ fun SensorButton(
         onClick = {
             when (state) {
                 SensorButtonState.ADD_SENSOR -> {
-                    permissionState.permissions.filter { !it.status.isGranted }.forEach {
-                        it.launchPermissionRequest()
-                    }
-
-                    if (permissionState.permissions.all { it.status.isGranted }) {
+                    if (!permissionState.allPermissionsGranted) {
+                        permissionState.launchMultiplePermissionRequest()
+                    } else {
                         onScanForSensor()
                     }
                 }
-
                 SensorButtonState.SCANNING -> {}
                 SensorButtonState.REMOVE_SENSOR -> {
                     onRemoveSensor()

@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,21 +12,29 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.SensorsOff
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.service.SensorData
 import com.plantCare.plantcare.ui.components.FillableSVG
 import com.plantCare.plantcare.ui.theme.size
 import com.plantCare.plantcare.ui.theme.spacing
+import java.security.Permission
 import kotlin.math.PI
 import kotlin.math.cos
 
@@ -49,12 +58,23 @@ fun NoData(content: @Composable () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SensorCard(
     hasSensor: Boolean,
     bluetoothOn: Boolean,
     sensorData: SensorData?,
+    onGetSensorData: () -> Unit,
+    onAskPermission: (MultiplePermissionsState) -> Unit,
 ) {
+    val permissionState = rememberMultiplePermissionsState(
+        listOf(
+            android.Manifest.permission.BLUETOOTH_SCAN,
+            android.Manifest.permission.BLUETOOTH_CONNECT,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        )
+    )
+
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -74,6 +94,23 @@ fun SensorCard(
             return@Card
         }
 
+        if (permissionState.permissions.any { !it.status.isGranted }) {
+            NoData {
+                Button(
+                    onClick = {
+                        onAskPermission(permissionState)
+                    }
+                ) {
+                    Text("Grant Permissions")
+                }
+            }
+            return@Card
+        }
+
+        LaunchedEffect(permissionState.allPermissionsGranted) {
+            onGetSensorData()
+        }
+
         if (sensorData == null) {
             NoData {
                 CircularProgressIndicator(
@@ -83,6 +120,7 @@ fun SensorCard(
                 )
                 Text("Loading sensor data")
             }
+
             return@Card
         }
 

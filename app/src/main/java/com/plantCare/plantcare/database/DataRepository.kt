@@ -1,11 +1,9 @@
 package com.plantCare.plantcare.database
 
 import android.content.Context
-import android.util.Log
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.utils.FileUtil
-import com.plantCare.plantcare.utils.RandomUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -132,8 +130,11 @@ class PlantRepository(
             }
     }
 
+    suspend fun setApiId(plantId: Long, id: Long?) {
+        plantDao.updateApiId(plantId, id)
+    }
+
     suspend fun setSensorAddress(id: Long, address: String?) {
-        Log.d("sensorScan", "id: $id address: $address")
         plantDao.updateSensorAddress(id, address)
     }
 
@@ -144,8 +145,6 @@ class PlantRepository(
         species: String? = null,
         plantedOn: LocalDate? = null,
         wateringInterval: WateringInterval? = null,
-        apiId: Long? = null,
-        sensorAddress: String? = null,
     ) {
         plantDao.getPlantFlow(id).first()?.let { plant ->
             plantDao.updatePlant(
@@ -156,8 +155,6 @@ class PlantRepository(
                     species = species ?: plant.species,
                     plantedOn = plantedOn ?: plant.plantedOn,
                     wateringInterval = wateringInterval ?: plant.wateringInterval,
-                    apiId = apiId ?: plant.apiId,
-                    sensorAddress = sensorAddress ?: plant.sensorAddress,
                 )
             )
         }

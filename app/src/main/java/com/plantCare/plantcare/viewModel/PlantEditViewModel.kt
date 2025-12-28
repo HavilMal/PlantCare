@@ -131,7 +131,6 @@ class PlantEditViewModel @Inject constructor(
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun scanForSensors() {
         plantEditFlow.update {
-            Log.d("sensorScan", "update for scan")
             it.copy(sensorButtonState = SensorButtonState.SCANNING)
         }
 
@@ -151,14 +150,16 @@ class PlantEditViewModel @Inject constructor(
                         sensorAddress = device.address,
                     )
                 }
-                Log.d("sensorScan", "Address state: ${device.address}")
             }
         }
     }
 
     fun removeSensor() {
         plantEditFlow.update {
-            it.copy(sensorButtonState = SensorButtonState.ADD_SENSOR)
+            it.copy(
+                sensorButtonState = SensorButtonState.ADD_SENSOR,
+                sensorAddress = null,
+            )
         }
     }
 
@@ -189,7 +190,6 @@ class PlantEditViewModel @Inject constructor(
     fun selectDay(day: DayOfWeek) {
         setSelectedDays(plantEditState.value.selectedDays + day)
     }
-
 
     fun unselectDay(day: DayOfWeek) {
         setSelectedDays(plantEditState.value.selectedDays - day)
@@ -238,9 +238,9 @@ class PlantEditViewModel @Inject constructor(
                             species = plantEditState.value.species,
                             plantedOn = plantEditState.value.plantedOn,
                             wateringInterval = plantEditState.value.interval,
-                            apiId = plantEditState.value.selectedPlant?.id
                         )
 
+                        plantRepository.setApiId(plantId, plantEditState.value.selectedPlant?.id)
                         plantRepository.setSensorAddress(plantId, plantEditState.value.sensorAddress)
 
                         plantRepository.setSchedule(

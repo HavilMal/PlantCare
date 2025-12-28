@@ -1,6 +1,5 @@
 package com.plantCare.plantcare.database
 
-import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
@@ -9,13 +8,13 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.Insert
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import androidx.room.Update
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -223,6 +222,9 @@ interface PlantDao {
 
     @Query("UPDATE plants SET sensorAddress = :address WHERE id = :plantId")
     suspend fun updateSensorAddress(plantId: Long, address: String?)
+
+    @Query("UPDATE plants SET apiId = :apiId WHERE id = :plantId")
+    suspend fun updateApiId(plantId: Long, apiId: Long?)
     @Insert
     suspend fun insertPlant(plant: Plant): Long
     @Insert

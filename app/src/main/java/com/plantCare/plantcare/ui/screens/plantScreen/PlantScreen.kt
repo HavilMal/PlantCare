@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.common.addQuery
@@ -32,7 +33,7 @@ import com.plantCare.plantcare.viewModel.EditMode
 import com.plantCare.plantcare.viewModel.PlantScreenViewModel
 import java.io.File
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun PlantScreen(
     viewModel: PlantScreenViewModel = hiltViewModel()
@@ -117,6 +118,12 @@ fun PlantScreen(
                     hasSensor = uiState.plant?.sensorAddress != null,
                     bluetoothOn = uiState.bluetoothOn,
                     sensorData = uiState.sensorData,
+                    onGetSensorData =  {
+                        viewModel.getSensorData()
+                    },
+                    onAskPermission = {
+                        viewModel.requestPermissions(it)
+                    }
                 )
             }
 
