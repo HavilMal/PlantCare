@@ -1,26 +1,25 @@
 package com.plantCare.plantcare.viewModel
 
-import android.content.Context
-import android.os.FileObserver
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionState
 import com.plantCare.plantcare.database.Note
 import com.plantCare.plantcare.database.NotesRepository
 import com.plantCare.plantcare.database.Plant
 import com.plantCare.plantcare.database.PlantDetails
 import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.service.PlantDetailsRepository
-import com.plantCare.plantcare.utils.FileUtil
+import com.plantCare.plantcare.service.SensorData
+import com.plantCare.plantcare.service.SensorService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -32,19 +31,24 @@ data class PlantScreenUiState(
     val plant: Plant? = null,
     val plantDetails: PlantDetails? = null,
     val dialogOpen: Boolean = false,
+    val bluetoothOn: Boolean = false,
+    val sensorData: SensorData? = null,
 )
 
+@SuppressLint("MissingPermission")
 @HiltViewModel
 class PlantScreenViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     val plantRepository: PlantRepository,
     private val notesRepository: NotesRepository,
     private val detailsRepository: PlantDetailsRepository,
-    savedStateHandle: SavedStateHandle
+    private val sensorService: SensorService,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val plantId: Long = checkNotNull(savedStateHandle.get<Long>("plantId"))
     private val stateFlow = MutableStateFlow(PlantScreenUiState())
     val uiState: StateFlow<PlantScreenUiState> = stateFlow
+    var sensorJob: Job? = null
+
     init {
         viewModelScope.launch {
             plantRepository.getPlant(plantId).collect { plant ->
@@ -77,6 +81,14 @@ class PlantScreenViewModel @Inject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            sensorService.getBluetoothStateFlow().collect { state ->
+                stateFlow.update {
+                    it.copy(bluetoothOn = state)
+                }
+            }
+        }
     }
 
     fun setDialogState(open: Boolean) {
@@ -87,19 +99,37 @@ class PlantScreenViewModel @Inject constructor(
 
     fun deleteCurrentPlant() {
         viewModelScope.launch {
-            uiState.value.plant?.let{ plant ->
+            uiState.value.plant?.let { plant ->
                 plantRepository.deletePlant(plant)
             }
         }
         viewModelScope.launch {
             plantRepository.getPlantMediaFlow(plantId).collect { media ->
-                stateFlow.update{
+                stateFlow.update {
                     it.copy(media = media)
                 }
             }
         }
     }
-    suspend fun deletePlantMedia(file: File){
+
+    fun getSensorData() {
+        val address = uiState.value.plant?.sensorAddress ?: return
+        sensorJob?.cancel()
+        sensorJob = viewModelScope.launch {
+            sensorService.getSensorDataFlow(address).collect { data ->
+                stateFlow.update {
+                    it.copy(sensorData = data)
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalPermissionsApi::class)
+    fun requestPermissions(permissionState: MultiplePermissionsState) {
+        permissionState.launchMultiplePermissionRequest()
+    }
+
+    suspend fun deletePlantMedia(file: File) {
         plantRepository.deletePlantMedia(file)
     }
 }

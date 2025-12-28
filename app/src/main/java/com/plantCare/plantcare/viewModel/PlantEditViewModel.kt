@@ -1,6 +1,8 @@
 package com.plantCare.plantcare.viewModel
 
+import android.Manifest
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +11,8 @@ import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.database.WateringInterval
 import com.plantCare.plantcare.service.PlantDetailsRepository
 import com.plantCare.plantcare.service.PlantSearchResult
+import com.plantCare.plantcare.service.SensorService
+import com.plantCare.plantcare.ui.screens.plantEditScreen.SensorButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -38,19 +43,21 @@ data class PlantEditUiState(
     val species: String = "",
     val plantedOn: LocalDate = LocalDate.now(),
     val isIndoor: Boolean = false,
-    val sensorName: String = "",
     val interval: WateringInterval = WateringInterval.WEEK,
     val selectedDays: Set<DayOfWeek> = setOf(),
     val showSearchResults: Boolean = false,
     val isSearching: Boolean = false,
     val searchResults: List<PlantSearchResult> = listOf(),
     val selectedPlant: PlantSearchResult? = null,
+    val sensorButtonState: SensorButtonState = SensorButtonState.ADD_SENSOR,
+    val sensorAddress: String? = null,
 )
 
 @HiltViewModel
 class PlantEditViewModel @Inject constructor(
     private val plantRepository: PlantRepository,
     private val plantDetailsRepository: PlantDetailsRepository,
+    private val sensorService: SensorService,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     val mode: EditMode = savedStateHandle["mode"]!!
@@ -78,7 +85,13 @@ class PlantEditViewModel @Inject constructor(
                                 plantedOn = plant.plantedOn,
                                 selectedDays = schedule.map { it.day }.toSet(),
                                 interval = plant.wateringInterval,
-                                isLoading = false
+                                isLoading = false,
+                                sensorAddress = plant.sensorAddress,
+                                sensorButtonState = if (plant.sensorAddress == null) {
+                                    SensorButtonState.ADD_SENSOR
+                                } else {
+                                    SensorButtonState.REMOVE_SENSOR
+                                }
                             )
                         }
                     }
@@ -115,9 +128,38 @@ class PlantEditViewModel @Inject constructor(
         }
     }
 
-    fun setSensorName(name: String) {
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
+    fun scanForSensors() {
         plantEditFlow.update {
-            it.copy(sensorName = name)
+            it.copy(sensorButtonState = SensorButtonState.SCANNING)
+        }
+
+        viewModelScope.launch {
+            val device = sensorService.scanForSensor().first()
+            if (device == null) {
+                plantEditFlow.update {
+                    it.copy(
+                        sensorButtonState = SensorButtonState.ADD_SENSOR,
+                        sensorAddress = null,
+                    )
+                }
+            } else {
+                plantEditFlow.update {
+                    it.copy(
+                        sensorButtonState = SensorButtonState.REMOVE_SENSOR,
+                        sensorAddress = device.address,
+                    )
+                }
+            }
+        }
+    }
+
+    fun removeSensor() {
+        plantEditFlow.update {
+            it.copy(
+                sensorButtonState = SensorButtonState.ADD_SENSOR,
+                sensorAddress = null,
+            )
         }
     }
 
@@ -149,19 +191,19 @@ class PlantEditViewModel @Inject constructor(
         setSelectedDays(plantEditState.value.selectedDays + day)
     }
 
-
     fun unselectDay(day: DayOfWeek) {
         setSelectedDays(plantEditState.value.selectedDays - day)
     }
 
     fun setIsSearching(isSearching: Boolean) {
-         plantEditFlow.update {
+        plantEditFlow.update {
             it.copy(isSearching = isSearching)
         }
     }
 
 
     fun savePlant() {
+        Log.d("sensorScan", "saving")
         if (!plantEditState.value.isLoading) {
             when (mode) {
                 EditMode.ADD -> {
@@ -175,6 +217,8 @@ class PlantEditViewModel @Inject constructor(
                             wateringInterval = plantEditState.value.interval,
                             apiId = plantEditState.value.selectedPlant?.id
                         )
+
+                        plantRepository.setSensorAddress(id, plantEditState.value.sensorAddress)
 
                         plantRepository.setSchedule(
                             id,
@@ -194,8 +238,10 @@ class PlantEditViewModel @Inject constructor(
                             species = plantEditState.value.species,
                             plantedOn = plantEditState.value.plantedOn,
                             wateringInterval = plantEditState.value.interval,
-                            apiId = plantEditState.value.selectedPlant?.id
                         )
+
+                        plantRepository.setApiId(plantId, plantEditState.value.selectedPlant?.id)
+                        plantRepository.setSensorAddress(plantId, plantEditState.value.sensorAddress)
 
                         plantRepository.setSchedule(
                             plantId,
