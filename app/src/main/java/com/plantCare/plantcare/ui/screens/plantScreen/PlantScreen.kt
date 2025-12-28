@@ -113,7 +113,11 @@ fun PlantScreen(
             }
 
             item {
-                SensorCard()
+                SensorCard(
+                    hasSensor = uiState.plant?.sensorAddress != null,
+                    bluetoothOn = uiState.bluetoothOn,
+                    sensorData = uiState.sensorData,
+                )
             }
 
             item {

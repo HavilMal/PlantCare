@@ -1,9 +1,6 @@
 package com.plantCare.plantcare.viewModel
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.os.FileObserver
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,17 +10,13 @@ import com.plantCare.plantcare.database.Plant
 import com.plantCare.plantcare.database.PlantDetails
 import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.service.PlantDetailsRepository
+import com.plantCare.plantcare.service.SensorData
 import com.plantCare.plantcare.service.SensorService
-import com.plantCare.plantcare.utils.FileUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -35,12 +28,13 @@ data class PlantScreenUiState(
     val plant: Plant? = null,
     val plantDetails: PlantDetails? = null,
     val dialogOpen: Boolean = false,
+    val bluetoothOn: Boolean = false,
+    val sensorData: SensorData? = null,
 )
 
 @SuppressLint("MissingPermission")
 @HiltViewModel
 class PlantScreenViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     val plantRepository: PlantRepository,
     private val notesRepository: NotesRepository,
     private val detailsRepository: PlantDetailsRepository,
@@ -63,8 +57,7 @@ class PlantScreenViewModel @Inject constructor(
                 sensorJob = viewModelScope.launch {
                     sensorService.getSensorDataFlow(address).collect { data->
                         stateFlow.update {
-                            Log.d("sensorData", "${data?.humidity}")
-                            it.copy()
+                            it.copy(sensorData = data)
                         }
                     }
                 }
@@ -91,6 +84,14 @@ class PlantScreenViewModel @Inject constructor(
             detailsRepository.getPlantDetails(plantId).collect { details ->
                 stateFlow.update {
                     it.copy(plantDetails = details)
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            sensorService.getBluetoothStateFlow().collect { state->
+                stateFlow.update {
+                    it.copy(bluetoothOn = state)
                 }
             }
         }
