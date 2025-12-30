@@ -1,7 +1,6 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,19 +21,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.toLowerCase
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.plantCare.plantcare.common.capitalize
 import com.plantCare.plantcare.common.getLocale
-import com.plantCare.plantcare.database.Note
 import com.plantCare.plantcare.database.PlantDetails
 import com.plantCare.plantcare.utils.ifNotEmpty
 import com.plantCare.plantcare.utils.listToStringWith
 import java.util.Locale
 
 
-@Preview
 @Composable
 fun PlantTipsCard(
     details: PlantDetails?,

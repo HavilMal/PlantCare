@@ -8,20 +8,16 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.common.WithPermission
@@ -33,7 +29,6 @@ fun CameraView() {
     val previewUseCase = remember { Preview.Builder().build() }
     val localContext = LocalContext.current
     var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
-    var cameraControl by remember { mutableStateOf<CameraControl?>(null) }
 
     fun rebindCameraProvider() {
         cameraProvider?.let { cameraProvider ->
@@ -46,7 +41,6 @@ fun CameraView() {
                 cameraSelector,
                 previewUseCase,
             )
-            cameraControl = camera.cameraControl
         }
     }
 
@@ -70,11 +64,10 @@ fun CameraView() {
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
-
     MainScaffold(Route.CAMERA.label) { modifier ->
         WithPermission(
             modifier = modifier,
-            permissions = listOf(Manifest.permission.CAMERA),
+            requestedPermissions = listOf(Manifest.permission.CAMERA),
         ) {
             CameraView()
         }

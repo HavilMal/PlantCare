@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.plantCare.plantcare.ui.components.InlinedText
 import com.plantCare.plantcare.ui.components.SquareButton
@@ -30,12 +31,12 @@ import com.plantCare.plantcare.ui.theme.spacing
 @Composable
 fun WithPermission(
     modifier: Modifier = Modifier,
-    permissions: List<String>,
-    content: @Composable () -> Unit
+    requestedPermissions: List<String>,
+    content: @Composable (MultiplePermissionsState) -> Unit
 ) {
     val context = LocalContext.current
     val permissionState = rememberMultiplePermissionsState(
-        permissions
+        requestedPermissions
     )
 
     if (!permissionState.allPermissionsGranted) {
@@ -86,8 +87,8 @@ fun WithPermission(
         return
     }
 
-    Surface(modifier = modifier) {
-        content()
+    Box(modifier = modifier) {
+        content(permissionState)
     }
 }
 
