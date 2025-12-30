@@ -51,6 +51,7 @@ data class PlantEditUiState(
     val selectedPlant: PlantSearchResult? = null,
     val sensorButtonState: SensorButtonState = SensorButtonState.ADD_SENSOR,
     val sensorAddress: String? = null,
+    val bluetoothOn: Boolean = false,
 )
 
 @HiltViewModel
@@ -100,6 +101,14 @@ class PlantEditViewModel @Inject constructor(
         } else {
             viewModelScope.launch {
                 plantEditFlow.update { it.copy(isLoading = false) }
+            }
+        }
+
+        viewModelScope.launch {
+            sensorService.getBluetoothStateFlow().collect { state ->
+                plantEditFlow.update {
+                    it.copy(bluetoothOn = state)
+                }
             }
         }
     }

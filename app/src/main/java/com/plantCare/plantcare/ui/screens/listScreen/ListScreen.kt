@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,8 +25,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.ui.components.InlinedText
-import com.plantCare.plantcare.ui.theme.size
-import com.plantCare.plantcare.ui.theme.spacing
 import com.plantCare.plantcare.viewModel.ListViewModel
 
 
@@ -64,7 +61,7 @@ fun ListScreen(
                         appendInlineContent("add_icon")
                         append(" button.")
                     },
-                    annotationDictionary = mapOf("add_icon" to Icons.Default.Add),
+                    annotationDictionary = mapOf("add_icon" to { Icon(Icons.Default.Add, null) }),
                 )
             }
             return@PlantListScaffold

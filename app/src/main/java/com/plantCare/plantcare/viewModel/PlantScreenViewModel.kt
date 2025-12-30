@@ -124,11 +124,6 @@ class PlantScreenViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalPermissionsApi::class)
-    fun requestPermissions(permissionState: MultiplePermissionsState) {
-        permissionState.launchMultiplePermissionRequest()
-    }
-
     suspend fun deletePlantMedia(file: File) {
         plantRepository.deletePlantMedia(file)
     }

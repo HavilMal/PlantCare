@@ -21,7 +21,7 @@ import com.plantCare.plantcare.ui.screens.galleryScreen.GalleryScreen
 import com.plantCare.plantcare.ui.screens.listScreen.ListScreen
 import com.plantCare.plantcare.ui.screens.noteEditScreen.NoteEditScreen
 import com.plantCare.plantcare.ui.screens.notesList.NoteListScreen
-import com.plantCare.plantcare.ui.screens.plantScreen.PlantCameraCaptureScreen
+import com.plantCare.plantcare.ui.screens.plantCameraCaptureScreen.PlantCameraCaptureScreen
 import com.plantCare.plantcare.ui.screens.plantEditScreen.PlantEditScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.DeviceGalleryScreen
 import com.plantCare.plantcare.ui.screens.plantScreen.PlantScreen

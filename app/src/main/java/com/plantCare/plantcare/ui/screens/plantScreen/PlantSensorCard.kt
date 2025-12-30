@@ -1,6 +1,5 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BluetoothDisabled
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.SensorsOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -24,17 +25,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.buildAnnotatedString
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
-import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.plantCare.plantcare.R
+import com.plantCare.plantcare.common.openAppSettings
 import com.plantCare.plantcare.service.SensorData
 import com.plantCare.plantcare.ui.components.FillableSVG
+import com.plantCare.plantcare.ui.components.InlinedText
+import com.plantCare.plantcare.ui.components.SquareButton
 import com.plantCare.plantcare.ui.theme.size
 import com.plantCare.plantcare.ui.theme.spacing
-import java.security.Permission
 import kotlin.math.PI
 import kotlin.math.cos
 
@@ -65,8 +69,8 @@ fun SensorCard(
     bluetoothOn: Boolean,
     sensorData: SensorData?,
     onGetSensorData: () -> Unit,
-    onAskPermission: (MultiplePermissionsState) -> Unit,
 ) {
+    val context = LocalContext.current
     val permissionState = rememberMultiplePermissionsState(
         listOf(
             android.Manifest.permission.BLUETOOTH_SCAN,
@@ -94,14 +98,44 @@ fun SensorCard(
             return@Card
         }
 
-        if (permissionState.permissions.any { !it.status.isGranted }) {
+        if (!permissionState.allPermissionsGranted) {
             NoData {
-                Button(
-                    onClick = {
-                        onAskPermission(permissionState)
+                if (permissionState.shouldShowRationale) {
+                    SquareButton(
+                        onClick = {
+                        }
+                    ) {
+                        Text("Grant Permissions")
                     }
-                ) {
-                    Text("Grant Permissions")
+                } else {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
+                    ) {
+                        SquareButton(
+                            onClick = {
+                                openAppSettings(context)
+                            }
+                        ) {
+                            Text("Open settings")
+                        }
+                        InlinedText(
+                            modifier = Modifier.padding(horizontal = MaterialTheme.spacing.small),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            annotatedText = buildAnnotatedString {
+                                appendInlineContent("warning_icon")
+                                append(" ")
+                                append("Grant permissions in app settings.")
+                            },
+                            annotationDictionary = mapOf("warning_icon" to { color ->
+                                Icon(
+                                    imageVector = Icons.Default.ErrorOutline,
+                                    contentDescription = null,
+                                    tint = color,
+                                )
+                            })
+                        )
+                    }
                 }
             }
             return@Card
