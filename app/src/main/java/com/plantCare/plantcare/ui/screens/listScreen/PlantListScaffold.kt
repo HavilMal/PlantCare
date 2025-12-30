@@ -17,7 +17,9 @@ import com.plantCare.plantcare.ui.components.TopBar
 import com.plantCare.plantcare.viewModel.EditMode
 
 @Composable
-fun PlantListScaffold(content: Content) {
+fun PlantListScaffold(
+    content: Content,
+) {
     val navController = NavigationController.current
 
     Scaffold(
@@ -26,13 +28,14 @@ fun PlantListScaffold(content: Content) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController?.navigate(Route.PLANT_EDIT.routeWithArgs( EditMode.ADD).addQuery("id", 0))
+                    navController?.navigate(
+                        Route.PLANT_EDIT.routeWithArgs(EditMode.ADD).addQuery("id", 0)
+                    )
                 }
             ) {
                 Icon(Icons.Default.Add, "Add plant")
             }
         }
-
     ) { contentPadding ->
         content(Modifier.padding(contentPadding))
     }
