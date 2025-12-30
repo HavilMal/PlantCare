@@ -16,9 +16,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.common.WithPermission
+import com.plantCare.plantcare.viewModel.SearchViewModel
 
 
 @Composable
@@ -26,7 +29,6 @@ fun CameraView() {
     val previewUseCase = remember { Preview.Builder().build() }
     val localContext = LocalContext.current
     var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
-    var cameraControl by remember { mutableStateOf<CameraControl?>(null) }
 
     fun rebindCameraProvider() {
         cameraProvider?.let { cameraProvider ->
@@ -39,7 +41,6 @@ fun CameraView() {
                 cameraSelector,
                 previewUseCase,
             )
-            cameraControl = camera.cameraControl
         }
     }
 
@@ -49,20 +50,26 @@ fun CameraView() {
         rebindCameraProvider()
     }
 
-    MainScaffold(Route.CAMERA.label) {
-        AndroidView(
-            factory = { context ->
-                PreviewView(context).also {
-                    previewUseCase.surfaceProvider = it.surfaceProvider
-                }
+    AndroidView(
+        factory = { context ->
+            PreviewView(context).also {
+                previewUseCase.surfaceProvider = it.surfaceProvider
             }
-        )
-    }
+        }
+    )
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun SearchScreen() {
-    WithPermission(permission = Manifest.permission.CAMERA) {
-        CameraView()
+fun SearchScreen(
+    viewModel: SearchViewModel = hiltViewModel()
+) {
+    MainScaffold(Route.CAMERA.label) { modifier ->
+        WithPermission(
+            modifier = modifier,
+            requestedPermissions = listOf(Manifest.permission.CAMERA),
+        ) {
+            CameraView()
+        }
     }
 }

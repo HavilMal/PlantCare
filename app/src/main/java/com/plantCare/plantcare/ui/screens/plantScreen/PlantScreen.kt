@@ -121,9 +121,6 @@ fun PlantScreen(
                     onGetSensorData =  {
                         viewModel.getSensorData()
                     },
-                    onAskPermission = {
-                        viewModel.requestPermissions(it)
-                    }
                 )
             }
 

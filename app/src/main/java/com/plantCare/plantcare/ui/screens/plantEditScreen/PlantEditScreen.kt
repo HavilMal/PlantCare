@@ -148,6 +148,7 @@ fun PlantEditScreen(
             Text("Sensor")
 
             SensorButton(
+                bluetoothOn = state.bluetoothOn,
                 state = state.sensorButtonState,
                 onScanForSensor = { viewModel.scanForSensors() },
                 onRemoveSensor = { viewModel.removeSensor() },

@@ -2,6 +2,7 @@ package com.plantCare.plantcare.ui.components
 
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,16 +18,16 @@ import androidx.compose.ui.text.TextStyle
 fun InlinedText(
     modifier: Modifier = Modifier,
     annotatedText: AnnotatedString,
-    annotationDictionary: Map<String, ImageVector>,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-    style: TextStyle = MaterialTheme.typography.bodyLarge
+    annotationDictionary: Map<String, @Composable (Color) -> Unit>,
+    color: Color = Color.Unspecified,
+    style: TextStyle = LocalTextStyle.current,
 ) {
     Text(
         modifier = modifier,
         style = style,
         color = color,
         text = annotatedText,
-        inlineContent = annotationDictionary.map { (entry, image) ->
+        inlineContent = annotationDictionary.map { (entry, content) ->
             entry to InlineTextContent(
                 placeholder = Placeholder(
                     width = style.fontSize,
@@ -34,11 +35,7 @@ fun InlinedText(
                     placeholderVerticalAlign = PlaceholderVerticalAlign.Center
                 )
             ) {
-                Icon(
-                    imageVector = image,
-                    contentDescription = null,
-                    tint = color,
-                )
+               content(color)
             }
         }.toMap()
     )
