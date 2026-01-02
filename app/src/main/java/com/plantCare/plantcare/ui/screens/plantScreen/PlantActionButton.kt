@@ -1,14 +1,13 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Contacts
-import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
@@ -30,20 +29,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.isShiftPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.customActions
-import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.traversalIndex
-import androidx.compose.ui.tooling.preview.Preview
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.viewModel.EditMode
@@ -71,8 +60,8 @@ fun PlantActionButton(plantId: Long?) {
                     EditMode.ADD, plantId
                 )
             ),
-            MenuItem(Icons.Filled.People, "Camera", Route.CAMERA.routeWithArgs(plantId)),
-            MenuItem(Icons.Filled.Contacts, "Gallery", Route.DEVICE_GALLERY.routeWithArgs(plantId))
+            MenuItem(Icons.Filled.CameraAlt, "Camera", Route.CAMERA.routeWithArgs(plantId)),
+            MenuItem(Icons.Filled.PhotoLibrary, "Gallery", Route.DEVICE_GALLERY.routeWithArgs(plantId))
         )
 
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }

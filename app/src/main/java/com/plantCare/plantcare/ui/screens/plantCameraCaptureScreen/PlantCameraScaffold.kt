@@ -33,7 +33,7 @@ fun PlantCameraScaffold(
                         onClick = { navController?.popBackStack() },
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.1f),
+                                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f),
                                 shape = CircleShape
                             )
                     ) {
