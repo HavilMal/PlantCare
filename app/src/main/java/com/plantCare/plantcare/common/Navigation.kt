@@ -108,7 +108,7 @@ fun AppNavHost(
                 arguments = listOf(
                     navArgument("plantId") { type = NavType.LongType }
                 )
-            ) { backStackEntry ->
+            ) {
                 GalleryScreen()
             }
 

@@ -11,10 +11,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 
 data class ListUiState(
     val isLoading: Boolean = true,
-    val plants: List<Plant> = listOf()
+    val plants: List<Plant> = listOf(),
+    val thumbnails: Map<Long, File?> = mapOf(),
 )
 
 @HiltViewModel
@@ -37,6 +39,14 @@ class ListViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+
+        viewModelScope.launch {
+            plantRepository.getPlantsTumbnailFlow().collect { thumbnails ->
+                listFlow.update {
+                    it.copy(thumbnails = thumbnails)
+                }
+            }
         }
     }
 }

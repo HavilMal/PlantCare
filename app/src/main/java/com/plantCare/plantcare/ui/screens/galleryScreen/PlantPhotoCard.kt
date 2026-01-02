@@ -34,6 +34,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.video.VideoFrameDecoder
 import coil3.video.videoFrameIndex
+import com.plantCare.plantcare.ui.components.MediaThumbnail
 import com.plantCare.plantcare.utils.FileUtil
 import kotlinx.coroutines.launch
 import java.io.File
@@ -72,7 +73,6 @@ fun VideoPlayer(file: File) {
 
 @Composable
 fun PlantMediaCard(media: File, onDelete: suspend () -> Unit) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var playVideo by remember { mutableStateOf(false) }
     Box(
@@ -82,40 +82,17 @@ fun PlantMediaCard(media: File, onDelete: suspend () -> Unit) {
                 playVideo = true
             }
     ) {
-        if (FileUtil.isVideo(media)) {
-            if (playVideo) {
-                VideoPlayer(file = media)
-            } else {
-                val loader = ImageLoader.Builder(context).components {
-                    add(VideoFrameDecoder.Factory())
-                }.build()
-
-                val request = ImageRequest.Builder(context)
-                    .data(media)
-                    .videoFrameIndex(0)
-                    .build()
-
-
-                AsyncImage(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(16f / 9f),
-                    model = request,
-                    imageLoader = loader,
-                    contentDescription = "video preview",
-                    contentScale = ContentScale.Crop
-                )
-            }
+        if (playVideo) {
+            VideoPlayer(file = media)
         } else {
-            AsyncImage(
+            MediaThumbnail(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(9f / 16f),
-                model = media,
-                contentDescription = "plant visual",
-                contentScale = ContentScale.Crop
+                file = media
             )
         }
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()

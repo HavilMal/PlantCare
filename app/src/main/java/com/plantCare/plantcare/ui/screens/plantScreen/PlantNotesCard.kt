@@ -16,6 +16,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +51,9 @@ fun PlantNotesCard(notes: List<Note>, onClick: () -> Unit, modifier: Modifier = 
                         .clickable {
                             onClick()
                         },
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ),
                     shape = RoundedCornerShape(20.dp),
                 ) {
                     Column(
@@ -96,6 +100,9 @@ fun NoNotes() {
         modifier = Modifier
             .fillMaxWidth()
             .height(150.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
         shape = RoundedCornerShape(20.dp),
     ) {
         Box(

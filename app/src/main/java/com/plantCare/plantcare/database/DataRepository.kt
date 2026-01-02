@@ -85,6 +85,15 @@ class PlantRepository(
         return plantDao.getPlantWateringSchedules()
     }
 
+    fun getPlantsTumbnailFlow(): Flow<Map<Long, File?>> {
+        return plantDao.getPlantThumbnails().map {
+            it.mapValues { (id, path) ->
+                val plantMediaDirPath: String = getPlantsMediaDirPath(id)
+                path?.let { File(appContext.filesDir, "$plantMediaDirPath/$path") }
+            }
+        }
+    }
+
     suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval) {
         plantDao.setSchedule(plantId, days, interval)
     }

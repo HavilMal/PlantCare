@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.ui.screens.listScreen
 
+import PlantCard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -75,7 +76,10 @@ fun ListScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(plantsUiState.value.plants) { plant ->
-                PlantCard(plant)
+                PlantCard(
+                    thumbnail = plantsUiState.value.thumbnails[plant.id],
+                    plant = plant
+                )
             }
         }
     }
