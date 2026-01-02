@@ -1,6 +1,8 @@
 package com.plantCare.plantcare.ui.screens.plantCameraCaptureScreen
 
 import android.Manifest
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,12 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.plantCare.plantcare.common.WithPermission
-import com.plantCare.plantcare.utils.CameraCapture
 import com.plantCare.plantcare.viewModel.PlantCameraCaptureViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.plantCare.plantcare.common.NavigationController
+import com.plantCare.plantcare.utils.takePhoto
 
 
 @Composable
@@ -37,31 +40,55 @@ fun PlantCameraCaptureView(
     val lifecycleOwner = LocalLifecycleOwner.current
 
     val cameraCapture = remember {
-        CameraCapture(context, lifecycleOwner)
-    }
-
-    var previewView by remember { mutableStateOf<PreviewView?>(null) }
-
-    LaunchedEffect(previewView) {
-        previewView?.let { view ->
-            cameraCapture.startCamera(view)
+//        CameraCapture(context, lifecycleOwner)
+        LifecycleCameraController(context).apply {
+            setEnabledUseCases(
+                CameraController.IMAGE_CAPTURE
+            )
         }
     }
+
+    DisposableEffect(lifecycleOwner) {
+        cameraCapture.bindToLifecycle(lifecycleOwner)
+        onDispose {
+            cameraCapture.unbind()
+        }
+    }
+
+//
+//    var previewView by remember { mutableStateOf<PreviewView?>(null) }
+//
+//    LaunchedEffect(previewView) {
+//        previewView?.let { view ->
+//            cameraCapture.startCamera(view)
+//        }
+//    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { ctx ->
-                PreviewView(ctx).also { previewView = it }
+                PreviewView(ctx).apply {
+                    implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                    scaleType = PreviewView.ScaleType.FILL_CENTER
+                    controller = cameraCapture
+                }
+            },
+            onRelease = {
+                cameraCapture.unbind()
             }
         )
         Button(
             onClick = {
-                cameraCapture.takePhoto { file ->
+                takePhoto(context, cameraCapture) { file ->
                     viewModel.savePhoto(file)
-                    cameraCapture.stopCamera()
                     navController?.popBackStack()
                 }
+//                cameraCapture.takePhoto { file ->
+//                    viewModel.savePhoto(file)
+//                    cameraCapture.stopCamera()
+//                    navController?.popBackStack()
+//                }
             },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
