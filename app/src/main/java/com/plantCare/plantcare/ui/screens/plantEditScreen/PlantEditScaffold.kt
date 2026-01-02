@@ -26,9 +26,11 @@ fun PlantEditScaffold(
             ) {
                 IconButton(
                     onClick = {
-                        plantEditViewModel.savePlant()
-                        navController?.popBackStack()
-                              },
+                        val correct = plantEditViewModel.savePlant()
+                        if(correct) {
+                            navController?.popBackStack()
+                        }
+                    },
                 ) {
                     Icon(
                         Icons.Filled.Save, "Save"

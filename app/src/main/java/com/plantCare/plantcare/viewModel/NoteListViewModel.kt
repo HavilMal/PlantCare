@@ -13,23 +13,27 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class NoteListUiState(
+    val isLoading: Boolean = true,
     val notes: List<Note>,
 )
 
 @HiltViewModel
 class NoteListViewModel @Inject constructor(
-    val notesRepository: NotesRepository,
-    val savedStateHandle: SavedStateHandle,
+    private val notesRepository: NotesRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val plantId: Long = savedStateHandle["plantId"]!!
-    private val noteListFlow = MutableStateFlow(NoteListUiState(listOf()))
+    private val noteListFlow = MutableStateFlow(NoteListUiState(notes = listOf()))
     val noteListState = noteListFlow.asStateFlow()
 
     init {
         viewModelScope.launch {
             notesRepository.getPlantNotesFlow(plantId).collect { notes ->
                 noteListFlow.update {
-                    it.copy(notes = notes)
+                    it.copy(
+                        notes = notes,
+                        isLoading = false,
+                    )
                 }
             }
         }

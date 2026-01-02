@@ -24,17 +24,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.ui.components.InlinedText
+import com.plantCare.plantcare.viewModel.GalleryViewModel
 import com.plantCare.plantcare.viewModel.PlantScreenViewModel
 
 @Preview
 @Composable
 fun GalleryScreen(
-    viewModel: PlantScreenViewModel = hiltViewModel()
+    viewModel: GalleryViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val state by viewModel.state.collectAsState()
+    val isEmpty = state.media.isEmpty()
+    val isLoading = state.isLoading
 
     GalleryScaffold { modifier ->
-        if (uiState.media.isEmpty()) {
+        if (!isLoading && isEmpty) {
             Column(
                 modifier = modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -76,7 +79,7 @@ fun GalleryScreen(
             modifier = modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(uiState.media) { item ->
+            items(state.media) { item ->
                 PlantMediaCard(item)
                 {
                     viewModel.deletePlantMedia(item)

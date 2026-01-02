@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ListUiState(
+    val isLoading: Boolean = true,
     val plants: List<Plant> = listOf()
 )
 
@@ -30,7 +31,10 @@ class ListViewModel @Inject constructor(
             plantRepository.plantDao.getPlants()
                 .collect { plantList ->
                     listFlow.update { currentState ->
-                        currentState.copy(plants = plantList)
+                        currentState.copy(
+                            plants = plantList,
+                            isLoading = false,
+                        )
                     }
                 }
         }
