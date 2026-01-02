@@ -108,10 +108,12 @@ fun PlantMediaCard(media: File, onDelete: suspend () -> Unit) {
             }
         } else {
             AsyncImage(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(9f / 16f),
                 model = media,
                 contentDescription = "plant visual",
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Crop
             )
         }
         Box(
