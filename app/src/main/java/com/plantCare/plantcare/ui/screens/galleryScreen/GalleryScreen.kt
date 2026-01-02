@@ -19,9 +19,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.ui.components.InlinedText
 import com.plantCare.plantcare.viewModel.GalleryViewModel
 
@@ -29,11 +31,14 @@ import com.plantCare.plantcare.viewModel.GalleryViewModel
 fun GalleryScreen(
     viewModel: GalleryViewModel = hiltViewModel()
 ) {
+    val navController = NavigationController.current
     val state by viewModel.state.collectAsState()
     val isEmpty = state.media.isEmpty()
     val isLoading = state.isLoading
 
-    GalleryScaffold { modifier ->
+    GalleryScaffold(
+        onBack = { navController?.popBackStack() }
+    ) { modifier ->
         if (!isLoading && isEmpty) {
             Column(
                 modifier = modifier
