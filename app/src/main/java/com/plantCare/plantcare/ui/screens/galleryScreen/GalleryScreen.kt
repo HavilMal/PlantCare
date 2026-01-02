@@ -20,14 +20,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.ui.components.InlinedText
 import com.plantCare.plantcare.viewModel.GalleryViewModel
-import com.plantCare.plantcare.viewModel.PlantScreenViewModel
 
-@Preview
 @Composable
 fun GalleryScreen(
     viewModel: GalleryViewModel = hiltViewModel()
@@ -39,7 +36,9 @@ fun GalleryScreen(
     GalleryScaffold { modifier ->
         if (!isLoading && isEmpty) {
             Column(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .padding(16.dp)
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {

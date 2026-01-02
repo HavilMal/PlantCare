@@ -15,6 +15,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,8 +40,6 @@ fun PlantTipsCard(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.BottomCenter,
     ) {
-
-
         if (details == null) {
             NoTips()
         } else {
@@ -57,6 +56,9 @@ fun PlantTipsCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ),
                     shape = RoundedCornerShape(20.dp),
                 ) {
                     Column(
@@ -103,6 +105,9 @@ fun NoTips() {
         modifier = Modifier
             .fillMaxWidth()
             .height(150.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
         shape = RoundedCornerShape(20.dp),
     ) {
         Box(
@@ -122,18 +127,18 @@ data class Tip(
 fun detailsToTips(details: PlantDetails, locale: Locale): List<Tip> {
     val tips = mutableListOf<Tip>()
 
-   details.wateringValue.filter { it != '"' }.ifNotEmpty { value ->
-    tips.add(
-        Tip(
-            "Watering",
-            "${details.commonName.capitalize(locale)} should be watered every $value ${
-                details.wateringUnit.lowercase(
-                    locale
-                )
-            }."
+    details.wateringValue.filter { it != '"' }.ifNotEmpty { value ->
+        tips.add(
+            Tip(
+                "Watering",
+                "${details.commonName.capitalize(locale)} should be watered every $value ${
+                    details.wateringUnit.lowercase(
+                        locale
+                    )
+                }."
+            )
         )
-    )
-   }
+    }
 
 
     listToStringWith(details.sunlight, "or").ifNotEmpty { sunlight ->

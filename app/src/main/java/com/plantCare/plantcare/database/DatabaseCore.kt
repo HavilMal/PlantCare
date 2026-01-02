@@ -8,6 +8,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.Insert
+import androidx.room.MapColumn
+import androidx.room.MapInfo
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
@@ -219,6 +221,9 @@ interface PlantDao {
          """
     )
     fun getPlantWateringSchedules(): Flow<List<PlantWateringSchedule>>
+
+    @Query("SELECT id, (SELECT media FROM plantMedia pm1 WHERE p1.id = pm1.plant LIMIT 1) media FROM plants p1")
+    fun getPlantThumbnails(): Flow<Map<@MapColumn(columnName = "id")Long, @MapColumn(columnName = "media")String?>>
 
     @Query("UPDATE plants SET sensorAddress = :address WHERE id = :plantId")
     suspend fun updateSensorAddress(plantId: Long, address: String?)

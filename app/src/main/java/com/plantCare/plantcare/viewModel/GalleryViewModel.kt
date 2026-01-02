@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.PlantRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +18,7 @@ data class GalleryState(
     val media: List<File> = listOf()
 )
 
+@HiltViewModel
 class GalleryViewModel @Inject constructor(
     private val plantRepository: PlantRepository,
     savedStateHandle: SavedStateHandle,
