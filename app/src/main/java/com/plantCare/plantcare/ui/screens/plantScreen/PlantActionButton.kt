@@ -1,6 +1,9 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
@@ -29,6 +32,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -61,56 +65,77 @@ fun PlantActionButton(plantId: Long?) {
                 )
             ),
             MenuItem(Icons.Filled.CameraAlt, "Camera", Route.CAMERA.routeWithArgs(plantId)),
-            MenuItem(Icons.Filled.PhotoLibrary, "Gallery", Route.DEVICE_GALLERY.routeWithArgs(plantId))
+            MenuItem(
+                Icons.Filled.PhotoLibrary,
+                "Gallery",
+                Route.DEVICE_GALLERY.routeWithArgs(plantId)
+            )
         )
 
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     BackHandler(fabMenuExpanded) { fabMenuExpanded = false }
 
-    FloatingActionButtonMenu(
-        expanded = fabMenuExpanded,
-        button = {
-            ToggleFloatingActionButton(
-                modifier =
-                    Modifier
-                        .semantics {
-                            traversalIndex = -1f
-                            stateDescription = if (fabMenuExpanded) "Expanded" else "Collapsed"
-                            contentDescription = "Toggle menu"
-                        }
-                        .animateFloatingActionButton(
-                            visible = fabVisible || fabMenuExpanded,
-                            alignment = Alignment.BottomEnd,
-                        )
-                        .focusRequester(focusRequester),
-                checked = fabMenuExpanded,
-                onCheckedChange = { fabMenuExpanded = !fabMenuExpanded },
-            ) {
-                val imageVector by remember {
-                    derivedStateOf {
-                        if (checkedProgress > 0.5f) Icons.Filled.Close else Icons.Filled.Add
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomEnd,
+    ) {
+
+        if (fabMenuExpanded) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures(onTap = {
+                            fabMenuExpanded = false
+                        })
                     }
+            )
+        }
+        FloatingActionButtonMenu(
+            expanded = fabMenuExpanded,
+            button = {
+                ToggleFloatingActionButton(
+                    modifier =
+                        Modifier
+                            .semantics {
+                                traversalIndex = -1f
+                                stateDescription = if (fabMenuExpanded) "Expanded" else "Collapsed"
+                                contentDescription = "Toggle menu"
+                            }
+                            .animateFloatingActionButton(
+                                visible = fabVisible || fabMenuExpanded,
+                                alignment = Alignment.BottomEnd,
+                            )
+                            .focusRequester(focusRequester),
+                    checked = fabMenuExpanded,
+                    onCheckedChange = { fabMenuExpanded = !fabMenuExpanded },
+                ) {
+                    val imageVector by remember {
+                        derivedStateOf {
+                            if (checkedProgress > 0.5f) Icons.Filled.Close else Icons.Filled.Add
+                        }
+                    }
+                    Icon(
+                        painter = rememberVectorPainter(imageVector),
+                        contentDescription = null,
+                        modifier = Modifier.animateIcon({ checkedProgress }),
+                    )
                 }
-                Icon(
-                    painter = rememberVectorPainter(imageVector),
-                    contentDescription = null,
-                    modifier = Modifier.animateIcon({ checkedProgress }),
+            },
+        ) {
+            items.forEachIndexed { i, item ->
+                FloatingActionButtonMenuItem(
+                    onClick = {
+                        fabMenuExpanded = false
+                        navController?.navigate(
+                            item.route
+                        )
+                    },
+                    icon = { Icon(item.icon, contentDescription = null) },
+                    text = { Text(text = item.label) },
                 )
             }
-        },
-    ) {
-        items.forEachIndexed { i, item ->
-            FloatingActionButtonMenuItem(
-                onClick = {
-                    fabMenuExpanded = false
-                    navController?.navigate(
-                        item.route
-                    )
-                },
-                icon = { Icon(item.icon, contentDescription = null) },
-                text = { Text(text = item.label) },
-            )
         }
     }
 }
