@@ -1,6 +1,5 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
