@@ -1,4 +1,5 @@
 package com.plantCare.plantcare.ui.theme
+
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -259,25 +260,23 @@ fun AppTheme(
     dynamicColor: Boolean = false,
     content: @Composable() () -> Unit
 ) {
-  val colorScheme = when {
-     dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-         val context = LocalContext.current
-         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-     }
-      
-      darkTheme -> darkScheme
-      else -> lightScheme
-  }
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+
+        darkTheme -> darkScheme
+        else -> lightScheme
+    }
     CompositionLocalProvider(
         LocalSize provides Size(),
         LocalSpacing provides Spacing(),
     ) {
-  MaterialTheme(
-    colorScheme = colorScheme,
-    typography = Typography,
-    content = content
-  )
+        MaterialTheme(
+            colorScheme = colorScheme,
+            content = content
+        )
     }
-
 }
 

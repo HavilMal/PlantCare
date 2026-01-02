@@ -1,16 +1,19 @@
 package com.plantCare.plantcare.ui.screens.galleryScreen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -60,8 +63,7 @@ fun VideoPlayer(file: File) {
     AndroidView(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp)
-            .aspectRatio(16f / 9f),
+            .aspectRatio( 9f / 16f),
         factory = {
             PlayerView(it).apply {
                 player = exoPlayer
@@ -99,11 +101,17 @@ fun PlantMediaCard(media: File, onDelete: suspend () -> Unit) {
                 .padding(4.dp),
             contentAlignment = Alignment.TopEnd
         ) {
-            IconButton(onClick = {
-                scope.launch {
-                    onDelete()
+            IconButton(
+                modifier = Modifier.background(
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f),
+                    shape = CircleShape
+                ),
+                onClick = {
+                    scope.launch {
+                        onDelete()
+                    }
                 }
-            }) {
+            ) {
                 Icon(Icons.Filled.Delete, contentDescription = "Delete")
             }
         }

@@ -1,7 +1,6 @@
 package com.plantCare.plantcare.ui.screens.plantEditScreen
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,7 +16,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.toUpperCase
 import com.plantCare.plantcare.common.capitalize
 import com.plantCare.plantcare.common.getLocale
 import com.plantCare.plantcare.service.PlantSearchResult
