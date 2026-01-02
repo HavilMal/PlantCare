@@ -1,5 +1,6 @@
 package com.plantCare.plantcare.viewModel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +23,7 @@ class PlantCameraCaptureViewModel @Inject constructor(
     val plantId: Long = savedStateHandle["plantId"]!!
     fun savePhoto(file: File?){
         viewModelScope.launch {
+//            Log.d("photo", "Save id: $plantId")
             if(file != null) {
                 repository.addPlantMedia(plantId, file)
             }

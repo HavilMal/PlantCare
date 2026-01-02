@@ -6,9 +6,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
@@ -71,8 +73,8 @@ fun PlantActionButton(plantId: Long?) {
                     EditMode.ADD, plantId
                 )
             ),
-            MenuItem(Icons.Filled.People, "Camera", Route.CAMERA.routeWithArgs(plantId)),
-            MenuItem(Icons.Filled.Contacts, "Gallery", Route.DEVICE_GALLERY.routeWithArgs(plantId))
+            MenuItem(Icons.Filled.CameraAlt, "Camera", Route.CAMERA.routeWithArgs(plantId)),
+            MenuItem(Icons.Filled.PhotoLibrary, "Gallery", Route.DEVICE_GALLERY.routeWithArgs(plantId))
         )
 
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }

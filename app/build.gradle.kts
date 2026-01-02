@@ -93,9 +93,7 @@ dependencies {
 
     implementation(libs.calendar.compose)
     implementation(libs.coil.compose)
-
-    implementation(libs.calendar.compose)
-    implementation(libs.coil.compose)
+    implementation(libs.coil.video)
 
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
