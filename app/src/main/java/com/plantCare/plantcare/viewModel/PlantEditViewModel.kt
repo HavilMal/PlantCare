@@ -1,7 +1,6 @@
 package com.plantCare.plantcare.viewModel
 
 import android.Manifest
-import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -40,7 +39,9 @@ data class PlantEditUiState(
     val isLoading: Boolean = true,
     val loadingError: Boolean = false,
     val plantName: String = "",
+    val nameError: String = "",
     val species: String = "",
+    val speciesError: String = "",
     val plantedOn: LocalDate = LocalDate.now(),
     val isIndoor: Boolean = false,
     val interval: WateringInterval = WateringInterval.WEEK,
@@ -129,6 +130,7 @@ class PlantEditViewModel @Inject constructor(
         plantEditFlow.update {
             it.copy(plantName = name)
         }
+        validateName()
     }
 
     fun setPlantedOn(date: LocalDate) {
@@ -176,6 +178,7 @@ class PlantEditViewModel @Inject constructor(
         plantEditFlow.update {
             it.copy(species = species)
         }
+        validateSpecies()
     }
 
     fun setSelectedPlant(plant: PlantSearchResult, locale: Locale) {
@@ -211,56 +214,67 @@ class PlantEditViewModel @Inject constructor(
     }
 
 
-    fun savePlant() {
-        Log.d("sensorScan", "saving")
-        if (!plantEditState.value.isLoading) {
-            when (mode) {
-                EditMode.ADD -> {
-                    viewModelScope.launch {
+    fun savePlant(): Boolean {
+        if (plantEditState.value.isLoading) {
+            return false
+        }
 
-                        val id = plantRepository.insertPlant(
-                            name = plantEditState.value.plantName,
-                            description = "todo",
-                            species = plantEditState.value.species,
-                            plantedOn = plantEditState.value.plantedOn,
-                            wateringInterval = plantEditState.value.interval,
-                            apiId = plantEditState.value.selectedPlant?.id
-                        )
+        val conditions = listOf(
+            !validateName(),
+            !validateSpecies(),
+        )
 
-                        plantRepository.setSensorAddress(id, plantEditState.value.sensorAddress)
+        if (conditions.any { it }) {
+            return false
+        }
 
-                        plantRepository.setSchedule(
-                            id,
-                            plantEditState.value.selectedDays,
-                            plantEditState.value.interval
-                        )
-                    }
+        when (mode) {
+            EditMode.ADD -> {
+                viewModelScope.launch {
 
+                    val id = plantRepository.insertPlant(
+                        name = plantEditState.value.plantName,
+                        description = "todo",
+                        species = plantEditState.value.species,
+                        plantedOn = plantEditState.value.plantedOn,
+                        wateringInterval = plantEditState.value.interval,
+                        apiId = plantEditState.value.selectedPlant?.id
+                    )
+
+                    plantRepository.setSensorAddress(id, plantEditState.value.sensorAddress)
+
+                    plantRepository.setSchedule(
+                        id,
+                        plantEditState.value.selectedDays,
+                        plantEditState.value.interval
+                    )
                 }
+            }
 
-                EditMode.EDIT -> {
-                    viewModelScope.launch {
-                        plantRepository.updatePlant(
-                            plantId,
-                            plantEditState.value.plantName,
-                            isIndoor = plantEditState.value.isIndoor,
-                            species = plantEditState.value.species,
-                            plantedOn = plantEditState.value.plantedOn,
-                            wateringInterval = plantEditState.value.interval,
-                        )
+            EditMode.EDIT -> {
+                viewModelScope.launch {
+                    plantRepository.updatePlant(
+                        plantId,
+                        plantEditState.value.plantName,
+                        isIndoor = plantEditState.value.isIndoor,
+                        species = plantEditState.value.species,
+                        plantedOn = plantEditState.value.plantedOn,
+                        wateringInterval = plantEditState.value.interval,
+                    )
 
-                        plantRepository.setApiId(plantId, plantEditState.value.selectedPlant?.id)
-                        plantRepository.setSensorAddress(plantId, plantEditState.value.sensorAddress)
+                    plantRepository.setApiId(plantId, plantEditState.value.selectedPlant?.id)
+                    plantRepository.setSensorAddress(plantId, plantEditState.value.sensorAddress)
 
-                        plantRepository.setSchedule(
-                            plantId,
-                            plantEditState.value.selectedDays,
-                            plantEditState.value.interval
-                        )
-                    }
+                    plantRepository.setSchedule(
+                        plantId,
+                        plantEditState.value.selectedDays,
+                        plantEditState.value.interval
+                    )
                 }
             }
         }
+
+        return true
     }
 
     fun searchSpecies() {
@@ -279,6 +293,34 @@ class PlantEditViewModel @Inject constructor(
                 setIsSearching(false)
                 toastMessageFlow.emit("Connection error.")
             }
+        }
+    }
+
+    private fun validateName(): Boolean {
+        if (plantEditState.value.plantName.isEmpty()) {
+            plantEditFlow.update {
+                it.copy(nameError = "Plant name can't be empty.")
+            }
+            return false
+        } else {
+            plantEditFlow.update {
+                it.copy(nameError = "")
+            }
+            return true
+        }
+    }
+
+    private fun validateSpecies(): Boolean {
+        if (plantEditState.value.species.isEmpty()) {
+            plantEditFlow.update {
+                it.copy(speciesError = "Plant species can't be empty.")
+            }
+            return false
+        } else {
+            plantEditFlow.update {
+                it.copy(speciesError = "")
+            }
+            return true
         }
     }
 

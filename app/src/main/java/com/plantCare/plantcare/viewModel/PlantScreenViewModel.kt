@@ -38,7 +38,7 @@ data class PlantScreenUiState(
 @SuppressLint("MissingPermission")
 @HiltViewModel
 class PlantScreenViewModel @Inject constructor(
-    val plantRepository: PlantRepository,
+    private val plantRepository: PlantRepository,
     private val notesRepository: NotesRepository,
     private val detailsRepository: PlantDetailsRepository,
     private val sensorService: SensorService,
@@ -124,7 +124,5 @@ class PlantScreenViewModel @Inject constructor(
         }
     }
 
-    suspend fun deletePlantMedia(file: File) {
-        plantRepository.deletePlantMedia(file)
-    }
+
 }

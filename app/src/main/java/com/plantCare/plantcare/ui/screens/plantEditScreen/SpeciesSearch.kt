@@ -34,6 +34,7 @@ fun SpeciesSearch(
     onQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
     onExpandedChange: (Boolean) -> Unit,
+    error: String,
     modifier: Modifier = Modifier,
 ) {
 
@@ -63,6 +64,12 @@ fun SpeciesSearch(
                     }
                 }
             },
+            isError = !error.isEmpty(),
+                supportingText = {
+                    if (!error.isEmpty()) {
+                        Text(error)
+                    }
+                }
         )
 
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {

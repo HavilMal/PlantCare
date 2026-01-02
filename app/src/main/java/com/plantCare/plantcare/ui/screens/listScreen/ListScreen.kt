@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,8 +36,9 @@ fun ListScreen(
 ) {
     val plantsUiState = viewModel.listState.collectAsState()
     val isEmpty = plantsUiState.value.plants.isEmpty()
+    val isLoading = plantsUiState.value.isLoading
     PlantListScaffold { modifier ->
-        if (isEmpty) {
+        if (!isLoading && isEmpty) {
             Column(
                 modifier = modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,

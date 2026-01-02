@@ -84,6 +84,12 @@ fun PlantEditScreen(
                 label = { Text("Name") },
                 value = state.plantName,
                 onValueChange = viewModel::setPlantName,
+                isError = !state.nameError.isEmpty(),
+                supportingText = {
+                    if (!state.nameError.isEmpty()) {
+                        Text(state.nameError)
+                    }
+                }
             )
 
             SpeciesSearch(
@@ -95,6 +101,7 @@ fun PlantEditScreen(
                 onSearch = viewModel::searchSpecies,
                 onExpandedChange = { viewModel.setShowResults(it) },
                 isSearching = state.isSearching,
+                error = state.speciesError,
                 modifier = Modifier.fillMaxWidth(),
             )
 
