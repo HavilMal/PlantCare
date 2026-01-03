@@ -150,8 +150,9 @@ class PlantRepository(
     suspend fun updatePlant(
         id: Long,
         name: String? = null,
-        isIndoor: Boolean? = null,
+        description: String? = null,
         species: String? = null,
+        isIndoor: Boolean? = null,
         plantedOn: LocalDate? = null,
         wateringInterval: WateringInterval? = null,
     ) {
@@ -160,8 +161,9 @@ class PlantRepository(
                 plant.copy(
                     id = id,
                     name = name ?: plant.name,
-                    isIndoor = isIndoor ?: plant.isIndoor,
+                    description = description ?: plant.description,
                     species = species ?: plant.species,
+                    isIndoor = isIndoor ?: plant.isIndoor,
                     plantedOn = plantedOn ?: plant.plantedOn,
                     wateringInterval = wateringInterval ?: plant.wateringInterval,
                 )

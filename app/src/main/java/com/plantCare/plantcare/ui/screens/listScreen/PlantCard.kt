@@ -19,14 +19,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.database.Plant
 import com.plantCare.plantcare.ui.components.MediaThumbnail
 import com.plantCare.plantcare.ui.theme.size
+import com.plantCare.plantcare.ui.theme.spacing
 import java.io.File
 
 
@@ -69,19 +69,21 @@ fun PlantCard(
         }
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(16.dp)
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+            modifier = Modifier.padding(MaterialTheme.spacing.medium)
         ) {
             Text(
                 text = plant.name,
+                style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = plant.description,
-                maxLines = 3,
-                minLines = 3,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 2,
+                minLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End),

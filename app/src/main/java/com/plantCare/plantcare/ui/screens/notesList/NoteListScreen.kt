@@ -1,7 +1,6 @@
 package com.plantCare.plantcare.ui.screens.notesList
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,13 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import coil3.compose.AsyncImage
-import com.plantCare.plantcare.database.Note
 import com.plantCare.plantcare.ui.components.InlinedText
 import com.plantCare.plantcare.ui.theme.spacing
 import com.plantCare.plantcare.viewModel.NoteListUiState
@@ -73,7 +69,13 @@ fun NoteList(state: NoteListUiState, viewModel: NoteListViewModel, modifier: Mod
                     appendInlineContent("add_icon")
                     append(" button.")
                 },
-                annotationDictionary = mapOf("add_icon" to { Icon(Icons.Default.Add, null) }),
+                annotationDictionary = mapOf("add_icon" to { tint ->
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        tint = tint,
+                    )
+                }),
             )
         }
         return
