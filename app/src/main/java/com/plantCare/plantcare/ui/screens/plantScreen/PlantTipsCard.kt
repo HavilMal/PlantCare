@@ -3,9 +3,7 @@ package com.plantCare.plantcare.ui.screens.plantScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,10 +12,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.plantCare.plantcare.common.capitalize
 import com.plantCare.plantcare.common.getLocale
 import com.plantCare.plantcare.database.PlantDetails
+import com.plantCare.plantcare.ui.components.TextCard
 import com.plantCare.plantcare.utils.ifNotEmpty
 import com.plantCare.plantcare.utils.listToStringWith
 import java.util.Locale
@@ -33,15 +29,19 @@ import java.util.Locale
 
 @Composable
 fun PlantTipsCard(
-    details: PlantDetails?,
     modifier: Modifier = Modifier,
+    details: PlantDetails?,
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.BottomCenter,
     ) {
         if (details == null) {
-            NoTips()
+            TextCard(
+                title = "Tips",
+                content = null,
+                noContent = "No tips for this plant"
+            )
         } else {
             val tips = detailsToTips(details, getLocale())
             val pagerState = rememberPagerState(pageCount = { tips.size })
@@ -51,26 +51,14 @@ fun PlantTipsCard(
                 modifier = Modifier.fillMaxWidth(),
                 pageSpacing = 16.dp
             ) { page ->
-
-                Card(
+                TextCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ),
-                    shape = RoundedCornerShape(20.dp),
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                    ) {
-                        Text(tips[page].title)
-                        Text(tips[page].content)
-                    }
-                }
+                    title = tips[page].title,
+                    content = tips[page].content,
+                    noContent = "Failed to load tip"
+                )
             }
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -95,26 +83,6 @@ fun PlantTipsCard(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun NoTips() {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        ),
-        shape = RoundedCornerShape(20.dp),
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text("No tips for this plant")
         }
     }
 }

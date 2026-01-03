@@ -32,6 +32,7 @@ import com.plantCare.plantcare.ui.theme.spacing
 fun WithPermission(
     modifier: Modifier = Modifier,
     requestedPermissions: List<String>,
+
     content: @Composable (MultiplePermissionsState) -> Unit
 ) {
     val context = LocalContext.current

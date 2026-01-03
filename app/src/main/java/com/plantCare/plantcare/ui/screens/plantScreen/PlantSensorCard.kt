@@ -1,19 +1,14 @@
 package com.plantCare.plantcare.ui.screens.plantScreen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.SensorsOff
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,41 +19,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.common.WithPermission
 import com.plantCare.plantcare.service.SensorData
+import com.plantCare.plantcare.ui.components.ContentCompositionRow
 import com.plantCare.plantcare.ui.components.FillableSVG
+import com.plantCare.plantcare.ui.components.TextCard
 import com.plantCare.plantcare.ui.theme.size
 import com.plantCare.plantcare.ui.theme.spacing
 import kotlin.math.PI
 import kotlin.math.cos
 
 
-@Composable
-fun NoData(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(MaterialTheme.spacing.medium),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(
-                space = MaterialTheme.spacing.extraSmall,
-                alignment = Alignment.CenterHorizontally,
-            )
-        ) {
-            content()
-        }
-    }
-}
-
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SensorCard(
+    modifier: Modifier = Modifier,
     hasSensor: Boolean,
     bluetoothOn: Boolean,
     sensorData: SensorData?,
@@ -72,29 +50,35 @@ fun SensorCard(
         )
     )
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        ),
-        shape = RoundedCornerShape(20.dp),
+    if (!hasSensor) {
+        TextCard(
+            modifier = modifier,
+            title = "Sensor",
+            hasContent = false,
+        ) {
+            Icon(Icons.Default.SensorsOff, "No sensor")
+            Text("No sensor connected")
+        }
+        return
+    }
+
+    if (!bluetoothOn) {
+        TextCard(
+            modifier = modifier,
+            title = "Sensor",
+            hasContent = false,
+        ) {
+            Icon(Icons.Default.BluetoothDisabled, "No Bluetooth")
+            Text("Bluetooth is off")
+        }
+        return
+    }
+
+    TextCard(
+        modifier = modifier.fillMaxWidth(),
+        title = "Sensor",
+        hasContent = sensorData == null
     ) {
-        if (!hasSensor) {
-            NoData {
-                Icon(Icons.Default.SensorsOff, "No sensor")
-                Text("No sensor connected")
-            }
-            return@Card
-        }
-
-        if (!bluetoothOn) {
-            NoData {
-                Icon(Icons.Default.BluetoothDisabled, "No Bluetooth")
-                Text("Bluetooth is off")
-            }
-            return@Card
-        }
-
         WithPermission(
             requestedPermissions = listOf(
                 android.Manifest.permission.BLUETOOTH_SCAN,
@@ -107,7 +91,7 @@ fun SensorCard(
             }
 
             if (sensorData == null) {
-                NoData {
+                ContentCompositionRow(false) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.secondary,
                         trackColor = MaterialTheme.colorScheme.surfaceVariant,
