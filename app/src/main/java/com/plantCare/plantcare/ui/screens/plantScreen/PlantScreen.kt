@@ -71,6 +71,12 @@ fun PlantScreen(
             }
 
             item {
+               PlantDescriptionCard(
+                   description = uiState.plant?.description,
+               )
+            }
+
+            item {
                 PlantNotesCard(notes = uiState.notes, onClick = {
                     navController?.navigate(Route.NOTE_LIST.routeWithArgs(uiState.plant?.id))
                 })

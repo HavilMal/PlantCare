@@ -22,8 +22,9 @@ fun NoteEditScreen(
     val navController = NavigationController.current
     NoteEditScaffold(
         onSave = {
-            viewModel.saveNote()
-            navController?.popBackStack()
+            if (viewModel.saveNote()) {
+                navController?.popBackStack()
+            }
         }
     ) { modifier ->
         Column(
@@ -37,6 +38,12 @@ fun NoteEditScreen(
                 value = state.value.title,
                 onValueChange = viewModel::setNoteTitle,
                 singleLine = true,
+                isError = !state.value.titleError.isEmpty(),
+                supportingText = {
+                    if (!state.value.titleError.isEmpty()) {
+                        Text(state.value.titleError)
+                    }
+                }
             )
 
             OutlinedTextField(
@@ -44,6 +51,12 @@ fun NoteEditScreen(
                 label = {},
                 value = state.value.content,
                 onValueChange = viewModel::setNoteContent,
+                isError = !state.value.contentError.isEmpty(),
+                supportingText = {
+                    if (!state.value.contentError.isEmpty()) {
+                        Text(state.value.contentError)
+                    }
+                }
             )
         }
 

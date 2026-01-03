@@ -42,6 +42,7 @@ data class PlantEditUiState(
     val nameError: String = "",
     val species: String = "",
     val speciesError: String = "",
+    val description: String = "",
     val plantedOn: LocalDate = LocalDate.now(),
     val isIndoor: Boolean = false,
     val interval: WateringInterval = WateringInterval.WEEK,
@@ -84,6 +85,7 @@ class PlantEditViewModel @Inject constructor(
                             it.copy(
                                 plantName = plant.name,
                                 species = plant.species,
+                                description = plant.description,
                                 plantedOn = plant.plantedOn,
                                 selectedDays = schedule.map { it.day }.toSet(),
                                 interval = plant.wateringInterval,
@@ -123,6 +125,12 @@ class PlantEditViewModel @Inject constructor(
     fun setSchedule(schedule: WateringInterval) {
         plantEditFlow.update {
             it.copy(interval = schedule)
+        }
+    }
+
+    fun setDescription(description: String) {
+        plantEditFlow.update {
+            it.copy(description = description)
         }
     }
 
@@ -234,7 +242,7 @@ class PlantEditViewModel @Inject constructor(
 
                     val id = plantRepository.insertPlant(
                         name = plantEditState.value.plantName,
-                        description = "todo",
+                        description = plantEditState.value.description,
                         species = plantEditState.value.species,
                         plantedOn = plantEditState.value.plantedOn,
                         wateringInterval = plantEditState.value.interval,
@@ -254,11 +262,12 @@ class PlantEditViewModel @Inject constructor(
             EditMode.EDIT -> {
                 viewModelScope.launch {
                     plantRepository.updatePlant(
-                        plantId,
-                        plantEditState.value.plantName,
-                        isIndoor = plantEditState.value.isIndoor,
+                        id = plantId,
+                        name = plantEditState.value.plantName,
+                        description = plantEditState.value.description,
                         species = plantEditState.value.species,
                         plantedOn = plantEditState.value.plantedOn,
+                        isIndoor = plantEditState.value.isIndoor,
                         wateringInterval = plantEditState.value.interval,
                     )
 

@@ -3,7 +3,6 @@ package com.plantCare.plantcare.viewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.plantCare.plantcare.database.Note
 import com.plantCare.plantcare.database.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -14,7 +13,9 @@ import kotlinx.coroutines.launch
 
 data class NoteEditUiState(
     val title: String,
+    val titleError: String,
     val content: String,
+    val contentError: String,
 )
 
 @HiltViewModel
@@ -27,7 +28,7 @@ class NoteEditViewModel @Inject constructor(
     val plantId: Long = savedStateHandle["plantId"]!!
     val noteId: Long = savedStateHandle["noteId"]!!
 
-    private val noteEditFlow = MutableStateFlow(NoteEditUiState("", ""))
+    private val noteEditFlow = MutableStateFlow(NoteEditUiState("", "", "", ""))
     val noteEditState = noteEditFlow.asStateFlow()
 
     init {
@@ -42,7 +43,16 @@ class NoteEditViewModel @Inject constructor(
         }
     }
 
-    fun saveNote() {
+    fun saveNote(): Boolean {
+        val correct = listOf(
+            validateTitle(),
+            validateContent(),
+        )
+
+        if (correct.any { !it }) {
+            return false
+        }
+
         when (mode) {
             EditMode.EDIT -> {
                 viewModelScope.launch {
@@ -65,17 +75,57 @@ class NoteEditViewModel @Inject constructor(
                 }
             }
         }
+
+        return true
     }
 
     fun setNoteTitle(title: String) {
         noteEditFlow.update {
             it.copy(title = title)
         }
+        validateTitle()
     }
 
     fun setNoteContent(content: String) {
         noteEditFlow.update {
             it.copy(content = content)
         }
+        validateContent()
+    }
+
+    private fun validateTitle(): Boolean {
+        var result: Boolean
+        val error = if (noteEditState.value.title.isEmpty()) {
+            result = false
+            "Note title can't be empty"
+        } else {
+            result = true
+            ""
+        }
+        noteEditFlow.update {
+            it.copy(
+                titleError = error,
+            )
+        }
+
+        return result
+    }
+
+    private fun validateContent(): Boolean {
+        var result: Boolean
+        val error = if (noteEditState.value.content.isEmpty()) {
+            result = false
+            "Note content can't be empty"
+        } else {
+            result = true
+            ""
+        }
+        noteEditFlow.update {
+            it.copy(
+                contentError = error,
+            )
+        }
+
+        return result
     }
 }
