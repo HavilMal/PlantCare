@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.plantCare.plantcare.common.getLocale
+import com.plantCare.plantcare.ui.theme.spacing
 import com.plantCare.plantcare.viewModel.PlantEditViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -86,8 +89,8 @@ fun PlantEditScreen(
     PlantEditScaffold(viewModel) { modifier ->
         LazyColumn(
             modifier = modifier
-                .padding(16.dp)
                 .fillMaxWidth(),
+            contentPadding = PaddingValues(MaterialTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {

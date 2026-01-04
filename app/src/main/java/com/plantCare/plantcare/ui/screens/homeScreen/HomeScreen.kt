@@ -1,6 +1,7 @@
 package com.plantCare.plantcare.ui.screens.homeScreen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,6 +31,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.database.Plant
+import com.plantCare.plantcare.ui.theme.spacing
 import com.plantCare.plantcare.viewModel.HomeViewModel
 
 
@@ -74,10 +77,10 @@ fun HomeScreen(
         }
     ) { modifier ->
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = modifier
-                .padding(horizontal = 16.dp)
                 .fillMaxSize(),
+            contentPadding = PaddingValues(MaterialTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
                 Card(
