@@ -1,10 +1,12 @@
 package com.plantCare.plantcare.viewModel
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionState
 import com.plantCare.plantcare.database.Note
 import com.plantCare.plantcare.database.NotesRepository
 import com.plantCare.plantcare.database.Plant
@@ -22,32 +24,6 @@ import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 
-sealed class SortableCard(
-    val id: Int,
-    private val defaultPriority: Int,
-    isAvailable: Boolean = false,
-    var priority: Int = defaultPriority,
-) {
-    init {
-        priority = if (isAvailable) {
-            defaultPriority
-        } else {
-            -1
-        }
-    }
-
-    class SensorCard(hasSensor: Boolean) :
-        SortableCard(id = 1, defaultPriority = 5, isAvailable = hasSensor)
-
-    class NotesCard(hasNotes: Boolean) :
-        SortableCard(id = 2, defaultPriority = 4, isAvailable = hasNotes)
-
-    class TipsCard(hasTips: Boolean) :
-        SortableCard(id = 3, defaultPriority = 3, isAvailable = hasTips)
-
-    class DescriptionCard(hasDescription: Boolean) :
-        SortableCard(id = 4, defaultPriority = 2, isAvailable = hasDescription)
-}
 
 data class PlantScreenUiState(
     val media: List<File> = emptyList(),
@@ -57,7 +33,6 @@ data class PlantScreenUiState(
     val dialogOpen: Boolean = false,
     val bluetoothOn: Boolean = false,
     val sensorData: SensorData? = null,
-    val cardOrder: List<SortableCard>,
 )
 
 @SuppressLint("MissingPermission")
@@ -70,8 +45,8 @@ class PlantScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val plantId: Long = checkNotNull(savedStateHandle.get<Long>("plantId"))
-    private val stateFlow = MutableStateFlow(PlantScreenUiState(cardOrder = getCardOrder()))
-    val state: StateFlow<PlantScreenUiState> = stateFlow
+    private val stateFlow = MutableStateFlow(PlantScreenUiState())
+    val uiState: StateFlow<PlantScreenUiState> = stateFlow
     var sensorJob: Job? = null
 
     init {
@@ -80,7 +55,6 @@ class PlantScreenViewModel @Inject constructor(
                 stateFlow.update {
                     it.copy(plant = plant)
                 }
-                updateOrder()
             }
         }
 
@@ -97,7 +71,6 @@ class PlantScreenViewModel @Inject constructor(
                 stateFlow.update {
                     it.copy(notes = notes)
                 }
-                updateOrder()
             }
         }
 
@@ -106,7 +79,6 @@ class PlantScreenViewModel @Inject constructor(
                 stateFlow.update {
                     it.copy(plantDetails = details)
                 }
-                updateOrder()
             }
         }
 
@@ -115,7 +87,6 @@ class PlantScreenViewModel @Inject constructor(
                 stateFlow.update {
                     it.copy(bluetoothOn = state)
                 }
-                updateOrder()
             }
         }
     }
@@ -128,7 +99,7 @@ class PlantScreenViewModel @Inject constructor(
 
     fun deleteCurrentPlant() {
         viewModelScope.launch {
-            state.value.plant?.let { plant ->
+            uiState.value.plant?.let { plant ->
                 plantRepository.deletePlant(plant)
             }
         }
@@ -142,7 +113,7 @@ class PlantScreenViewModel @Inject constructor(
     }
 
     fun getSensorData() {
-        val address = state.value.plant?.sensorAddress ?: return
+        val address = uiState.value.plant?.sensorAddress ?: return
         sensorJob?.cancel()
         sensorJob = viewModelScope.launch {
             sensorService.getSensorDataFlow(address).collect { data ->
@@ -153,26 +124,5 @@ class PlantScreenViewModel @Inject constructor(
         }
     }
 
-    private fun updateOrder() {
-        stateFlow.update {
-            it.copy(cardOrder = getCardOrder())
-        }
-    }
 
-    @Suppress("UNNECESSARY_SAFE_CALL")
-    private fun getCardOrder(): List<SortableCard> {
-        val order: List<SortableCard> = mutableListOf(
-            SortableCard.SensorCard(hasSensor = state?.value?.plant?.sensorAddress != null),
-            SortableCard.NotesCard(hasNotes = state?.value?.notes?.isNotEmpty() ?: false),
-            SortableCard.TipsCard(hasTips = state?.value?.plantDetails != null),
-            SortableCard.DescriptionCard(
-                hasDescription = state?.value?.plant?.description?.isNotEmpty() ?: false
-            )
-        )
-        val sorted = order.sortedBy { it.priority }.reversed()
-        Log.d(
-            "order",
-            sorted.joinToString(separator = ", ") { "${it.javaClass.name} : ${it.priority}" })
-        return sorted
-    }
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +27,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.ui.components.InlinedText
-import com.plantCare.plantcare.ui.theme.spacing
 import com.plantCare.plantcare.viewModel.ListViewModel
 
 
@@ -72,12 +72,7 @@ fun ListScreen(
 
         LazyColumn(
             modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                top = MaterialTheme.spacing.medium,
-                start = MaterialTheme.spacing.medium,
-                end = MaterialTheme.spacing.medium,
-                bottom = MaterialTheme.spacing.fab,
-            ),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(plantsUiState.value.plants) { plant ->

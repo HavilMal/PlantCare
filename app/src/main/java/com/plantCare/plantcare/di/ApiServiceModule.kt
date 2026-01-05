@@ -1,13 +1,8 @@
 package com.plantCare.plantcare.di
 
-import android.content.Context
-import com.plantCare.plantcare.BuildConfig
-import com.plantCare.plantcare.service.PlantService
-import com.plantCare.plantcare.service.SensorService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jakarta.inject.Singleton
 import okhttp3.Interceptor
@@ -16,10 +11,10 @@ import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class ApiKeyQueryInterceptor(private val apiKey: String) : Interceptor {
+class ApiKeyQueryInterceptor(private val apiKey: String, private val paramName: String ="key") : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val url = chain.request().url.newBuilder()
-            .addQueryParameter("key", apiKey)
+            .addQueryParameter(paramName, apiKey)
             .build()
 
         val request = chain.request().newBuilder().url(url).build()
@@ -27,33 +22,26 @@ class ApiKeyQueryInterceptor(private val apiKey: String) : Interceptor {
     }
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-object ServiceModule {
-   @Provides
-    @Singleton
+
+abstract class ApiServiceModule<T : Any> {
+    protected abstract val apiKeyParamName: String
+    protected abstract val apiKey: String
+    protected abstract val baseUrl: String
+    protected abstract val serviceClass: Class<T>
+
     fun provideOkHttpClient(): OkHttpClient =
         OkHttpClient.Builder()
-            .addInterceptor(ApiKeyQueryInterceptor(BuildConfig.PLANT_API_KEY))
+            .addInterceptor(ApiKeyQueryInterceptor(apiKey,apiKeyParamName))
             .build()
 
-    @Provides
-    @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl("https://perenual.com/api/v2/")
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
 
-    @Provides
-    @Singleton
-    fun provideApiService(retrofit: Retrofit): PlantService=
-        retrofit.create(PlantService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideSensorService(@ApplicationContext context: Context): SensorService =
-        SensorService(context)
-
+    fun provideApiService(): T {
+        return provideRetrofit(provideOkHttpClient()).create(serviceClass)
+    }
 }

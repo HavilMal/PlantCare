@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,22 +15,20 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.plantCare.plantcare.database.Note
-import com.plantCare.plantcare.ui.components.TextCard
 
 
 @Composable
-fun PlantNotesCard(
-    modifier: Modifier = Modifier,
-    notes: List<Note>,
-    onClick: () -> Unit,
-) {
+fun PlantNotesCard(notes: List<Note>, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val pagerState = rememberPagerState(pageCount = { notes.size })
 
     Box(
@@ -36,28 +36,36 @@ fun PlantNotesCard(
         contentAlignment = Alignment.BottomCenter,
     ) {
         if (notes.isEmpty()) {
-            TextCard(
-                title = "Notes",
-                content = null,
-                noContent = "You don't have any notes"
-            )
+            NoNotes()
         } else {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxWidth(),
                 pageSpacing = 16.dp
             ) { page ->
-                TextCard(
+
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
                         .clickable {
                             onClick()
                         },
-                    title = notes[page].title,
-                    content = notes[page].note,
-                    noContent = "This note is empty"
-                )
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ),
+                    shape = RoundedCornerShape(20.dp),
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                    ) {
+                        Text(notes[page].title)
+                        Text(notes[page].note)
+                    }
+                }
             }
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -82,6 +90,26 @@ fun PlantNotesCard(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun NoNotes() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(150.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        shape = RoundedCornerShape(20.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text("No notes")
         }
     }
 }
