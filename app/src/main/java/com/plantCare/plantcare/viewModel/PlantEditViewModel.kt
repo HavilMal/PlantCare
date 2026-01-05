@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -154,12 +154,11 @@ class PlantEditViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val device = sensorService.scanForSensor().first()
+            val device = sensorService.scanForSensor().firstOrNull()
             if (device == null) {
                 plantEditFlow.update {
                     it.copy(
                         sensorButtonState = SensorButtonState.ADD_SENSOR,
-                        sensorAddress = null,
                     )
                 }
             } else {

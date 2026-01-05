@@ -1,6 +1,8 @@
 package com.plantCare.plantcare.ui.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -12,9 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
+import com.plantCare.plantcare.R
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
 
@@ -28,8 +33,10 @@ fun BottomBar() {
         current = backStackEntry?.destination?.route
     }
 
-    NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-        listOf(Route.HOME, Route.PLANT_LIST, Route.CALENDAR, Route.SEARCH).forEach { route ->
+    NavigationBar(
+        windowInsets = NavigationBarDefaults.windowInsets,
+    ) {
+        listOf(Route.HOME, Route.PLANT_LIST, Route.CALENDAR).forEach { route ->
             NavigationBarItem(
                 selected = current == route.route,
                 onClick = {
@@ -43,10 +50,11 @@ fun BottomBar() {
                     )
                 },
                 icon = {
-                    if (route.icon != null) {
-                        Icon(route.icon, route.label)
-                    } else {
-                        Icon(Icons.Filled.Star, route.label)
+                    when (route) {
+                        Route.HOME -> Icon(Icons.Default.Home, route.label)
+                        Route.PLANT_LIST -> Icon(ImageVector.vectorResource(R.drawable.plant), route.label)
+                        Route.CALENDAR -> Icon(Icons.Default.CalendarMonth, route.label)
+                        else -> Icon(Icons.Filled.Star, route.label)
                     }
                 },
                 label = { Text(route.label) }
