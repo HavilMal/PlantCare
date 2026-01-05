@@ -10,6 +10,13 @@ import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.service.PlantDetailsRepository
 import com.plantCare.plantcare.service.PlantService
 import com.plantCare.plantcare.database.SettingsRepository
+import com.plantCare.plantcare.database.UserActivityDao
+import com.plantCare.plantcare.database.UserActivityRepository
+import com.plantCare.plantcare.database.WateringDao
+import com.plantCare.plantcare.database.WateringRepository
+import com.plantCare.plantcare.database.WeatherRecordDao
+import com.plantCare.plantcare.database.WeatherRepository
+import com.plantCare.plantcare.service.WeatherService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,17 +66,52 @@ object RepositoryModule {
 
     @Provides
     @Singleton
+    fun provideWeatherRepository(
+        weatherService: WeatherService,
+        weatherDao: WeatherRecordDao,
+        settingsRepository: SettingsRepository
+    ): WeatherRepository {
+        return WeatherRepository(
+            weatherService = weatherService,
+            weatherDao = weatherDao,
+            settingsRepository = settingsRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideWateringRepository(
+        wateringDao: WateringDao
+    ): WateringRepository {
+        return WateringRepository(
+            wateringDao
+        )
+    }
+    @Provides
+    @Singleton
     fun provideSettingsRepository(
         @ApplicationContext context: Context
     ): SettingsRepository {
         return SettingsRepository(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideUserActivityRepository(
+        userActivityDao: UserActivityDao
+    ): UserActivityRepository {
+        return UserActivityRepository(userActivityDao)
+    }
+
+
     @Provides
     @Singleton
     fun provideAppRepository(
         plantRepository: PlantRepository,
+        userActivityRepository: UserActivityRepository,
+        weatherRepository: WeatherRepository,
         settingsRepository: SettingsRepository
     ): AppRepository {
-        return AppRepository(plantRepository,settingsRepository)
+        return AppRepository(plantRepository,userActivityRepository,weatherRepository,settingsRepository)
     }
 }

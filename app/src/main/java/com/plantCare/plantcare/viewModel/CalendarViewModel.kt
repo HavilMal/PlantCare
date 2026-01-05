@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.database.WateringSchedule
+import com.plantCare.plantcare.database.WeatherRepository
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.ui.screens.calendarScreen.WateringState
 import dagger.hilt.android.lifecycle.HiltViewModel

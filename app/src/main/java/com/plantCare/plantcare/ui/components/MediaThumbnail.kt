@@ -17,6 +17,7 @@ import java.io.File
 fun MediaThumbnail(
     modifier: Modifier = Modifier,
     file: File,
+    contentScale: ContentScale = ContentScale.Crop
 ) {
     val context = LocalContext.current
 
@@ -36,14 +37,14 @@ fun MediaThumbnail(
             model = request,
             imageLoader = loader,
             contentDescription = "video preview",
-            contentScale = ContentScale.Crop
+            contentScale = contentScale
         )
     } else {
         AsyncImage(
             modifier = modifier,
             model = file,
             contentDescription = "plant visual",
-            contentScale = ContentScale.Crop
+            contentScale = contentScale
         )
     }
 }

@@ -23,6 +23,7 @@ import com.google.gson.reflect.TypeToken
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import kotlinx.coroutines.flow.Flow
 import java.lang.reflect.Type
+import java.sql.Timestamp
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -47,7 +48,18 @@ class Converters {
     fun arrayListToString(list: List<String>): String {
         return Gson().toJson(list)
     }
+
+    @TypeConverter
+    fun fromTimestampToLong(ts: Timestamp?): Long? {
+        return ts?.time
+    }
+
+    @TypeConverter
+    fun fromLongToTimestamp(value: Long?): Timestamp? {
+        return value?.let { Timestamp(it) }
+    }
 }
+
 
 
 @Entity(tableName = "plants")
@@ -144,7 +156,7 @@ data class PlantMedia(
     ]
 )
 data class WateringEntry(
-    val plant: Int,
+    val plant: Long,
     val date: LocalDate
 )
 
@@ -175,6 +187,28 @@ data class WateringSchedule(
     val day: DayOfWeek,
     val startingDate: LocalDate,
 )
+
+
+@Entity(
+    tableName = "weatherRecord"
+)
+data class  WeatherRecord(
+    @PrimaryKey(autoGenerate = false)
+    val timestamp: Timestamp,
+    val hasRained: Boolean,
+    val rainVolume: Double?
+)
+
+
+@Entity(
+    tableName = "userDailyRecord"
+)
+data class UserDailyRecord(
+    @PrimaryKey(autoGenerate = false)
+    val date: LocalDate,
+    val streakMaintained : Boolean
+)
+
 
 
 @Dao
@@ -271,16 +305,18 @@ interface PlantDao {
         WateringEntry::class,
         WateringSchedule::class,
         PlantDetails::class,
-        PlantMedia::class
+        PlantMedia::class,
+        WeatherRecord::class,
+        UserDailyRecord::class
     ],
     version = 1
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun plantDao(): PlantDao
-
     abstract fun notesDAO(): NotesDAO
-
     abstract fun plantDetailsDAO(): PlantDetailsDao
-
+    abstract fun weatherRecordDao(): WeatherRecordDao
+    abstract fun wateringDao(): WateringDao
+    abstract fun userActivityDao(): UserActivityDao
 }
