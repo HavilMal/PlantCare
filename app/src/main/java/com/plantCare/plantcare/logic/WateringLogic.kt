@@ -10,6 +10,7 @@ import com.plantCare.plantcare.database.WeatherRepository
 import com.plantCare.plantcare.utils.RandomUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -34,60 +35,41 @@ class WateringLogicEvaluator(
     private val weatherRepository: WeatherRepository,
     private val wateringRepository: WateringRepository
 ){
+    fun getPlantsWaterStatus(date: LocalDate) : Flow<List<PlantWateringStatus>> {
+        val plantsFlow = wateringRepository.getAllPlantsWateringInfo()
 
-    suspend fun getPlantsWaterStatusToday() : Flow<List<PlantWateringStatus>> {
-        val today : LocalDate = LocalDate.now()
-//        Log.d("devo","0")
-//        val whatever = wateringRepository.getAllPlantsWateringInfo()
-//        Log.d("devo","1 whatever empty? = ${whatever.firstOrNull()}")
-//        val whatever2 = wateringRepository.getAllPlantsWateringInfo().first()
-//        Log.d("devo","3")
-//        if(whatever2 != null && !whatever2.isEmpty()) Log.d("devo",whatever.first().toString())
-//        Log.d("devo","2")
-        return wateringRepository.getAllPlantsWateringInfo().map { infos ->
-                infos.mapNotNull { info ->
-                    when {
-                        info.isIndoor ->
-                            when {
-                                today == info.lastWateredOn -> // user watered today
-                                    PlantWateringStatus(info.plantId, WateringStatus.WATERED_BY_USER)
+        return plantsFlow.map { plantInfos ->
+            plantInfos.mapNotNull { info ->
+                val baseStatus = when {
+                    date == info.lastWateredByUserOn ->
+                        WateringStatus.WATERED_BY_USER
 
-                                ChronoUnit.DAYS.between( // hasnt been watered yet
-                                    info.lastWateredOn,
-                                    today
-                                ) >= info.wateringInterval.interval ->
-                                    PlantWateringStatus(info.plantId, WateringStatus.NEEDS_WATERING)
+                    ChronoUnit.DAYS.between(info.lastWateredByUserOn, date) >= info.wateringInterval.interval &&
+                            info.wateringDays.contains(date.dayOfWeek) ->
+                        WateringStatus.NEEDS_WATERING
 
-                                else -> // interval not reached yet
-                                    PlantWateringStatus(info.plantId, WateringStatus.NEEDS_NO_WATERING)
-                            }
-                        else ->
-                            when {
-                                ChronoUnit.DAYS.between(
-                                    info.lastWateredOn,
-                                    today
-                                ) >= info.wateringInterval.interval ->
-                                    when {
-                                        weatherRepository.hasRainedOn(today)->  // weather watered today
-                                            when {
-                                                today == info.lastWateredOn ->
-                                                    PlantWateringStatus(info.plantId, WateringStatus.WATERED_BY_USER_AND_WEATHER)
-                                                else ->
-                                                    PlantWateringStatus(info.plantId, WateringStatus.WATERED_BY_WEATHER)
-                                            }
-
-                                        today == info.lastWateredOn ->
-                                            PlantWateringStatus(info.plantId, WateringStatus.WATERED_BY_USER)
-
-                                        else ->
-                                            PlantWateringStatus(info.plantId, WateringStatus.NEEDS_WATERING)
-                                    }
-
-                                else ->
-                                    PlantWateringStatus(info.plantId, WateringStatus.NEEDS_NO_WATERING)
-                            }
-                    }
+                    else ->
+                        WateringStatus.NEEDS_NO_WATERING
                 }
+
+                val finalStatus = if (!info.isIndoor) {
+                    val rained : Boolean = weatherRepository.hasRainedOn(date)
+
+                    when {
+                        rained ->
+                            when {
+                                baseStatus == WateringStatus.WATERED_BY_USER -> WateringStatus.WATERED_BY_USER_AND_WEATHER
+                                else -> WateringStatus.WATERED_BY_WEATHER
+                            }
+                        else ->baseStatus
+                    }
+                } else baseStatus
+
+                PlantWateringStatus(info.plantId, finalStatus)
             }
+        }
+    }
+    fun getPlantsWaterStatusToday() : Flow<List<PlantWateringStatus>> {
+        return getPlantsWaterStatus(LocalDate.now())
     }
 }

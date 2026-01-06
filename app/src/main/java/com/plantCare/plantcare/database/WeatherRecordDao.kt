@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.plantCare.plantcare.utils.DateUtil
+import kotlinx.coroutines.flow.Flow
 import java.sql.Timestamp
 import java.time.LocalDate
 
@@ -26,6 +27,12 @@ interface WeatherRecordDao {
             AND hasRained = 1 )
         """)
     fun hasRainedInRange(from: Timestamp,to: Timestamp) : Boolean
+    fun hasRainedInRange(from: LocalDate, to: LocalDate): Boolean {
+        return hasRainedInRange(
+            DateUtil.startOfDay(from),
+            DateUtil.endOfDay(to)
+        )
+    }
 
     @Query("""
     SELECT EXISTS(
@@ -43,6 +50,25 @@ interface WeatherRecordDao {
             DateUtil.endOfDay(date)
         )
     }
+
+    @Query("""
+    SELECT DISTINCT date(timestamp / 1000, 'unixepoch') AS rainDay
+    FROM weatherRecord
+    WHERE timestamp BETWEEN :from AND :to
+      AND hasRained = 1
+    ORDER BY rainDay
+""")
+    fun rainDays(from: LocalDate, to:LocalDate) : Flow<List<LocalDate>>
+
+    @Query("""
+    SELECT date(timestamp / 1000, 'unixepoch')
+    FROM weatherRecord
+    WHERE hasRained = 1
+    ORDER BY timestamp DESC
+    LIMIT 1
+""")
+    fun latestRainDay() : Flow<LocalDate?>
+
 
     @Query(
         """

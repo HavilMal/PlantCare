@@ -107,17 +107,6 @@ class HomeViewModel @Inject constructor(
         wateringRepository.insertWateringEntry(plantId)
     }
 
-    fun parseWateringStatus(wateringStatus: WateringStatus) : String{
-        return when(wateringStatus){
-            WateringStatus.NEEDS_WATERING -> ""
-            WateringStatus.NEEDS_NO_WATERING -> ""
-            WateringStatus.WATERED_BY_USER_AND_WEATHER -> ""
-            WateringStatus.WATERED_BY_WEATHER -> ""
-            WateringStatus.WATERED_BY_USER -> ""
-            else -> ""
-        }
-    }
-
     fun logWeatherData() {
         Log.d("devo","weather entries:")
         viewModelScope.launch(Dispatchers.IO) {
