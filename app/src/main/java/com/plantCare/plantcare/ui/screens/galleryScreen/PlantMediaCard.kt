@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,6 +39,7 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.plantCare.plantcare.ui.components.MediaThumbnail
 import com.plantCare.plantcare.utils.FileUtil
+import com.plantCare.plantcare.utils.MediaUtil
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -76,42 +76,125 @@ fun VideoPlayer(
         }
     )
 }
-
+//
+//@Composable
+//fun PlantMediaCard(
+//    media: File,
+//    onDelete: suspend () -> Unit)
+//{
+//    val scope = rememberCoroutineScope()
+//    var playVideo by remember { mutableStateOf(false) }
+//    val isVideo = FileUtil.isVideo(media)
+//    val aspectRatio = remember(media) { MediaUtil.getMediaAspectRatio(media, isVideo) }
+//    Log.d("devo","aspect ratio = $aspectRatio")
+//    Box(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .aspectRatio(aspectRatio)
+//            .clip(RoundedCornerShape(16.dp))
+//            .clickable(enabled = isVideo) {
+//                playVideo = true
+//            }
+//    ) {
+//        if (playVideo) {
+//            VideoPlayer(
+//                file = media,
+//                modifier = Modifier.matchParentSize()
+//            )
+//        } else {
+//            MediaThumbnail(
+//                modifier = Modifier.fillMaxWidth(),
+//                file = media,
+//                contentScale = ContentScale.Crop
+//            )
+//        }
+//
+//        if (isVideo && !playVideo) {
+//            Box(
+//                modifier = Modifier.matchParentSize(),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Box(
+//                    modifier = Modifier
+//                        .size(56.dp)
+//                        .background(
+//                            color = Color.Black.copy(alpha = 0.5f),
+//                            shape = CircleShape
+//                        ),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Filled.PlayArrow,
+//                        contentDescription = "Play video",
+//                        tint = Color.White,
+//                        modifier = Modifier.size(32.dp)
+//                    )
+//                }
+//            }
+//        }
+//
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(4.dp),
+//            contentAlignment = Alignment.TopEnd
+//        ) {
+//            IconButton(
+//                modifier = Modifier.background(
+//                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f),
+//                    shape = CircleShape
+//                ),
+//                onClick = {
+//                    scope.launch { onDelete() }
+//                }
+//            ) {
+//                Icon(Icons.Filled.Delete, contentDescription = "Delete")
+//            }
+//        }
+//    }
+//}
 @Composable
 fun PlantMediaCard(
     media: File,
-    onDelete: suspend () -> Unit)
-{
+    onDelete: suspend () -> Unit
+) {
     val scope = rememberCoroutineScope()
     var playVideo by remember { mutableStateOf(false) }
     val isVideo = FileUtil.isVideo(media)
+    val videoAspectRatio = remember(media) {
+        if (isVideo) MediaUtil.getVideoAspectRatio(media) else null
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(9f/16f)
+            .then(
+                if (isVideo && videoAspectRatio != null) {
+                    Modifier.aspectRatio(videoAspectRatio)
+                } else {
+                    Modifier
+                }
+            )
             .clip(RoundedCornerShape(16.dp))
             .clickable(enabled = isVideo) {
                 playVideo = true
             }
     ) {
-        if (playVideo) {
+        if (playVideo && isVideo) {
             VideoPlayer(
                 file = media,
                 modifier = Modifier.matchParentSize()
             )
         } else {
             MediaThumbnail(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 file = media,
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Fit
             )
         }
 
         if (isVideo && !playVideo) {
             Box(
-                modifier = Modifier
-                    .matchParentSize(),
+                modifier = Modifier.matchParentSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Box(
@@ -132,8 +215,6 @@ fun PlantMediaCard(
                 }
             }
         }
-
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -146,9 +227,7 @@ fun PlantMediaCard(
                     shape = CircleShape
                 ),
                 onClick = {
-                    scope.launch {
-                        onDelete()
-                    }
+                    scope.launch { onDelete() }
                 }
             ) {
                 Icon(Icons.Filled.Delete, contentDescription = "Delete")
