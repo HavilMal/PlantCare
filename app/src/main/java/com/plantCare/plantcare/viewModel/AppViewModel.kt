@@ -21,7 +21,6 @@ class AppViewModel @Inject constructor(
     fun onAppStart() {
         viewModelScope.launch(Dispatchers.IO) {
             appRepository.weatherRepository.fetchWeatherData()
-            appRepository.setDefaultSettings()
         }
     }
 }

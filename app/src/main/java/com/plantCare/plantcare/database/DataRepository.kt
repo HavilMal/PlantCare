@@ -196,60 +196,37 @@ class AppRepository(
             "${System.currentTimeMillis()}.png"
         )
 
-        var id = plantRepository.plantDao.insertPlant(
-            Plant(
-                name = "Storczyk Tadek",
-                description = "Fajny jest",
-                species = "Storczykus",
-                plantedOn = LocalDate.of(2025,12,1),
-                isIndoor = true,
-                createdOn = LocalDate.of(2025,12,1),
-                wateringInterval = WateringInterval.WEEK,
-                apiId = null,
-                sensorAddress = null
-            )
+        var id = plantRepository.insertPlant(
+            name = "Storczyk Tadek",
+            description = "Fajny jest",
+            species = "Storczykus",
+            plantedOn = LocalDate.of(2025,12,1),
+            isIndoor = true,
+            wateringInterval = WateringInterval.WEEK,
         )
         plantRepository.addPlantMedia(id, cactusImageFile)
         plantRepository.addPlantMedia(id, cactusImageFile)
         plantRepository.plantDao.insertWateringEntry(WateringEntry(id,LocalDate.of(2025,12,28)))
+        plantRepository.plantDao.insertWateringEntry(WateringEntry(id,LocalDate.of(2026,1,1)))
 
+        plantRepository.setSchedule(id,setOf(DayOfWeek.MONDAY,DayOfWeek.TUESDAY), WateringInterval.WEEK)
 
-        id = plantRepository.plantDao.insertPlant(
-            Plant(
-                name = "Kaktus Maksiu",
-                description = "Fajny jest",
-                species = "Cactus cactus",
-                plantedOn = LocalDate.of(2025,12,1),
-                isIndoor = true,
-                createdOn = LocalDate.of(2025,12,1),
-                wateringInterval = WateringInterval.WEEK,
-                apiId = null,
-                sensorAddress = null
-            )
+        id = plantRepository.insertPlant(
+            name = "Kaktus Maksiu",
+            description = "Fajny jest",
+            species = "Cactus cactus",
+            plantedOn = LocalDate.of(2025,12,1),
+            isIndoor = true,
+            wateringInterval = WateringInterval.TWO_WEEKS
         )
         plantRepository.addPlantMedia(id, cactusImageFile)
         plantRepository.addPlantMedia(id, cactusImageFile)
         plantRepository.plantDao.insertWateringEntry(WateringEntry(id,LocalDate.of(2025,12,20)))
-
-//        userActivityRepository.insertUserStreakRecord(LocalDate.of(2026,1,2))
-//        userActivityRepository.insertUserStreakRecord(LocalDate.of(2026,1,1))
-//        userActivityRepository.insertUserStreakRecord(LocalDate.of(2025,12,31))
-//        userActivityRepository.insertUserStreakRecord(LocalDate.of(2025,12,30))
-//        userActivityRepository.insertUserStreakRecord(LocalDate.of(2025,12,29))
-//        userActivityRepository.insertUserStreakRecord(LocalDate.of(2025,12,28))
-//        userActivityRepository.insertUserStreakRecord(LocalDate.of(2025,12,27))
-//        userActivityRepository.insertUserStreakRecord(LocalDate.of(2025,12,26))
-//        userActivityRepository.insertUserStreakRecord(LocalDate.of(2025,12,25))
-
 
         settingsRepository.setLocation(51.0,17.0)
     }
 
     suspend fun setDefaultSettings() {
         settingsRepository.setDefault()
-    }
-
-    suspend fun fetchWeatherData() {
-//        weatherRepository.
     }
 }

@@ -2,6 +2,7 @@ package com.plantCare.plantcare.database
 
 import android.util.Log
 import com.plantCare.plantcare.service.WeatherService
+import kotlinx.coroutines.flow.Flow
 import java.sql.Timestamp
 import java.time.LocalDate
 
@@ -19,7 +20,15 @@ class WeatherRepository (
     fun hasRainedOn(date: LocalDate) : Boolean {
         return weatherDao.hasRainedOn(date)
     }
-
+    fun hasRainedInRange(from: LocalDate, to:LocalDate) : Boolean {
+        return weatherDao.hasRainedInRange(from,to)
+    }
+    fun rainDays(from: LocalDate, to:LocalDate) : Flow<List<LocalDate>> {
+        return weatherDao.rainDays(from, to)
+    }
+    fun latestRainDay(): Flow<LocalDate?> {
+        return weatherDao.latestRainDay()
+    }
     suspend fun fetchWeatherData(){
         val (lat, lon) = settingsRepository.getLocation()
 

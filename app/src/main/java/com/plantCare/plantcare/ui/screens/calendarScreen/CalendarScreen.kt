@@ -3,7 +3,9 @@ package com.plantCare.plantcare.ui.screens.calendarScreen
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -34,6 +36,11 @@ fun CalendarScreen(viewModel: CalendarViewModel = hiltViewModel()) {
         firstDayOfWeek = firstDayOfWeek,
     )
 
+    val firstVisibleMonth by remember { derivedStateOf { calendarState.firstVisibleMonth } }
+    LaunchedEffect(firstVisibleMonth) {
+        viewModel.onMonthVisible(firstVisibleMonth.yearMonth)
+    }
+
     CalendarScaffold(currentMonth, calendarState) { modifier ->
         Column(
             modifier = modifier
@@ -43,7 +50,13 @@ fun CalendarScreen(viewModel: CalendarViewModel = hiltViewModel()) {
                 userScrollEnabled = true,
                 calendarScrollPaged = true,
                 state = calendarState,
-                dayContent = { Day(it, state.schedules) },
+                dayContent = { day ->
+                    Day(
+                        day = day,
+                        plantWateringSchedules = state.schedules,
+                        monthData = viewModel.getMonthData(YearMonth.from(day.date))
+                    )
+                },
                 monthHeader = {
                     MonthHeader(it)
                 }

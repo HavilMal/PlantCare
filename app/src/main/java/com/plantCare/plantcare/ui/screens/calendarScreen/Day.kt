@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.AbsoluteCutCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -20,9 +22,11 @@ import androidx.compose.ui.unit.dp
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
+import com.plantCare.plantcare.model.MonthData
 import com.plantCare.plantcare.ui.theme.radius
 import com.plantCare.plantcare.ui.theme.size
 import com.plantCare.plantcare.ui.theme.spacing
+import com.plantCare.plantcare.utils.DateUtil
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -32,53 +36,64 @@ enum class WateringState {
     MISSED,
     SCHEDULED,
     SATISFIED,
-    CURRENT_DAY,
     NONE,
 }
 
 @Composable
-fun Modifier.getDayStyle(state: WateringState): Modifier {
-    return when (state) {
-        WateringState.WATERED -> this.background(
-            color = getDayTextColor(state),
-        )
 
-        WateringState.MISSED -> this.border(
-            width = 2.dp,
-            color = getDayTextColor(state),
+fun Modifier.getDayStyle(state: WateringState, color: Color, isToday: Boolean, isWatered: Boolean, isRainy: Boolean): Modifier {
+    val width = if (isToday) 6.dp else 2.dp
+
+    val baseModifier = when {
+        isWatered ->
+            this.background(
+                color = color,
+            ).border(
+                width = width,
+                color = color,
+                shape = CircleShape
+            )
+
+        isRainy -> this.border(
+            width = width,
+            color = color,
             shape = CircleShape
         )
 
-        WateringState.SCHEDULED -> this.border(
-            width = 2.dp,
-            color = getDayTextColor(state),
+        state == WateringState.SCHEDULED -> this.border(
+            width = width,
+            color = color,
             shape = RoundedCornerShape(MaterialTheme.radius.small)
         )
 
-        WateringState.SATISFIED -> this.border(
-            width = 2.dp,
-            color = getDayTextColor(state),
+        state == WateringState.SATISFIED -> this.border(
+            width = width,
+            color = color,
             shape = RoundedCornerShape(MaterialTheme.radius.small)
         )
 
-        WateringState.CURRENT_DAY -> this.border(
-            width = 2.dp,
-            color = getDayTextColor(state),
-            shape = CircleShape
-        )
+       else -> this
+    }
 
-        WateringState.NONE -> this
+    return if (isToday && state == WateringState.NONE) {
+        baseModifier.border(
+            width = width,
+            color = Color.White,
+            shape = AbsoluteCutCornerShape(MaterialTheme.radius.small)
+        )
+    } else {
+        baseModifier
     }
 }
 
+
 @Composable
-fun getDayTextColor(state: WateringState): Color {
+fun getDayTextColor(state: WateringState, isToday: Boolean, isWatered: Boolean, isRainy: Boolean): Color {
     return when (state) {
         WateringState.WATERED -> MaterialTheme.colorScheme.primary
         WateringState.MISSED -> MaterialTheme.colorScheme.error
         WateringState.SCHEDULED -> MaterialTheme.colorScheme.tertiary // todo change color scheme
         WateringState.SATISFIED -> MaterialTheme.colorScheme.primary
-        WateringState.CURRENT_DAY -> MaterialTheme.colorScheme.onSurface
         WateringState.NONE -> MaterialTheme.colorScheme.onSurface
     }
 }
@@ -86,7 +101,7 @@ fun getDayTextColor(state: WateringState): Color {
 fun getWateringState(date: LocalDate, schedules: List<PlantWateringSchedule>): WateringState {
     for (schedule in schedules) {
         val diff = ChronoUnit.DAYS.between(schedule.startingDate, date)
-//        Log.d("day", "diff: $diff")
+
         if (diff > 0 && diff % schedule.wateringInterval.interval == 0L) {
             return WateringState.SCHEDULED
         }
@@ -99,9 +114,17 @@ fun getWateringState(date: LocalDate, schedules: List<PlantWateringSchedule>): W
 fun Day(
     day: CalendarDay,
     plantWateringSchedules: List<PlantWateringSchedule>,
+    monthData: MonthData? = null
 ) {
+    Log.d("devomd","day's monthdata = ${monthData}")
     val state: WateringState = getWateringState(day.date, plantWateringSchedules)
-    val modifier = Modifier.getDayStyle(state)
+
+    val isWatered = monthData?.wateredDays?.contains(day.date.dayOfMonth) ?: false
+    val isRainy = monthData?.rainDays?.contains(day.date.dayOfMonth) ?: false
+    val isToday = DateUtil.localDateToday() == day.date
+
+    val textColor = getDayTextColor(state, isToday,isWatered, isRainy)
+    val modifier = Modifier.getDayStyle(state, textColor,isToday, isWatered, isRainy)
 
     Box(
         modifier = Modifier
@@ -116,7 +139,7 @@ fun Day(
             ) {
                 Text(
                     text = day.date.dayOfMonth.toString(),
-                    color = getDayTextColor(state),
+                    color = textColor
                 )
             }
         }
