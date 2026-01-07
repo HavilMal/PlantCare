@@ -4,12 +4,14 @@ import android.content.Context
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.utils.FileUtil
+import com.plantCare.plantcare.utils.RandomUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
+import kotlin.collections.sortedBy
 
 const val PLANTS_DIR: String = "plants/"
 
@@ -20,7 +22,7 @@ class PlantRepository(
     companion object {
         const val PLANT_MEDIA_DIR_NAME = "media"
         fun genPlantMediaId(): String {
-            return System.currentTimeMillis().toString()
+            return RandomUtil.genUUIDString()
         }
     }
 
@@ -72,6 +74,11 @@ class PlantRepository(
     fun getPlant(plantId: Long): Flow<Plant?> {
         return plantDao.getPlantFlow(plantId)
     }
+
+    fun getAllPlants(): Flow<List<Plant>> {
+        return plantDao.getPlants()
+    }
+
 
     fun getSchedule(plantId: Long): Flow<List<WateringSchedule>> {
         return plantDao.getWateringSchedule(plantId)
@@ -136,6 +143,7 @@ class PlantRepository(
                 mediaNames.map { mediaName ->
                     File(appContext.filesDir, "$plantMediaDirPath/$mediaName")
                 }
+                    .sortedBy { it.lastModified() }
             }
     }
 
@@ -174,25 +182,48 @@ class PlantRepository(
 
 class AppRepository(
     val plantRepository: PlantRepository,
+    val userActivityRepository: UserActivityRepository,
+    val weatherRepository: WeatherRepository,
     val settingsRepository: SettingsRepository
 ) {
     suspend fun seedDatabase() {
         plantRepository.deleteAllPlants()
-        var id = plantRepository.insertPlant(
-            "Kaktus Maksiu",
-            "Nazwa po moim zmarłym dziadku",
-            "Kaktus Kaktus"
-        )
+        userActivityRepository.deleteRecords()
+
         val cactusImageFile = FileUtil.drawableAsFile(
             plantRepository.appContext,
             R.drawable.cactus,
             "${System.currentTimeMillis()}.png"
         )
 
+        var id = plantRepository.insertPlant(
+            name = "Storczyk Tadek",
+            description = "Fajny jest",
+            species = "Storczykus",
+            plantedOn = LocalDate.of(2025,12,1),
+            isIndoor = true,
+            wateringInterval = WateringInterval.WEEK,
+        )
         plantRepository.addPlantMedia(id, cactusImageFile)
         plantRepository.addPlantMedia(id, cactusImageFile)
+        plantRepository.plantDao.insertWateringEntry(WateringEntry(id,LocalDate.of(2025,12,28)))
+        plantRepository.plantDao.insertWateringEntry(WateringEntry(id,LocalDate.of(2026,1,1)))
 
-        plantRepository.insertPlant("Storczyk Tadek", "Fajny jest", "Storczyk")
+        plantRepository.setSchedule(id,setOf(DayOfWeek.MONDAY,DayOfWeek.TUESDAY), WateringInterval.WEEK)
+
+        id = plantRepository.insertPlant(
+            name = "Kaktus Maksiu",
+            description = "Fajny jest",
+            species = "Cactus cactus",
+            plantedOn = LocalDate.of(2025,12,1),
+            isIndoor = true,
+            wateringInterval = WateringInterval.TWO_WEEKS
+        )
+        plantRepository.addPlantMedia(id, cactusImageFile)
+        plantRepository.addPlantMedia(id, cactusImageFile)
+        plantRepository.plantDao.insertWateringEntry(WateringEntry(id,LocalDate.of(2025,12,20)))
+
+        settingsRepository.setLocation(51.0,17.0)
     }
 
     suspend fun setDefaultSettings() {

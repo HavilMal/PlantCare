@@ -15,4 +15,8 @@ object RandomUtil {
     fun genBool(): Boolean {
         return Random.nextBoolean()
     }
+
+    fun genUniNormFloat(): Float{
+        return Random.nextFloat()
+    }
 }

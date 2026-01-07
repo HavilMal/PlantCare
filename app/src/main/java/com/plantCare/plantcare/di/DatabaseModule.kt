@@ -7,6 +7,9 @@ import com.plantCare.plantcare.database.AppDatabase
 import com.plantCare.plantcare.database.NotesDAO
 import com.plantCare.plantcare.database.PlantDao
 import com.plantCare.plantcare.database.PlantDetailsDao
+import com.plantCare.plantcare.database.UserActivityDao
+import com.plantCare.plantcare.database.WateringDao
+import com.plantCare.plantcare.database.WeatherRecordDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,6 +48,22 @@ object DatabaseModule {
     @Singleton
     fun provideNotesDAO(database: AppDatabase): NotesDAO {
          return database.notesDAO()
+    }
+    @Provides
+    @Singleton
+    fun provideWeatherRecordDao(database: AppDatabase): WeatherRecordDao {
+        return database.weatherRecordDao()
+    }
+    @Provides
+    @Singleton
+    fun provideWateringDao(database: AppDatabase): WateringDao {
+        return database.wateringDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserActivityDao(database: AppDatabase): UserActivityDao {
+        return database.userActivityDao()
     }
 
 }
