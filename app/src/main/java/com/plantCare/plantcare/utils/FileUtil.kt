@@ -52,7 +52,7 @@ object FileUtil {
         val mimeType = contentResolver.getType(uri)
         val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "tmp"
 
-        val tempFile = File(context.cacheDir, "picked_${System.currentTimeMillis()}.$extension")
+        val tempFile = File.createTempFile("picked_", ".$extension", context.cacheDir)
 
         contentResolver.openInputStream(uri)?.use { inputStream ->
             tempFile.outputStream().use { output ->

@@ -35,17 +35,17 @@ fun SettingsScreen(
     )
 
     val settings = listOf(
-        Setting("Location", uiState.location.toString()) {
+        Setting("Location",  uiState.locationName ?: "Location not set") {
             CoroutineScope(Dispatchers.Main).launch {
                 val (lat, lon) = viewModel.settingsRepository.getLocation()
-                MapUtils.locationSelectionMap(context, lat, lon) { lat, lon ->
+                MapUtils.locationSelectionMap(context, lat ?: 0.0, lon?: 0.0) { lat, lon ->
                     viewModel.setLocation(lat, lon)
                 }
             }
         },
-        Setting("Date format", uiState.dateFormat,{}),
-        Setting("Notifications mode", uiState.notificationMode.toString(),{}),
-        Setting("Unit", "Set your units",{}),
+//        Setting("Date format", uiState.dateFormat,{}),
+//        Setting("Notifications mode", uiState.notificationMode.toString(),{}),
+//        Setting("Unit", "Set your units",{}),
     )
 
 

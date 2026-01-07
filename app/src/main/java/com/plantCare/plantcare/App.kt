@@ -1,5 +1,6 @@
 package com.plantCare.plantcare
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -18,7 +19,7 @@ fun App(
 
     LaunchedEffect(Unit) {
         viewModel.seedDatabase()
-//        viewModel.appRepository.setDefaultSettings()
+        viewModel.onAppStart()
     }
 
     val navController = rememberNavController()

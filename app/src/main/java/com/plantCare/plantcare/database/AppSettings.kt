@@ -24,6 +24,7 @@ private object PreferencesKeys {
     val DATE_FORMAT = stringPreferencesKey("app_setting_date_format")
     val LOCATION_LAT = doublePreferencesKey("app_setting_location_lat")
     val LOCATION_LON = doublePreferencesKey("app_setting_location_lon")
+    val LOCATION_NAME = stringPreferencesKey("app_Setting_location_name")
     val NOTIFICATION_MODE = stringPreferencesKey("app_setting_notification")
 }
 
@@ -34,11 +35,16 @@ class SettingsRepository(private val context: Context) {
             prefs[PreferencesKeys.DATE_FORMAT] ?: "dd/mm/yyyy"
         }
 
-    val location: Flow<Pair<Double, Double>> =
+    val location: Flow<Pair<Double?, Double?>> =
         context.dataStore.data.map { prefs ->
-            val lat = prefs[PreferencesKeys.LOCATION_LAT] ?: 0.0
-            val lon = prefs[PreferencesKeys.LOCATION_LON] ?: 0.0
+            val lat = prefs[PreferencesKeys.LOCATION_LAT]
+            val lon = prefs[PreferencesKeys.LOCATION_LON]
             lat to lon
+        }
+
+    val locationName: Flow<String?> =
+        context.dataStore.data.map { prefs ->
+            prefs[PreferencesKeys.LOCATION_NAME]
         }
 
     val notificationMode: Flow<AppSettingNotificationMode> =
@@ -54,13 +60,20 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
-    suspend fun setLocation(lat: Double, lon: Double) {
+    suspend fun setLocation(lat: Double?, lon: Double?) {
         context.dataStore.edit { prefs ->
-            prefs[PreferencesKeys.LOCATION_LAT] = lat
-            prefs[PreferencesKeys.LOCATION_LON] = lon
+            if(lat!=null) prefs[PreferencesKeys.LOCATION_LAT] = lat else prefs.remove(PreferencesKeys.LOCATION_LAT)
+            if(lon!=null) prefs[PreferencesKeys.LOCATION_LON] = lon else prefs.remove(PreferencesKeys.LOCATION_LON)
+            prefs.remove(PreferencesKeys.LOCATION_NAME)
+        }
+
+    }
+    suspend fun setLocationName(location: String?){
+        context.dataStore.edit { prefs ->
+            if(location!=null) prefs[PreferencesKeys.LOCATION_NAME] = location else prefs.remove(PreferencesKeys.LOCATION_NAME)
         }
     }
-    suspend fun getLocation() : Pair<Double, Double> {
+    suspend fun getLocation() : Pair<Double?, Double?> {
         return location.first()
     }
 
@@ -71,7 +84,7 @@ class SettingsRepository(private val context: Context) {
     }
     suspend fun setDefault(){
         setDateFormat("dd/mm/yyyy")
-        setLocation(0.0,0.0)
+        setLocation(51.11076082080715, 17.0329828639918) // wroclaw
         setNotificationMode(AppSettingNotificationMode.ALWAYS_NOTIFY)
     }
 }
