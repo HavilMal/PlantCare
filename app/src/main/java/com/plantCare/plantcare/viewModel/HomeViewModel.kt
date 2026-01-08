@@ -80,6 +80,9 @@ class HomeViewModel @Inject constructor(
 
         }
 //        viewModelScope.launch {
+//            updateStreakData()
+//        }
+//        viewModelScope.launch {
 //            homeFlow
 //                .map { it.plantWateringStatuses }
 //                .distinctUntilChanged()
@@ -115,5 +118,9 @@ class HomeViewModel @Inject constructor(
                 Log.d("devo",r.toString())
             }
         }
+    }
+
+    suspend fun updateStreakData(){
+        userActivityRepository.updateUserStreakData()
     }
 }

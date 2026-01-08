@@ -136,8 +136,9 @@ fun HomeScreen(
             ) {
 
                 item {
-                    CurrentStreakAnimation(petal, androidx.compose.ui.graphics.Color.Red, androidx.compose.ui.graphics.Color.Yellow,20,1,1,1.0F,10000)
+//                    CurrentStreakAnimation(petal, androidx.compose.ui.graphics.Color.Red, androidx.compose.ui.graphics.Color.Yellow,20,1,1,1.0F,10000)
 //                    CurrentStreakAnimation(petal, androidx.compose.ui.graphics.Color.Red, androidx.compose.ui.graphics.Color.Yellow,uiState.value.userCurrentStreak,1,1,1.0F,10000)
+//                    RandomFlowersAnimation(5)
                 }
 
                 PlantWateringSection.entries.forEach { section ->
