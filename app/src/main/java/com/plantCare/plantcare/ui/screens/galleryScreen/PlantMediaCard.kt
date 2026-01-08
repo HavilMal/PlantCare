@@ -40,6 +40,7 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.plantCare.plantcare.ui.components.MediaThumbnail
 import com.plantCare.plantcare.utils.FileUtil
+import com.plantCare.plantcare.utils.MediaUtil
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -85,10 +86,15 @@ fun PlantMediaCard(
     val scope = rememberCoroutineScope()
     var playVideo by remember { mutableStateOf(false) }
     val isVideo = FileUtil.isVideo(media)
+    val modifier = remember { if (isVideo) {
+        Modifier.aspectRatio(MediaUtil.getVideoAspectRatio(media))
+    } else {
+        Modifier
+    }
+    }
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(9f/16f)
             .clip(RoundedCornerShape(16.dp))
             .clickable(enabled = isVideo) {
                 playVideo = true
