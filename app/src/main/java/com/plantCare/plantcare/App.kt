@@ -21,7 +21,6 @@ fun App(
 ) {
 
     LaunchedEffect(Unit) {
-        viewModel.seedDatabase()
         viewModel.onAppStart()
     }
 

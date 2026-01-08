@@ -12,14 +12,9 @@ import javax.inject.Inject
 class AppViewModel @Inject constructor(
     val appRepository: AppRepository
 ) : ViewModel() {
-    suspend fun seedDatabase() {
-        viewModelScope.launch(Dispatchers.IO) {
-                appRepository.seedDatabase()
-            }
-    }
-
     fun onAppStart() {
         viewModelScope.launch(Dispatchers.IO) {
+//            appRepository.seedDatabase()
             appRepository.weatherRepository.fetchWeatherData()
         }
     }
