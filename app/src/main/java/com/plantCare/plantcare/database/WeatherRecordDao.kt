@@ -42,9 +42,9 @@ interface WeatherRecordDao {
         AND hasRained = 1
     )
 """)
-    fun hasRainedOn(dayStart: Timestamp, dayEnd: Timestamp) : Boolean
+    suspend fun hasRainedOn(dayStart: Timestamp, dayEnd: Timestamp) : Boolean
 
-    fun hasRainedOn(date: LocalDate): Boolean {
+    suspend fun hasRainedOn(date: LocalDate): Boolean {
         return hasRainedOn(
             DateUtil.startOfDay(date),
             DateUtil.endOfDay(date)
