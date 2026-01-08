@@ -22,16 +22,13 @@ fun DeviceGalleryScreen(
     viewModel: DeviceGalleryScreenViewModel = hiltViewModel()
 ) {
     val navController = NavigationController.current
-    val scope = rememberCoroutineScope()
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia(maxItems = 50)
     ) { uris ->
         if (uris.isNotEmpty()) {
-            scope.launch {
-                viewModel.saveMedia(uris)
-                navController?.popBackStack()
-            }
+            viewModel.saveMedia(uris)
+            navController?.popBackStack()
         } else {
             navController?.popBackStack()
         }

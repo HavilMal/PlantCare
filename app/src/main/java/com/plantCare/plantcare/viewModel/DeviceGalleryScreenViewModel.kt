@@ -36,10 +36,12 @@ class DeviceGalleryScreenViewModel @Inject constructor(
 
 
     val plantId: Long = savedStateHandle["plantId"]!!
-    suspend fun saveMedia(uris: List<Uri>) {
-        uris.forEach { uri ->
-            val file = FileUtil.copyUriToFile(context, uri)
-            repository.addPlantMedia(plantId,file)
+    fun saveMedia(uris: List<Uri>) {
+        viewModelScope.launch {
+            uris.forEach { uri ->
+                val file = FileUtil.copyUriToFile(context, uri)
+                repository.addPlantMedia(plantId, file)
+            }
         }
     }
 }
