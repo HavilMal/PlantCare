@@ -37,6 +37,9 @@ FROM breaks
 """)
     fun getLatestStreakBreak(today: LocalDate) : Flow<LocalDate?>
 
+    @Query("SELECT MAX(date) FROM userDailyRecord")
+    fun latestRecordedDate() : LocalDate?
+
     @Query(  """
     SELECT EXISTS(
         SELECT 1
@@ -54,4 +57,7 @@ FROM breaks
 
     @Query("SELECT COUNT(*) FROM userDailyRecord")
     fun getRowCount(): Flow<Int>
+
+    @Query("SELECT * FROM userDailyRecord")
+    suspend fun getAllRecords() : List<UserDailyRecord>
 }

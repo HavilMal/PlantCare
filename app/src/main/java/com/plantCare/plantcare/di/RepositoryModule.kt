@@ -98,9 +98,12 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideUserActivityRepository(
-        userActivityDao: UserActivityDao
+        userActivityDao: UserActivityDao,
+        weatherRepository: WeatherRepository,
+        wateringRepository: WateringRepository,
+        plantRepository: PlantRepository
     ): UserActivityRepository {
-        return UserActivityRepository(userActivityDao)
+        return UserActivityRepository(userActivityDao,weatherRepository,wateringRepository, plantRepository)
     }
 
 

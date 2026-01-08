@@ -79,30 +79,30 @@ class HomeViewModel @Inject constructor(
             }
 
         }
-        viewModelScope.launch {
-            homeFlow
-                .map { it.plantWateringStatuses }
-                .distinctUntilChanged()
-                .collect { statuses ->
-                    if (statuses.isNotEmpty() &&
-                        statuses.none { it.wateringStatus == WateringStatus.NEEDS_WATERING }) {
-                        Log.d("devo", "All plants watered today!!")
-                        userActivityRepository.insertUserStreakRecord()
-                    }
-                }
-        }
+//        viewModelScope.launch {
+//            homeFlow
+//                .map { it.plantWateringStatuses }
+//                .distinctUntilChanged()
+//                .collect { statuses ->
+//                    if (statuses.isNotEmpty() &&
+//                        statuses.none { it.wateringStatus == WateringStatus.NEEDS_WATERING }) {
+//                        Log.d("devo", "All plants watered today!!")
+//                        userActivityRepository.insertUserStreakRecord()
+//                    }
+//                }
+//        }
     }
 
     fun allPlantsWatered() : Boolean {
         Log.d("devo","VM = " + homeFlow.value.plantWateringStatuses.toString())
         return homeFlow.value.plantWateringStatuses.none { pws -> pws.wateringStatus == WateringStatus.NEEDS_WATERING }
     }
-    suspend fun checkTodayStreak(){
-        if(allPlantsWatered()) {
-            Log.d("devo","all plants watered today!!")
-            userActivityRepository.insertUserStreakRecord()
-        }
-    }
+//    suspend fun checkTodayStreak(){
+//        if(allPlantsWatered()) {
+//            Log.d("devo","all plants watered today!!")
+//            userActivityRepository.insertUserStreakRecord()
+//        }
+//    }
     suspend fun waterPlant(plantId: Long){
         wateringRepository.insertWateringEntry(plantId)
     }

@@ -98,6 +98,22 @@ interface WateringDao {
     fun wateringDays(from: LocalDate, to: LocalDate) : Flow<List<LocalDate>>
 
 
+    @Query(""" 
+    SELECT EXISTS(
+        SELECT 
+            1 
+        FROM wateringHistory
+        WHERE plant = :plantId AND date = :date
+    )
+ """)
+    suspend fun wasWatered(plantId: Long, date: LocalDate) : Boolean
+
     @Insert
     suspend fun insertWateringEntry(wateringEntry: WateringEntry)
+
+    @Query("SELECT * FROM wateringSchedule WHERE plant = :plantId")
+    suspend fun getWateringSchedule(plantId: Long): List<WateringSchedule>
+
+    @Query("SELECT wateringInterval FROM plants WHERE plants.id = :plantId")
+    suspend fun getWateringInterval(plantId: Long): WateringInterval
 }

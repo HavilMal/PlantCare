@@ -214,7 +214,11 @@ data class UserDailyRecord(
 @Dao
 interface PlantDao {
     @Query("SELECT * FROM plants")
-    fun getPlants(): Flow<List<Plant>>
+    fun getPlantsFlow(): Flow<List<Plant>>
+    @Query("SELECT * FROM plants")
+    fun getPlants(): List<Plant>
+    @Query("SELECT id FROM plants")
+    suspend fun getPlantIds(): List<Long>
 
     @Query("SELECT * FROM plants WHERE id = :plantId")
     suspend fun getPlant(plantId: Long): Plant

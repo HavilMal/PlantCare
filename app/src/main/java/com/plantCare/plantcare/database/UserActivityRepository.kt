@@ -1,6 +1,7 @@
 package com.plantCare.plantcare.database
 
 import android.util.Log
+import androidx.compose.material3.DatePicker
 import com.plantCare.plantcare.utils.DateUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -10,13 +11,16 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 class UserActivityRepository(
-    val userActivityDao: UserActivityDao
+    val userActivityDao: UserActivityDao,
+    val weatherRepository: WeatherRepository,
+    val wateringRepository: WateringRepository,
+    val plantRepository: PlantRepository
 ) {
-    suspend fun insertUserStreakRecord(date: LocalDate){
-        userActivityDao.insertDailyRecord(UserDailyRecord(date,true))
+    suspend fun insertUserStreakRecord(streakMaintained: Boolean, date: LocalDate, ){
+        userActivityDao.insertDailyRecord(UserDailyRecord(date,streakMaintained))
     }
-    suspend fun insertUserStreakRecord(){
-        insertUserStreakRecord(DateUtil.localDateToday())
+    suspend fun insertUserStreakRecord(streakMaintained: Boolean){
+        insertUserStreakRecord(streakMaintained,DateUtil.localDateToday())
     }
 
     fun todayStreakMaintained() : Flow<Boolean> {
@@ -40,5 +44,43 @@ class UserActivityRepository(
 
     suspend fun deleteRecords(){
         userActivityDao.deleteAllRecords()
+    }
+
+    suspend fun updateUserStreakData() {
+        val today: LocalDate = DateUtil.localDateToday()
+        val plants: List<Plant> = plantRepository.getAllPlants()
+
+        suspend fun streakBroke(plantId: Long, isIndoor: Boolean, currentDate: LocalDate): Boolean {
+            if (wateringRepository.needsWatering(plantId, currentDate)) {
+                if (!wateringRepository.wasWateredByUser(plantId, currentDate)) {
+                    if (isIndoor) {
+                        return true
+                    } else if (!weatherRepository.hasRainedOn(currentDate)) {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+
+        val latest: LocalDate? = userActivityDao.latestRecordedDate() ?: today
+        var currentDate = today
+        do {
+            var streakMaintained = true
+
+            for (plant in plants) {
+                if (streakBroke(plant.id, plant.isIndoor, currentDate)) {
+                    streakMaintained = false
+                    break
+                }
+            }
+
+            insertUserStreakRecord(streakMaintained, currentDate)
+            currentDate = currentDate.minusDays(1)
+        } while (currentDate.isAfter(latest))
+
+        userActivityDao.getAllRecords().forEach { r->
+            Log.d("devo","activity record = $r")
+        }
     }
 }
