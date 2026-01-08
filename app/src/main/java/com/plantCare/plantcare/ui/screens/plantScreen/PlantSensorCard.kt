@@ -17,20 +17,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.plantCare.plantcare.R
 import com.plantCare.plantcare.common.WithPermission
 import com.plantCare.plantcare.service.SensorData
 import com.plantCare.plantcare.ui.components.ContentCompositionRow
-import com.plantCare.plantcare.ui.components.FillableSVG
+import com.plantCare.plantcare.ui.components.FillableSun
+import com.plantCare.plantcare.ui.components.FillableWaterDrop
 import com.plantCare.plantcare.ui.components.TextCard
 import com.plantCare.plantcare.ui.theme.size
 import com.plantCare.plantcare.ui.theme.spacing
-import kotlin.math.PI
-import kotlin.math.cos
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -77,7 +73,7 @@ fun SensorCard(
     TextCard(
         modifier = modifier.fillMaxWidth(),
         title = "Sensor",
-        hasContent = sensorData == null
+        hasContent = sensorData != null
     ) {
         WithPermission(
             requestedPermissions = listOf(
@@ -109,35 +105,15 @@ fun SensorCard(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                // todo does not fill fully at 100%
+
                 Column(
                     verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text("Humidity")
-                    FillableSVG(
+                    FillableWaterDrop(
                         modifier = Modifier.size(MaterialTheme.size.large),
-                        svg = R.drawable.water_drop,
                         fill = sensorData.humidity,
-                        fillColor = Color.Blue,
-                        backgroundColor = Color.LightGray,
-                        fillShape = { size, height ->
-                            val waveLength = size.width / 2.5f
-                            val waveHeight = 10f
-                            val offset = 1f
-                            Path().apply {
-                                moveTo(0f, size.height)
-
-                                for (x in 0..size.width.toInt()) {
-                                    val y =
-                                        (size.height - height) + (cos((x / waveLength) * (2 * PI)).toFloat() * waveHeight + offset)
-                                    lineTo(x.toFloat(), y)
-                                }
-
-                                lineTo(size.width, size.height)
-                                close()
-                            }
-                        }
                     )
                 }
                 Column(
@@ -145,12 +121,9 @@ fun SensorCard(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text("Light")
-                    FillableSVG(
+                    FillableSun(
                         modifier = Modifier.size(MaterialTheme.size.large),
-                        svg = R.drawable.sun,
                         fill = sensorData.light,
-                        fillColor = Color.Yellow,
-                        backgroundColor = Color.LightGray
                     )
                 }
             }

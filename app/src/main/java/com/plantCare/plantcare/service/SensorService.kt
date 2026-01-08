@@ -56,16 +56,7 @@ class SensorScanCallback(
             return
         }
 
-        // A device can technically have multiple manufacturer data entries
-        for (i in 0 until manufacturerData.size) {
-            val id = manufacturerData.keyAt(i)
-            val data = manufacturerData.valueAt(i)
-
-            // Example: If ID is 0xFFFF and data is "HI" (48 49), show a message
-            if (id == 0xFFFF && data.contentEquals(byteArrayOf(0x48, 0x49))) {
-                onDeviceFound(result.device!!)
-            }
-        }
+        onDeviceFound(result.device!!)
     }
 
     override fun onScanFailed(errorCode: Int) {

@@ -1,6 +1,7 @@
 package com.plantCare.plantcare.common
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
@@ -8,12 +9,14 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.plantCare.plantcare.R
 import com.plantCare.plantcare.ui.screens.calendarScreen.CalendarScreen
 import com.plantCare.plantcare.ui.screens.homeScreen.HomeScreen
 import com.plantCare.plantcare.ui.screens.SearchScreen
@@ -31,13 +34,12 @@ import com.plantCare.plantcare.viewModel.EditMode
 enum class Route(
     val route: String,
     val label: String,
-    val icon: ImageVector? = null
 ) {
     // Main routes
-    HOME("home", "Home", Icons.Filled.Home),
-    PLANT_LIST("list", "List", Icons.Filled.Star),
-    CALENDAR("calendar", "Calendar", Icons.Filled.DateRange),
-    SEARCH("search", "Search", Icons.Filled.Search),
+    HOME("home", "Home"),
+    PLANT_LIST("list", "List"),
+    CALENDAR("calendar", "Calendar"),
+    SEARCH("search", "Search"),
 
     // Other routes
     SETTINGS("settings", "Settings"),
