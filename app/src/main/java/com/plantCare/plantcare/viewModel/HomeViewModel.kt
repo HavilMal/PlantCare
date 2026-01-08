@@ -79,21 +79,6 @@ class HomeViewModel @Inject constructor(
             }
 
         }
-//        viewModelScope.launch {
-//            updateStreakData()
-//        }
-//        viewModelScope.launch {
-//            homeFlow
-//                .map { it.plantWateringStatuses }
-//                .distinctUntilChanged()
-//                .collect { statuses ->
-//                    if (statuses.isNotEmpty() &&
-//                        statuses.none { it.wateringStatus == WateringStatus.NEEDS_WATERING }) {
-//                        Log.d("devo", "All plants watered today!!")
-//                        userActivityRepository.insertUserStreakRecord()
-//                    }
-//                }
-//        }
     }
 
     fun allPlantsWatered() : Boolean {
@@ -108,19 +93,13 @@ class HomeViewModel @Inject constructor(
 //    }
     suspend fun waterPlant(plantId: Long){
         wateringRepository.insertWateringEntry(plantId)
+//        userActivityRepository.updateUserStreakData()
     }
 
-    fun logWeatherData() {
-        Log.d("devo","weather entries:")
+
+    fun updateStreakData(){
         viewModelScope.launch(Dispatchers.IO) {
-            val records = weatherRepository.weatherDao.getAllRecords()
-            records.forEach { r ->
-                Log.d("devo",r.toString())
-            }
+            userActivityRepository.updateUserStreakData()
         }
-    }
-
-    suspend fun updateStreakData(){
-        userActivityRepository.updateUserStreakData()
     }
 }

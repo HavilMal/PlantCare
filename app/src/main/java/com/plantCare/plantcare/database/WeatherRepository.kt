@@ -17,7 +17,7 @@ class WeatherRepository (
             200, 201, 202
         )
     }
-    fun hasRainedOn(date: LocalDate) : Boolean {
+    suspend fun hasRainedOn(date: LocalDate) : Boolean {
         return weatherDao.hasRainedOn(date)
     }
     fun hasRainedInRange(from: LocalDate, to:LocalDate) : Boolean {

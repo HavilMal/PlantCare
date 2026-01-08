@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.items
@@ -33,7 +34,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,6 +48,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.plantCare.plantcare.R
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.Route
@@ -52,6 +58,7 @@ import com.plantCare.plantcare.database.Plant
 import com.plantCare.plantcare.database.PlantWateringInfo
 import com.plantCare.plantcare.logic.PlantWateringStatus
 import com.plantCare.plantcare.logic.WateringStatus
+import com.plantCare.plantcare.ui.components.TextCard
 import com.plantCare.plantcare.ui.screens.homeScreen.HomeScaffold
 import com.plantCare.plantcare.ui.theme.spacing
 import com.plantCare.plantcare.viewModel.HomeViewModel
@@ -108,11 +115,18 @@ fun HomeScreen(
     val context  = LocalContext.current
     val uiState = viewModel.homeState.collectAsState()
     val scope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    val petal =  painterResource(R.drawable.petal_long)
-
-    LaunchedEffect(Unit) {
-        viewModel.logWeatherData()
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+               viewModel.updateStreakData()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -130,15 +144,29 @@ fun HomeScreen(
 
             LazyColumn(
                 contentPadding = PaddingValues(MaterialTheme.spacing.medium),
-                modifier = modifier
-                    .fillMaxSize(),
+                modifier = modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
                 item {
-//                    CurrentStreakAnimation(petal, androidx.compose.ui.graphics.Color.Red, androidx.compose.ui.graphics.Color.Yellow,20,1,1,1.0F,10000)
-//                    CurrentStreakAnimation(petal, androidx.compose.ui.graphics.Color.Red, androidx.compose.ui.graphics.Color.Yellow,uiState.value.userCurrentStreak,1,1,1.0F,10000)
-//                    RandomFlowersAnimation(5)
+                    val height = 250.dp
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(height),
+                        colors = CardDefaults.cardColors(
+                            containerColor = CardDefaults.cardColors().containerColor.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            RandomFlowersAnimation(
+                                itemCount = 200,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
                 }
 
                 PlantWateringSection.entries.forEach { section ->

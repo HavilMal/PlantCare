@@ -24,7 +24,6 @@ import java.time.YearMonth
 import java.util.LinkedList
 
 data class MonthData (
-    val yearMonth: YearMonth,
     val wateredDays: Set<Int>,
     val rainDays: Set<Int>
 )
@@ -32,7 +31,7 @@ data class MonthData (
 data class CalendarUiState(
     val isLoading: Boolean,
     val schedules: List<PlantWateringSchedule>,
-    val monthData: List<MonthData>
+    val monthData: Map<YearMonth, MonthData>
 )
 
 
@@ -43,7 +42,7 @@ class CalendarViewModel @Inject constructor(
     val wateringRepository: WateringRepository
 ) : ViewModel() {
     private val calendarStateFlow =
-        MutableStateFlow(CalendarUiState(true, listOf(), LinkedList<MonthData>()))
+        MutableStateFlow(CalendarUiState(true, listOf(), emptyMap()))
 
     val calendarState = calendarStateFlow.asStateFlow()
 
@@ -62,36 +61,45 @@ class CalendarViewModel @Inject constructor(
 
 
     fun onMonthVisible(month: YearMonth) {
-        if (calendarState.value.monthData.any { it.yearMonth == month }) return
+        Log.d("devocal","months loaded = ${calendarState.value.monthData}")
+        val monthsToLoad = (-2..2).map { month.plusMonths(it.toLong()) }
+            .filter { !calendarState.value.monthData.containsKey(it) }
 
-        viewModelScope.launch {
-            calculateMonthData(month).collect { md ->
-                calendarStateFlow.update {
-                    it.copy(
-                        monthData = it.monthData + md
-                    )
+        monthsToLoad.forEach { m ->
+            Log.d("devocal","month to load = $m")
+            viewModelScope.launch {
+                calculateMonthData(m).collect { md ->
+                    calendarStateFlow.update {
+                        it.copy(
+                            monthData = it.monthData + (m to md)
+                        )
+                    }
                 }
             }
+        }
+
+        val monthsToKeep = (-2..2).map { month.plusMonths(it.toLong()) }.toSet()
+        calendarStateFlow.update {
+            it.copy(monthData = it.monthData.filterKeys { it in monthsToKeep })
         }
     }
 
     fun calculateMonthData(month: YearMonth) : Flow<MonthData> {
-        val firstDay : LocalDate = month.atDay(1)
-        val lastDay : LocalDate = month.atEndOfMonth()
+        val firstDay = month.atDay(1)
+        val lastDay = month.atEndOfMonth()
 
-        val rainyDays:  Flow<List<LocalDate>> = weatherRepository.rainDays(firstDay, lastDay)
-        val wateredDays:  Flow<List<LocalDate>> = wateringRepository.wateringDays(firstDay,lastDay)
+        val rainyDays = weatherRepository.rainDays(firstDay, lastDay)
+        val wateredDays = wateringRepository.wateringDays(firstDay, lastDay)
 
         return combine(wateredDays, rainyDays) { watered, rainy ->
             MonthData(
-                yearMonth = month,
-                wateredDays = watered.map { ld -> ld.dayOfMonth }.toSet(),
-                rainDays = rainy.map { ld -> ld.dayOfMonth }.toSet()
+                wateredDays = watered.map { it.dayOfMonth }.toSet(),
+                rainDays = rainy.map { it.dayOfMonth }.toSet()
             )
         }
     }
 
     fun getMonthData(month: YearMonth): MonthData? {
-        return calendarState.value.monthData.find { it.yearMonth == month }
+        return calendarState.value.monthData[month]
     }
 }

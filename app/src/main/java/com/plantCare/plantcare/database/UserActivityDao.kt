@@ -38,7 +38,7 @@ FROM breaks
     fun getLatestStreakBreak(today: LocalDate) : Flow<LocalDate?>
 
     @Query("SELECT MAX(date) FROM userDailyRecord")
-    fun latestRecordedDate() : LocalDate?
+    suspend fun latestRecordedDate() : LocalDate?
 
     @Query(  """
     SELECT EXISTS(

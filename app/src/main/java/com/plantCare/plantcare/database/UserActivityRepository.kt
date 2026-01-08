@@ -78,9 +78,5 @@ class UserActivityRepository(
             insertUserStreakRecord(streakMaintained, currentDate)
             currentDate = currentDate.minusDays(1)
         } while (currentDate.isAfter(latest))
-
-        userActivityDao.getAllRecords().forEach { r->
-            Log.d("devo","activity record = $r")
-        }
     }
 }
