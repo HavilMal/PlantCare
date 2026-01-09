@@ -5,23 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.Plant
 import com.plantCare.plantcare.database.PlantRepository
-import com.plantCare.plantcare.database.PlantWateringInfo
-import com.plantCare.plantcare.database.UserActivityDao
 import com.plantCare.plantcare.database.UserActivityRepository
 import com.plantCare.plantcare.database.WateringRepository
 import com.plantCare.plantcare.database.WeatherRepository
-import com.plantCare.plantcare.logic.PlantWateringStatus
 import com.plantCare.plantcare.logic.WateringLogicEvaluator
 import com.plantCare.plantcare.logic.WateringStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -86,18 +79,22 @@ class HomeViewModel @Inject constructor(
     }
 //    suspend fun checkTodayStreak(){
 //        if(allPlantsWatered()) {
-//            Log.d("devo","all plants watered today!!")
-//            userActivityRepository.insertUserStreakRecord()
+//            userActivityRepository.in
 //        }
 //    }
     suspend fun waterPlant(plantId: Long){
         wateringRepository.insertWateringEntry(plantId)
-//        userActivityRepository.updateUserStreakData()
+        updateStreakData()
     }
 
 
     fun updateStreakData(){
         viewModelScope.launch(Dispatchers.IO) {
+            val records = userActivityRepository.getAllRecords()
+            Log.d("devom","records:")
+            records.forEach { r ->
+                Log.d("devom",r.toString())
+            }
             userActivityRepository.updateUserStreakData()
         }
     }

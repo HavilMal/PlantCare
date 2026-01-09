@@ -1,12 +1,8 @@
 package com.plantCare.plantcare.database
 
-import android.util.Log
-import androidx.compose.material3.DatePicker
 import com.plantCare.plantcare.utils.DateUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -30,7 +26,7 @@ class UserActivityRepository(
         val today = DateUtil.localDateToday()
         val latestBreakFlow = userActivityDao.getLatestStreakBreak(today)
         val todayMaintainedFlow = todayStreakMaintained()
-        val totalRowsFlow = userActivityDao.getRowCount()
+        val totalRowsFlow = userActivityDao.getPositiveRowCount()
         return latestBreakFlow.combine(todayMaintainedFlow) { latestBreak, todayMaintained ->
             latestBreak to todayMaintained
         }.combine(totalRowsFlow) { (latestBreak, todayMaintained), rowCount ->
@@ -45,11 +41,17 @@ class UserActivityRepository(
     suspend fun deleteRecords(){
         userActivityDao.deleteAllRecords()
     }
+    suspend fun getAllRecords() : List<UserDailyRecord>{
+        return userActivityDao.getAllRecords()
+    }
 
     suspend fun updateUserStreakData() {
         val today: LocalDate = DateUtil.localDateToday()
         val plants: List<Plant> = plantRepository.getAllPlants()
-
+        if(plants.isEmpty()){
+            insertUserStreakRecord(false,today)
+            return
+        }
         suspend fun streakBroke(plantId: Long, isIndoor: Boolean, currentDate: LocalDate): Boolean {
             if (wateringRepository.needsWatering(plantId, currentDate)) {
                 if (!wateringRepository.wasWateredByUser(plantId, currentDate)) {

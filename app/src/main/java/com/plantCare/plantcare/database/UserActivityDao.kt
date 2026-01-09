@@ -57,6 +57,8 @@ FROM breaks
 
     @Query("SELECT COUNT(*) FROM userDailyRecord")
     fun getRowCount(): Flow<Int>
+    @Query("SELECT COUNT(*) FROM userDailyRecord WHERE streakMaintained = 1")
+    fun getPositiveRowCount(): Flow<Int>
 
     @Query("SELECT * FROM userDailyRecord")
     suspend fun getAllRecords() : List<UserDailyRecord>

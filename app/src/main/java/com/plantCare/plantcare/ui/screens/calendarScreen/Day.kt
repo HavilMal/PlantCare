@@ -1,14 +1,10 @@
 package com.plantCare.plantcare.ui.screens.calendarScreen
 
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.AbsoluteCutCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +20,6 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.plantCare.plantcare.database.model.PlantWateringSchedule
 import com.plantCare.plantcare.model.MonthData
 import com.plantCare.plantcare.ui.theme.radius
-import com.plantCare.plantcare.ui.theme.size
 import com.plantCare.plantcare.ui.theme.spacing
 import com.plantCare.plantcare.utils.DateUtil
 import java.time.LocalDate
@@ -94,7 +89,7 @@ fun getDayColor(state: WateringState, isToday: Boolean, isWatered: Boolean, isRa
         state == WateringState.SATISFIED -> MaterialTheme.colorScheme.primary
         isToday -> MaterialTheme.colorScheme.inverseSurface
         state == WateringState.NONE -> MaterialTheme.colorScheme.onSurface
-        else -> MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.inverseSurface
     }
 }
 
