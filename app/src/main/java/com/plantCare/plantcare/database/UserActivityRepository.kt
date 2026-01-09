@@ -80,8 +80,9 @@ class UserActivityRepository(
                 } else {
                     return StreakStatus.POSITIVE
                 }
+            } else {
+                return StreakStatus.NEUTRAL
             }
-            return StreakStatus.NEUTRAL
         }
 
         val latest: LocalDate? = userActivityDao.latestRecordedDate() ?: today
@@ -93,7 +94,6 @@ class UserActivityRepository(
                 val evaluation = streakEvaluation(plant.id, plant.isIndoor, currentDate)
                 if (evaluation == StreakStatus.NEGATIVE) {
                     nonNegative = false
-                    break
                 } else {
                     if (evaluation == StreakStatus.POSITIVE){
                         anyWatered = true

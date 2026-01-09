@@ -33,8 +33,12 @@ class WateringLogicEvaluator(
                     date == info.lastWateredByUserOn ->
                         WateringStatus.WATERED_BY_USER
 
-                    ChronoUnit.DAYS.between(info.lastWateredByUserOn ?: info.plantedOn, date) >= info.wateringInterval.interval &&
-                            info.wateringDays.contains(date.dayOfWeek) ->
+//                    ChronoUnit.DAYS.between(info.lastWateredByUserOn ?: info.plantedOn, date) >= info.wateringInterval.interval && info.wateringDays.contains(date.dayOfWeek) ->
+//                    ChronoUnit.DAYS.between(info.plantedOn, date) >= info.wateringInterval.interval && info.wateringDays.contains(date.dayOfWeek) ->
+                        wateringRepository.needsWatering(info.plantId,date) && info.lastWateredByUserOn != date ->
+                        WateringStatus.NEEDS_WATERING
+
+                    date == info.plantedOn ->
                         WateringStatus.NEEDS_WATERING
 
                     else ->

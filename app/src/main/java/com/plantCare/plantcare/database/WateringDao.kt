@@ -111,4 +111,5 @@ interface WateringDao {
 
     @Query("SELECT wateringInterval FROM plants WHERE plants.id = :plantId")
     suspend fun getWateringInterval(plantId: Long): WateringInterval
+
 }

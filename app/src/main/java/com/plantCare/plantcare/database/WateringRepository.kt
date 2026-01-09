@@ -38,7 +38,7 @@ class WateringRepository(
         val interval: WateringInterval = wateringDao.getWateringInterval(plantId)
         wateringDao.getWateringSchedule(plantId).forEach { schedule ->
             val diff = ChronoUnit.DAYS.between(schedule.startingDate, date)
-            if (diff > 0 && diff % interval.interval == 0L) {
+            if (diff >= 0 && diff % interval.interval == 0L) {
                 return true
             }
         }
