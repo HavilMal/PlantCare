@@ -9,6 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.setWindowAnimations(0)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {

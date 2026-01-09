@@ -30,7 +30,7 @@ class ListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            plantRepository.plantDao.getPlants()
+            plantRepository.plantDao.getPlantsFlow()
                 .collect { plantList ->
                     listFlow.update { currentState ->
                         currentState.copy(

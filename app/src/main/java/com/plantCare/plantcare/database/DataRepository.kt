@@ -75,8 +75,14 @@ class PlantRepository(
         return plantDao.getPlantFlow(plantId)
     }
 
-    fun getAllPlants(): Flow<List<Plant>> {
+    fun getAllPlantsFlow(): Flow<List<Plant>> {
+        return plantDao.getPlantsFlow()
+    }
+    suspend fun getAllPlants(): List<Plant> {
         return plantDao.getPlants()
+    }
+    suspend fun getAllPlantIds(): List<Long> {
+        return plantDao.getPlantIds()
     }
 
 

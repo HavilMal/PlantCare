@@ -16,6 +16,7 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
 //            appRepository.seedDatabase()
             appRepository.weatherRepository.fetchWeatherData()
+            appRepository.userActivityRepository.updateUserStreakData()
         }
     }
 }

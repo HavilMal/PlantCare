@@ -17,7 +17,7 @@ class WeatherRepository (
             200, 201, 202
         )
     }
-    fun hasRainedOn(date: LocalDate) : Boolean {
+    suspend fun hasRainedOn(date: LocalDate) : Boolean {
         return weatherDao.hasRainedOn(date)
     }
     fun hasRainedInRange(from: LocalDate, to:LocalDate) : Boolean {
@@ -36,7 +36,6 @@ class WeatherRepository (
 
         val response = weatherService.getWeather5Days(lat ?: 0.0,lon ?: 0.0)
         val r = response.getAsJsonObject().getAsJsonArray("list")
-//        Log.d("devo","response = $response")
         r.forEachIndexed { index, item ->
             val obj = item.asJsonObject
             val dt = obj.get("dt").asLong
