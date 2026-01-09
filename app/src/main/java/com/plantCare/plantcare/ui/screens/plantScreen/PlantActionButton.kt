@@ -48,7 +48,6 @@ import com.plantCare.plantcare.common.Route
 import com.plantCare.plantcare.viewModel.EditMode
 
 
-// todo close on tap outside
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PlantActionButton(plantId: Long?) {

@@ -33,7 +33,6 @@ class PlantDetailsRepository(
     private val cacheDuration = 31
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    // todo handle errors
     suspend fun findPlant(plantName: String): List<PlantSearchResult>? {
         val response: JsonObject
         try {

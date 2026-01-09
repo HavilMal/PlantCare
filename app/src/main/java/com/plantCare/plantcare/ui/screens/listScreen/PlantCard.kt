@@ -1,5 +1,6 @@
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,10 +39,14 @@ fun PlantCard(
     val navController = NavigationController.current
 
     Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navController?.navigate(Route.PLANT.routeWithArgs(plant.id))
+            },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        modifier = Modifier.fillMaxWidth()
     ) {
         if (thumbnail != null) {
             MediaThumbnail(
@@ -70,8 +75,10 @@ fun PlantCard(
 
         Column(
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-            modifier = Modifier.padding(MaterialTheme.spacing.medium)
-        ) {
+            modifier = Modifier
+                .padding(MaterialTheme.spacing.medium),
+
+            ) {
             Text(
                 text = plant.name,
                 style = MaterialTheme.typography.titleLarge,
@@ -94,14 +101,13 @@ fun PlantCard(
 //                ) {
 //                    Text("Water")
 //                }
-                Button(
-                    onClick = {
-                        navController?.navigate(Route.PLANT.routeWithArgs(plant.id))
-                    }
-                ) {
-                    Text("View")
-                }
-
+//                Button(
+//                    onClick = {
+//                        navController?.navigate(Route.PLANT.routeWithArgs(plant.id))
+//                    }
+//                ) {
+//                    Text("View")
+//                }
             }
         }
     }
