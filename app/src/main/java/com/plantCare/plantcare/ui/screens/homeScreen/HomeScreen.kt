@@ -51,6 +51,7 @@ import com.plantCare.plantcare.viewModel.HomeViewModel
 import com.plantCare.plantcare.viewModel.PlantWateringCardInfo
 import com.plantCare.plantcare.viewModel.PlantWateringSection
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 @Composable
 fun PlantItem(
@@ -145,10 +146,10 @@ fun HomeScreen(
                         Box(
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            RandomFlowersAnimation(
-                                itemCount = uiState.value.userCurrentStreak,
-                                modifier = Modifier.fillMaxSize()
-                            )
+                                RandomFlowersAnimation(
+                                    itemCount = max(uiState.value.userCurrentStreak,0),
+                                    modifier = Modifier.fillMaxSize()
+                                )
                         }
                     }
                 }

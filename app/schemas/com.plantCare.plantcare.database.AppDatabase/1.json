@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "498614732f06284834cf3f0c79035f13",
+    "identityHash": "7cccd08393fc978185c58345033e4543",
     "entities": [
       {
         "tableName": "plants",
@@ -371,7 +371,7 @@
       },
       {
         "tableName": "userDailyRecord",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`date` INTEGER NOT NULL, `streakMaintained` INTEGER NOT NULL, PRIMARY KEY(`date`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`date` INTEGER NOT NULL, `streakStatus` TEXT NOT NULL, PRIMARY KEY(`date`))",
         "fields": [
           {
             "fieldPath": "date",
@@ -380,9 +380,9 @@
             "notNull": true
           },
           {
-            "fieldPath": "streakMaintained",
-            "columnName": "streakMaintained",
-            "affinity": "INTEGER",
+            "fieldPath": "streakStatus",
+            "columnName": "streakStatus",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -396,7 +396,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '498614732f06284834cf3f0c79035f13')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7cccd08393fc978185c58345033e4543')"
     ]
   }
 }

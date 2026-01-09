@@ -35,7 +35,7 @@ data class PlantWateringCardInfo(
 )
 data class HomeUiState(
     val plantWateringStatuses: List<PlantWateringCardInfo> = emptyList(),
-    val userCurrentStreak: Int = 0
+    val userCurrentStreak: Int = 0,
 )
 
 @HiltViewModel

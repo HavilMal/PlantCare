@@ -9,7 +9,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.MapColumn
-import androidx.room.MapInfo
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
@@ -58,6 +57,11 @@ class Converters {
     fun fromLongToTimestamp(value: Long?): Timestamp? {
         return value?.let { Timestamp(it) }
     }
+    @TypeConverter
+    fun fromStatus(status: StreakStatus): String = status.name
+
+    @TypeConverter
+    fun toStatus(value: String): StreakStatus = StreakStatus.valueOf(value)
 }
 
 
@@ -188,7 +192,6 @@ data class WateringSchedule(
     val startingDate: LocalDate,
 )
 
-
 @Entity(
     tableName = "weatherRecord"
 )
@@ -199,14 +202,18 @@ data class  WeatherRecord(
     val rainVolume: Double?
 )
 
-
+enum class StreakStatus {
+    POSITIVE,   // streak +
+    NEGATIVE,   // streak break
+    NEUTRAL     // nothing
+}
 @Entity(
     tableName = "userDailyRecord"
 )
 data class UserDailyRecord(
     @PrimaryKey(autoGenerate = false)
     val date: LocalDate,
-    val streakMaintained : Boolean
+    val streakStatus: StreakStatus
 )
 
 

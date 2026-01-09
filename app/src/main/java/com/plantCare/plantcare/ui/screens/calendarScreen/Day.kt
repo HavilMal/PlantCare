@@ -36,10 +36,16 @@ enum class WateringState {
 
 @Composable
 
-fun Modifier.getDayStyle(state: WateringState, color: Color, isToday: Boolean, isWatered: Boolean, isRainy: Boolean): Modifier {
+fun Modifier.getDayStyle(state: WateringState, color: Color, isToday: Boolean, isWatered: Boolean, isRainy: Boolean, isStreakBraeak: Boolean): Modifier {
     val width = if (isToday) 6.dp else 2.dp
 
     val baseModifier = when {
+        isStreakBraeak ->
+            this.border(
+                width = width,
+                color = color,
+                shape = CircleShape
+            )
         isWatered ->
             this.border(
                 width = width,
@@ -81,8 +87,9 @@ fun Modifier.getDayStyle(state: WateringState, color: Color, isToday: Boolean, i
 
 
 @Composable
-fun getDayColor(state: WateringState, isToday: Boolean, isWatered: Boolean, isRainy: Boolean): Color {
+fun getDayColor(state: WateringState, isToday: Boolean, isWatered: Boolean, isRainy: Boolean, isStreakBraeak: Boolean): Color {
     return when {
+        isStreakBraeak && !isToday-> MaterialTheme.colorScheme.error
         isWatered -> Color.Blue
         isRainy -> Color.Cyan
         state == WateringState.SCHEDULED -> MaterialTheme.colorScheme.tertiary // todo change color scheme
@@ -116,10 +123,11 @@ fun Day(
 
     val isWatered = monthData?.wateredDays?.contains(day.date.dayOfMonth) ?: false
     val isRainy = monthData?.rainDays?.contains(day.date.dayOfMonth) ?: false
+    val isStreakBreak = monthData?.streakBreaks?.contains(day.date.dayOfMonth) ?: false
     val isToday = DateUtil.localDateToday() == day.date
 
-    val textColor = getDayColor(state, isToday,isWatered, isRainy)
-    val modifier = Modifier.getDayStyle(state, textColor,isToday, isWatered, isRainy)
+    val textColor = getDayColor(state, isToday,isWatered, isRainy, isStreakBreak)
+    val modifier = Modifier.getDayStyle(state, textColor,isToday, isWatered, isRainy, isStreakBreak)
 
     Box(
         modifier = Modifier
