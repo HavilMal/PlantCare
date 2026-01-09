@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -74,34 +75,36 @@ class PlantEditViewModel @Inject constructor(
 
     init {
         if (mode == EditMode.EDIT) {
-            val combinedFlow = plantRepository.getPlant(plantId)
-                .combine(plantRepository.getSchedule(plantId)) { plant, schedule ->
-                    Pair(plant, schedule)
-                }
+            viewModelScope.launch {
+                val combinedFlow = plantRepository.getPlant(plantId)
+                    .combine(plantRepository.getSchedule(plantId)) { plant, schedule ->
+                        Pair(plant, schedule)
+                    }
 
-            combinedFlow
-                .onEach { (plant, schedule) ->
-                    if (plant != null) {
-                        plantEditFlow.update { it ->
-                            it.copy(
-                                plantName = plant.name,
-                                species = plant.species,
-                                description = plant.description,
-                                plantedOn = plant.plantedOn,
-                                selectedDays = schedule.map { it.day }.toSet(),
-                                interval = plant.wateringInterval,
-                                isLoading = false,
-                                sensorAddress = plant.sensorAddress,
-                                sensorButtonState = if (plant.sensorAddress == null) {
-                                    SensorButtonState.ADD_SENSOR
-                                } else {
-                                    SensorButtonState.REMOVE_SENSOR
-                                }
-                            )
+                combinedFlow
+                    .first()
+                    .let { (plant, schedule) ->
+                        if (plant != null) {
+                            plantEditFlow.update { it ->
+                                it.copy(
+                                    plantName = plant.name,
+                                    species = plant.species,
+                                    description = plant.description,
+                                    plantedOn = plant.plantedOn,
+                                    selectedDays = schedule.map { it.day }.toSet(),
+                                    interval = plant.wateringInterval,
+                                    isLoading = false,
+                                    sensorAddress = plant.sensorAddress,
+                                    sensorButtonState = if (plant.sensorAddress == null) {
+                                        SensorButtonState.ADD_SENSOR
+                                    } else {
+                                        SensorButtonState.REMOVE_SENSOR
+                                    }
+                                )
+                            }
                         }
                     }
-                }
-                .launchIn(viewModelScope)
+            }
         } else {
             viewModelScope.launch {
                 plantEditFlow.update { it.copy(isLoading = false) }
