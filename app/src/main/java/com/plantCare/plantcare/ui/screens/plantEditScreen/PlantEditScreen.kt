@@ -175,6 +175,7 @@ fun PlantEditScreen(
                 SensorButton(
                     bluetoothOn = state.bluetoothOn,
                     state = state.sensorButtonState,
+                    error = state.scanError,
                     onScanForSensor = { viewModel.scanForSensors() },
                     onRemoveSensor = { viewModel.removeSensor() },
                 )

@@ -40,19 +40,25 @@ fun BottomBar() {
             NavigationBarItem(
                 selected = current == route.route,
                 onClick = {
-                    controller?.navigate(
-                        route = route.route,
-                        navOptions = navOptions {
-                            popUpTo(route.route) {
-                                inclusive = true
+                    if (current != route.route) {
+                        controller?.navigate(
+                            route = route.route,
+                            navOptions = navOptions {
+                                popUpTo(route.route) {
+                                    inclusive = true
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 },
                 icon = {
                     when (route) {
                         Route.HOME -> Icon(Icons.Default.Home, route.label)
-                        Route.PLANT_LIST -> Icon(ImageVector.vectorResource(R.drawable.plant), route.label)
+                        Route.PLANT_LIST -> Icon(
+                            ImageVector.vectorResource(R.drawable.plant),
+                            route.label
+                        )
+
                         Route.CALENDAR -> Icon(Icons.Default.CalendarMonth, route.label)
                         else -> Icon(Icons.Filled.Star, route.label)
                     }
