@@ -162,7 +162,7 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             RandomFlowersAnimation(
-                                itemCount = 200,
+                                itemCount = 11,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }

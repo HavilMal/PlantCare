@@ -76,7 +76,7 @@ fun Modifier.getDayStyle(state: WateringState, color: Color, isToday: Boolean, i
     return if (isToday && state == WateringState.NONE) {
         baseModifier.border(
             width = width,
-            color = Color.White,
+            color = color,
             shape = AbsoluteCutCornerShape(MaterialTheme.radius.small)
         )
     } else {
@@ -92,7 +92,7 @@ fun getDayColor(state: WateringState, isToday: Boolean, isWatered: Boolean, isRa
         isRainy -> Color.Cyan
         state == WateringState.SCHEDULED -> MaterialTheme.colorScheme.tertiary // todo change color scheme
         state == WateringState.SATISFIED -> MaterialTheme.colorScheme.primary
-        isToday -> Color.White
+        isToday -> MaterialTheme.colorScheme.inverseSurface
         state == WateringState.NONE -> MaterialTheme.colorScheme.onSurface
         else -> MaterialTheme.colorScheme.onSurface
     }
@@ -116,7 +116,7 @@ fun Day(
     plantWateringSchedules: List<PlantWateringSchedule>,
     monthData: MonthData? = null
 ) {
-    Log.d("devomd","day's monthdata = ${monthData}")
+
     val state: WateringState = getWateringState(day.date, plantWateringSchedules)
 
     val isWatered = monthData?.wateredDays?.contains(day.date.dayOfMonth) ?: false

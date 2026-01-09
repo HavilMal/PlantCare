@@ -61,12 +61,10 @@ class CalendarViewModel @Inject constructor(
 
 
     fun onMonthVisible(month: YearMonth) {
-        Log.d("devocal","months loaded = ${calendarState.value.monthData}")
         val monthsToLoad = (-2..2).map { month.plusMonths(it.toLong()) }
             .filter { !calendarState.value.monthData.containsKey(it) }
 
         monthsToLoad.forEach { m ->
-            Log.d("devocal","month to load = $m")
             viewModelScope.launch {
                 calculateMonthData(m).collect { md ->
                     calendarStateFlow.update {

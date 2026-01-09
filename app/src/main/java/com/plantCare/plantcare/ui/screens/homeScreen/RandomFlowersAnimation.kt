@@ -2,7 +2,9 @@ package com.plantCare.plantcare.ui.screens.homeScreen
 
 import com.plantCare.plantcare.R
 import android.util.Log
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
@@ -20,13 +22,17 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -36,7 +42,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.plantCare.plantcare.utils.RandomUtil
+import kotlinx.coroutines.delay
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -46,19 +54,32 @@ fun Flower(
     painter: Painter,
     x: Float,
     y: Float,
-    size: Dp = 32.dp
+    size: Dp = 32.dp,
+    delayMillis: Int = 0
 ) {
-    val rotation by rememberInfiniteTransition()
-        .animateFloat(
-            initialValue = 0f,
-            targetValue = 360f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(
-                    durationMillis = 5000,
-                    easing = LinearEasing
-                )
+    val alpha = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        delay(delayMillis.toLong())
+        alpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = 1000,
+                easing = LinearEasing
             )
         )
+    }
+
+    val colorFilter = ColorFilter.colorMatrix(
+        ColorMatrix().apply {
+            setToScale(
+                RandomUtil.genUniNormFloat(),
+                RandomUtil.genUniNormFloat(),
+                RandomUtil.genUniNormFloat(),
+                1f
+            )
+        }
+    )
 
     Image(
         painter = painter,
@@ -68,11 +89,11 @@ fun Flower(
             .graphicsLayer {
                 translationX = x
                 translationY = y
-                rotationZ = rotation
-            }
+                this.alpha = alpha.value
+            },
+        colorFilter = colorFilter
     )
 }
-
 @Composable
 fun RandomFlowersAnimation(
     itemCount: Int,
@@ -103,16 +124,18 @@ fun RandomFlowersAnimation(
                 x to y
             }
         }
-
-        positions.forEach { (x, y) ->
+        val flowerSize = (64.dp - itemCount.dp.coerceIn(0.dp, 32.dp)).coerceIn(16.dp, 64.dp)
+        positions.forEachIndexed { index, (x, y) ->
             Flower(
                 painter = painterResource(R.drawable.flower),
                 x = x,
                 y = y,
-                size = 32.dp
+                size = flowerSize,
+                delayMillis = index * 10
             )
         }
 
+        val circleColor = MaterialTheme.colorScheme.inverseSurface
         if (itemCount > 0) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -122,17 +145,31 @@ fun RandomFlowersAnimation(
                     modifier = Modifier.size(circleSizeDp)
                 ) {
                     drawCircle(
-                        color = Color.White,
+                        color = circleColor,
                         style = Stroke(width = 4.dp.toPx())
                     )
                 }
 
-                Text(
-                    text = "$itemCount day${if (itemCount == 1) "" else "s"}",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = itemCount.toString(),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = circleColor,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Text(
+                        text = if (itemCount == 1) "Day" else "Days",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = circleColor,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
             }
         }
 
@@ -143,8 +180,8 @@ fun RandomFlowersAnimation(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(top = 0.dp),
-                color = Color.Gray
             )
         }
     }
 }
+

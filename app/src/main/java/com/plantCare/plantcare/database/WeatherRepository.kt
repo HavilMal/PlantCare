@@ -36,7 +36,6 @@ class WeatherRepository (
 
         val response = weatherService.getWeather5Days(lat ?: 0.0,lon ?: 0.0)
         val r = response.getAsJsonObject().getAsJsonArray("list")
-//        Log.d("devo","response = $response")
         r.forEachIndexed { index, item ->
             val obj = item.asJsonObject
             val dt = obj.get("dt").asLong

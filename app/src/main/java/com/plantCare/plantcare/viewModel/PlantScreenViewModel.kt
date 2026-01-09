@@ -170,9 +170,6 @@ class PlantScreenViewModel @Inject constructor(
             )
         )
         val sorted = order.sortedBy { it.priority }.reversed()
-        Log.d(
-            "order",
-            sorted.joinToString(separator = ", ") { "${it.javaClass.name} : ${it.priority}" })
         return sorted
     }
 }

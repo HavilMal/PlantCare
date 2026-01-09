@@ -82,7 +82,6 @@ class HomeViewModel @Inject constructor(
     }
 
     fun allPlantsWatered() : Boolean {
-        Log.d("devo","VM = " + homeFlow.value.plantWateringStatuses.toString())
         return homeFlow.value.plantWateringStatuses.none { pws -> pws.wateringStatus == WateringStatus.NEEDS_WATERING }
     }
 //    suspend fun checkTodayStreak(){
