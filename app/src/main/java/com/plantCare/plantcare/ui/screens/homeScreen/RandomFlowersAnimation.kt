@@ -96,20 +96,23 @@ fun RandomFlowersAnimation(
         val circleCenterY = heightPx / 2
         val circleRadius = circleSizePx / 2
 
-        val positions = remember {
+        val positions = remember(widthPx, heightPx, itemCount) {
             List(itemCount) {
                 var x: Float
                 var y: Float
                 do {
                     x = RandomUtil.genUniNormFloat() * (widthPx - sizePx)
                     y = RandomUtil.genUniNormFloat() * (heightPx - sizePx)
-                } while (itemCount > 0 &&
+                } while (
+                    itemCount > 0 &&
                     (x + sizePx / 2 - circleCenterX).pow(2) +
-                    (y + sizePx / 2 - circleCenterY).pow(2) < (circleRadius + sizePx / 2).pow(2)
+                    (y + sizePx / 2 - circleCenterY).pow(2) <
+                    (circleRadius + sizePx / 2).pow(2)
                 )
                 x to y
             }
         }
+
         val flowerSize = (64.dp - itemCount.dp.coerceIn(0.dp, 32.dp)).coerceIn(16.dp, 64.dp)
         positions.forEachIndexed { index, (x, y) ->
             Flower(
