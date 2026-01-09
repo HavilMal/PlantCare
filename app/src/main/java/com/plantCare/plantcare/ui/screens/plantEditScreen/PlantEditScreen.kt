@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
@@ -38,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -104,6 +106,9 @@ fun PlantEditScreen(
                     value = state.plantName,
                     onValueChange = viewModel::setPlantName,
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     isError = !state.nameError.isEmpty(),
                     supportingText = {
                         if (!state.nameError.isEmpty()) {
@@ -175,6 +180,7 @@ fun PlantEditScreen(
                 SensorButton(
                     bluetoothOn = state.bluetoothOn,
                     state = state.sensorButtonState,
+                    error = state.scanError,
                     onScanForSensor = { viewModel.scanForSensors() },
                     onRemoveSensor = { viewModel.removeSensor() },
                 )
@@ -237,6 +243,9 @@ fun PlantEditScreen(
                     modifier = Modifier.fillMaxWidth(),
                     value = state.description,
                     onValueChange = viewModel::setDescription,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                 )
             }
 

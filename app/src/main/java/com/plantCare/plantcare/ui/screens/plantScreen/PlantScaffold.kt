@@ -59,12 +59,18 @@ fun PlantScaffold(
                             DropdownMenuItem(
                                 text = { Text("Edit") },
                                 leadingIcon = { Icon(Icons.Default.Edit, "Edit") },
-                                onClick = onEdit,
+                                onClick = {
+                                    expanded = false
+                                    onEdit()
+                                },
                             )
                             DropdownMenuItem(
                                 text = { Text("Delete") },
                                 leadingIcon = { Icon(Icons.Default.Delete, "Delete") },
-                                onClick = onDelete,
+                                onClick = {
+                                    expanded = false
+                                    onDelete()
+                                },
                             )
                         }
                     }

@@ -128,7 +128,6 @@ fun detailsToTips(details: PlantDetails, locale: Locale): List<Tip> {
         )
     }
 
-    // todo check
     listToStringWith(details.soil, "or").ifNotEmpty { soil ->
         tips.add(
             Tip(

@@ -43,8 +43,7 @@ fun WithPermission(
     if (!permissionState.allPermissionsGranted) {
         Column(
             modifier = modifier
-                .fillMaxSize()
-                .padding(MaterialTheme.spacing.medium),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(
                 space = MaterialTheme.spacing.extraSmall,
                 alignment = Alignment.CenterVertically

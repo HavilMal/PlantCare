@@ -90,8 +90,8 @@ fun Modifier.getDayStyle(state: WateringState, color: Color, isToday: Boolean, i
 fun getDayColor(state: WateringState, isToday: Boolean, isWatered: Boolean, isRainy: Boolean, isStreakBraeak: Boolean): Color {
     return when {
         isStreakBraeak && !isToday-> MaterialTheme.colorScheme.error
-        isWatered -> Color.Blue
-        isRainy -> Color.Cyan
+        isWatered -> Color(0xFF6FA4C6)
+        isRainy -> Color(0xFF1490E2)
         state == WateringState.SCHEDULED -> MaterialTheme.colorScheme.tertiary // todo change color scheme
         state == WateringState.SATISFIED -> MaterialTheme.colorScheme.primary
         isToday -> MaterialTheme.colorScheme.inverseSurface

@@ -64,7 +64,7 @@ fun ListScreen(
                         appendInlineContent("add_icon")
                         append(" button.")
                     },
-                    annotationDictionary = mapOf("add_icon" to { Icon(Icons.Default.Add, null) }),
+                    annotationDictionary = mapOf("add_icon" to {color -> Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = color) }),
                 )
             }
             return@PlantListScaffold

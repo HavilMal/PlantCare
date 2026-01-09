@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.plantCare.plantcare.common.capitalize
 import com.plantCare.plantcare.common.getLocale
 import com.plantCare.plantcare.ui.theme.size
 import java.time.DayOfWeek
@@ -26,7 +27,7 @@ fun WeekHeader() {
                 modifier = Modifier.size(MaterialTheme.size.medium),
                 contentAlignment = Alignment.Center
             ) {
-                Text(it.getDisplayName(TextStyle.SHORT, getLocale()).filter { it != '.' }.take(3))
+                Text(it.getDisplayName(TextStyle.SHORT, getLocale()).filter { it != '.' }.take(3).capitalize(getLocale()))
             }
         }
     }

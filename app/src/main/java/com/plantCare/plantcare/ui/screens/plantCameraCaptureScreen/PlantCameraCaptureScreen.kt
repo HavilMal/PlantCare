@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -23,6 +24,7 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.common.WithPermission
+import com.plantCare.plantcare.ui.theme.spacing
 import com.plantCare.plantcare.utils.takePhoto
 import com.plantCare.plantcare.viewModel.PlantCameraCaptureViewModel
 
@@ -103,6 +105,7 @@ fun PlantCameraCaptureScreen(viewModel: PlantCameraCaptureViewModel = hiltViewMo
         navController = navController,
     ) { modifier ->
         WithPermission(
+            modifier = modifier.padding(MaterialTheme.spacing.medium),
             requestedPermissions = listOf(Manifest.permission.CAMERA),
         ) {
             PlantCameraCaptureView(

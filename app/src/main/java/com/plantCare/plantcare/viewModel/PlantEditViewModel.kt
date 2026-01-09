@@ -54,6 +54,7 @@ data class PlantEditUiState(
     val sensorButtonState: SensorButtonState = SensorButtonState.ADD_SENSOR,
     val sensorAddress: String? = null,
     val bluetoothOn: Boolean = false,
+    val scanError: Boolean = false,
 )
 
 @HiltViewModel
@@ -150,7 +151,10 @@ class PlantEditViewModel @Inject constructor(
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun scanForSensors() {
         plantEditFlow.update {
-            it.copy(sensorButtonState = SensorButtonState.SCANNING)
+            it.copy(
+                sensorButtonState = SensorButtonState.SCANNING,
+                scanError = false,
+            )
         }
 
         viewModelScope.launch {
@@ -159,6 +163,7 @@ class PlantEditViewModel @Inject constructor(
                 plantEditFlow.update {
                     it.copy(
                         sensorButtonState = SensorButtonState.ADD_SENSOR,
+                        scanError = true,
                     )
                 }
             } else {
@@ -166,6 +171,7 @@ class PlantEditViewModel @Inject constructor(
                     it.copy(
                         sensorButtonState = SensorButtonState.REMOVE_SENSOR,
                         sensorAddress = device.address,
+                        scanError = false,
                     )
                 }
             }

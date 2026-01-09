@@ -166,6 +166,7 @@ fun RandomFlowersAnimation(
             Text(
                 text = "You have no streak yet. Water plants daily to earn streak",
                 textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.outline,
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(top = 0.dp),

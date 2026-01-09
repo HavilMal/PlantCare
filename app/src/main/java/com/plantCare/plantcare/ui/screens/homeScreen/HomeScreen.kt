@@ -55,7 +55,7 @@ import kotlin.math.max
 
 @Composable
 fun PlantItem(
-    context : Context,
+    context: Context,
     plantWateringCardInfo: PlantWateringCardInfo,
     onWater: (Plant) -> Unit
 ) {
@@ -74,7 +74,7 @@ fun PlantItem(
                 .wrapContentHeight(align = Alignment.CenterVertically),
         )
 
-        when(plantWateringCardInfo.wateringStatus){
+        when (plantWateringCardInfo.wateringStatus) {
             WateringStatus.NEEDS_WATERING ->
                 Button(onClick = {
                     MediaPlayer.create(context, R.raw.sound_watering).apply {
@@ -85,6 +85,7 @@ fun PlantItem(
                 }) {
                     Text("Water")
                 }
+
             else -> {}
 
         }
@@ -97,7 +98,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val navController = NavigationController.current
-    val context  = LocalContext.current
+    val context = LocalContext.current
     val uiState = viewModel.homeState.collectAsState()
     val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -105,7 +106,7 @@ fun HomeScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-               viewModel.updateStreakData()
+                viewModel.updateStreakData()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -125,7 +126,7 @@ fun HomeScreen(
                     Icon(Icons.Default.Settings, "Settings")
                 }
             }
-        ){ modifier ->
+        ) { modifier ->
 
             LazyColumn(
                 contentPadding = PaddingValues(MaterialTheme.spacing.medium),
@@ -140,8 +141,8 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .height(height),
                         colors = CardDefaults.cardColors(
-                            containerColor = CardDefaults.cardColors().containerColor.copy(alpha = 0.3f)
-                        )
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        ),
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize()
@@ -168,19 +169,21 @@ fun HomeScreen(
 
                         if (filtered.isNotEmpty()) {
                             item {
-                                Surface(
+                                Card(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 2.dp, vertical = 4.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    tonalElevation = 2.dp
+                                        .fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                    ),
                                 ) {
-                                    Column {
+                                    Column(
+                                        modifier = Modifier.padding(vertical = MaterialTheme.spacing.medium)
+                                    ) {
 
                                         Text(
                                             text = section.sectionName,
                                             modifier = Modifier
-                                                .padding(start = 16.dp, top = 12.dp, end = 16.dp),
+                                                .padding(start = 16.dp, end = 16.dp),
                                             style = MaterialTheme.typography.titleLarge,
                                             fontWeight = FontWeight.SemiBold
                                         )
