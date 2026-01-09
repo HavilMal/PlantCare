@@ -1,17 +1,15 @@
 package com.plantCare.plantcare.database
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Embedded
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.Transaction
-import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import java.time.DayOfWeek
 import java.time.LocalDate
+
 data class PlantWateringBaseInfo(
     val plantId: Long,
     val isIndoor: Boolean,
@@ -75,12 +73,9 @@ interface WateringDao {
             p.id AS plantId,
             p.isIndoor AS isIndoor,
             p.wateringInterval AS wateringInterval,
-            COALESCE(
                 (SELECT MAX(date)
                  FROM wateringHistory
-                 WHERE plant = p.id),
-                p.plantedOn
-            ) AS lastWateredByUserOn,
+                 WHERE plant = p.id) AS lastWateredByUserOn,
             p.plantedOn AS plantedOn
         FROM plants p
     """)

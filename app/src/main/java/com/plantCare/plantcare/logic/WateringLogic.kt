@@ -1,22 +1,11 @@
 package com.plantCare.plantcare.logic
 
-import android.util.Log
-import com.plantCare.plantcare.database.Plant
-import com.plantCare.plantcare.database.PlantRepository
-import com.plantCare.plantcare.database.WateringDao
 import com.plantCare.plantcare.database.WateringRepository
-import com.plantCare.plantcare.database.WeatherRecord
 import com.plantCare.plantcare.database.WeatherRepository
-import com.plantCare.plantcare.utils.RandomUtil
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import java.util.Date
 
 enum class WateringStatus { // today's status
     NEEDS_NO_WATERING,
@@ -44,7 +33,7 @@ class WateringLogicEvaluator(
                     date == info.lastWateredByUserOn ->
                         WateringStatus.WATERED_BY_USER
 
-                    ChronoUnit.DAYS.between(info.lastWateredByUserOn, date) >= info.wateringInterval.interval &&
+                    ChronoUnit.DAYS.between(info.lastWateredByUserOn ?: info.plantedOn, date) >= info.wateringInterval.interval &&
                             info.wateringDays.contains(date.dayOfWeek) ->
                         WateringStatus.NEEDS_WATERING
 
