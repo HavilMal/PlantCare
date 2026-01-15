@@ -25,10 +25,11 @@ class UserActivityRepository(
     fun getStreakBreaks(from:LocalDate, to: LocalDate): Flow<List<LocalDate>> {
         return userActivityDao.getStreakBreaks(from,to)
     }
-    suspend fun getUserCurrentStreak() : Flow<Int> {
-        val today = DateUtil.localDateToday()
-
-        val latestBreakFlow = userActivityDao.getLatestStreakBreak(today)
+    fun getUserCurrentStreakToday() : Flow<Int> {
+        return getUserCurrentStreak(DateUtil.localDateToday())
+    }
+    fun getUserCurrentStreak(date: LocalDate) : Flow<Int> {
+        val latestBreakFlow = userActivityDao.getLatestStreakBreak(date)
         val todayMaintainedFlow = todayStreakMaintained()
 
         return latestBreakFlow
@@ -40,7 +41,7 @@ class UserActivityRepository(
                     userActivityDao.getPositiveRowCount()
                 } else {
                     userActivityDao
-                        .getPositiveRowCount(latestBreak, today)
+                        .getPositiveRowCount(latestBreak, date)
                         .map { positiveCount ->
 //                            positiveCount + if (todayMaintained) 1 else 0
                             positiveCount
@@ -56,16 +57,37 @@ class UserActivityRepository(
         return userActivityDao.getAllRecords()
     }
 
-    suspend fun updateUserStreakData() {
-        val today: LocalDate = DateUtil.localDateToday()
+    suspend fun updateUserStreakDataToday() {
+        updateUserStreakData(DateUtil.localDateToday())
+    }
+    suspend fun updateUserStreakData(date: LocalDate) {
         val plants: List<Plant> = plantRepository.getAllPlants()
         if(plants.isEmpty()){
-            insertUserStreakRecord(StreakStatus.NEUTRAL,today)
+            insertUserStreakRecord(StreakStatus.NEUTRAL,date)
             return
         }
         suspend fun streakEvaluation(plantId: Long, isIndoor: Boolean, currentDate: LocalDate): StreakStatus {
-            if (wateringRepository.needsWatering(plantId, currentDate)) {
-                if (!wateringRepository.wasWateredByUser(plantId, currentDate)) {
+//            if (wateringRepository.needsWatering(plantId, currentDate)) {
+//                if (!wateringRepository.wasWateredByUser(plantId, currentDate)) {
+//                    if (isIndoor) {
+//                        return StreakStatus.NEGATIVE
+//                    } else {
+//                        if (!weatherRepository.hasRainedOn(currentDate)) {
+//                            return StreakStatus.NEGATIVE
+//                        }
+//                        else {
+//                            return StreakStatus.POSITIVE
+//                        }
+//                    }
+//
+//                } else {
+//                    return StreakStatus.POSITIVE
+//                }
+//            } else {
+//                return StreakStatus.NEUTRAL
+//            }
+            if (!wateringRepository.wasWateredByUser(plantId, currentDate)) {
+                if (wateringRepository.needsWatering(plantId, currentDate)) {
                     if (isIndoor) {
                         return StreakStatus.NEGATIVE
                     } else {
@@ -78,15 +100,16 @@ class UserActivityRepository(
                     }
 
                 } else {
-                    return StreakStatus.POSITIVE
+                    return StreakStatus.NEUTRAL
                 }
             } else {
-                return StreakStatus.NEUTRAL
+                return StreakStatus.POSITIVE
             }
         }
 
-        val latest: LocalDate? = userActivityDao.latestRecordedDate() ?: today
-        var currentDate = today
+
+        val latest: LocalDate? = userActivityDao.latestRecordedDate() ?: date
+        var currentDate = date
         do {
             var nonNegative = true
             var anyWatered = false
