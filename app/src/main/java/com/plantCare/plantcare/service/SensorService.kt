@@ -262,6 +262,4 @@ class SensorService(val context: Context) {
             context.unregisterReceiver(receiver)
         }
     }
-
-
 }
