@@ -15,20 +15,8 @@ import kotlin.collections.sortedBy
 
 const val PLANTS_DIR: String = "plants/"
 
-class PlantRepository(
-    val appContext: Context,
-    val plantDao: PlantDao,
-) {
-    companion object {
-        const val PLANT_MEDIA_DIR_NAME = "media"
-        fun genPlantMediaId(): String {
-            return RandomUtil.genUUIDString()
-        }
-    }
-
-    fun getPlantDirName(plantId: Long): String {
-        return plantId.toString()
-    }
+interface PlantRepository {
+    fun getPlantDirName(plantId: Long): String
 
     suspend fun insertPlant(
         name: String,
@@ -39,6 +27,83 @@ class PlantRepository(
         wateringInterval: WateringInterval = WateringInterval.WEEK,
         apiId: Long? = null,
         sensorAddress: String? = null,
+    ): Long
+
+    suspend fun deletePlant(plant: Plant)
+
+    suspend fun deleteAllPlants()
+
+    fun getPlant(plantId: Long): Flow<Plant?>
+
+    fun getAllPlantsFlow(): Flow<List<Plant>>
+
+    suspend fun getAllPlants(): List<Plant>
+
+    suspend fun getAllPlantIds(): List<Long>
+
+    fun getSchedule(plantId: Long): Flow<List<WateringSchedule>>
+
+    fun getSchedules(): Flow<List<WateringSchedule>>
+
+    fun getPlantWateringSchedules(): Flow<List<PlantWateringSchedule>>
+
+    fun getPlantsTumbnailFlow(): Flow<Map<Long, File?>>
+
+    suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval)
+
+    fun getPlantsDirPath(plantId: Long): String
+
+    fun getPlantsDirPath(plant: Plant): String
+
+    fun getPlantsMediaDirPath(plantDirPath: String?): String
+
+    fun getPlantsMediaDirPath(plantId: Long): String
+
+    suspend fun addPlantMedia(plantId: Long, media: File)
+
+    suspend fun deletePlantMedia(file: File)
+
+    fun getPlantMediaFlow(plantId: Long): Flow<List<File>>
+
+    suspend fun setApiId(plantId: Long, id: Long?)
+
+    suspend fun setSensorAddress(id: Long, address: String?)
+
+    suspend fun updatePlant(
+        id: Long,
+        name: String? = null,
+        description: String? = null,
+        species: String? = null,
+        isIndoor: Boolean? = null,
+        plantedOn: LocalDate? = null,
+        wateringInterval: WateringInterval? = null,
+    )
+}
+
+class PlantRepositoryImpl(
+    val appContext: Context,
+    val plantDao: PlantDao,
+) : PlantRepository {
+    companion object {
+        const val PLANT_MEDIA_DIR_NAME = "media"
+        fun genPlantMediaId(): String {
+            return RandomUtil.genUUIDString()
+        }
+    }
+
+    override fun getPlantDirName(plantId: Long): String {
+        return plantId.toString()
+    }
+
+    override suspend fun insertPlant(
+        name: String,
+        description: String,
+        species: String,
+        plantedOn: LocalDate,
+        isIndoor: Boolean,
+        wateringInterval: WateringInterval,
+        apiId: Long?,
+        sensorAddress: String?,
     ): Long {
         val id = plantDao.insertPlant(
             Plant(
@@ -61,44 +126,46 @@ class PlantRepository(
         return id
     }
 
-    suspend fun deletePlant(plant: Plant) {
+    override suspend fun deletePlant(plant: Plant) {
         FileUtil.deleteDir(appContext, getPlantsDirPath(plant.id))
         plantDao.deletePlant(plant)
     }
 
-    suspend fun deleteAllPlants() {
+    override suspend fun deleteAllPlants() {
         FileUtil.deleteDir(appContext, PLANTS_DIR)
         plantDao.deleteAllPlants()
     }
 
-    fun getPlant(plantId: Long): Flow<Plant?> {
+    override fun getPlant(plantId: Long): Flow<Plant?> {
         return plantDao.getPlantFlow(plantId)
     }
 
-    fun getAllPlantsFlow(): Flow<List<Plant>> {
+    override fun getAllPlantsFlow(): Flow<List<Plant>> {
         return plantDao.getPlantsFlow()
     }
-    suspend fun getAllPlants(): List<Plant> {
+
+    override suspend fun getAllPlants(): List<Plant> {
         return plantDao.getPlants()
     }
-    suspend fun getAllPlantIds(): List<Long> {
+
+    override suspend fun getAllPlantIds(): List<Long> {
         return plantDao.getPlantIds()
     }
 
 
-    fun getSchedule(plantId: Long): Flow<List<WateringSchedule>> {
+    override fun getSchedule(plantId: Long): Flow<List<WateringSchedule>> {
         return plantDao.getWateringSchedule(plantId)
     }
 
-    fun getSchedules(): Flow<List<WateringSchedule>> {
+    override fun getSchedules(): Flow<List<WateringSchedule>> {
         return plantDao.getWateringSchedules()
     }
 
-    fun getPlantWateringSchedules(): Flow<List<PlantWateringSchedule>> {
+    override fun getPlantWateringSchedules(): Flow<List<PlantWateringSchedule>> {
         return plantDao.getPlantWateringSchedules()
     }
 
-    fun getPlantsTumbnailFlow(): Flow<Map<Long, File?>> {
+    override fun getPlantsTumbnailFlow(): Flow<Map<Long, File?>> {
         return plantDao.getPlantThumbnails().map {
             it.mapValues { (id, path) ->
                 val plantMediaDirPath: String = getPlantsMediaDirPath(id)
@@ -107,27 +174,31 @@ class PlantRepository(
         }
     }
 
-    suspend fun setSchedule(plantId: Long, days: Set<DayOfWeek>, interval: WateringInterval) {
+    override suspend fun setSchedule(
+        plantId: Long,
+        days: Set<DayOfWeek>,
+        interval: WateringInterval
+    ) {
         plantDao.setSchedule(plantId, days, interval)
     }
 
-    fun getPlantsDirPath(plantId: Long): String {
+    override fun getPlantsDirPath(plantId: Long): String {
         return "$PLANTS_DIR${getPlantDirName(plantId)}"
     }
 
-    fun getPlantsDirPath(plant: Plant): String {
+    override fun getPlantsDirPath(plant: Plant): String {
         return getPlantsDirPath(plant.id)
     }
 
-    fun getPlantsMediaDirPath(plantDirPath: String?): String {
+    override fun getPlantsMediaDirPath(plantDirPath: String?): String {
         return "$plantDirPath/$PLANT_MEDIA_DIR_NAME"
     }
 
-    fun getPlantsMediaDirPath(plantId: Long): String {
+    override fun getPlantsMediaDirPath(plantId: Long): String {
         return getPlantsMediaDirPath(getPlantsDirPath(plantId))
     }
 
-    suspend fun addPlantMedia(plantId: Long, media: File) {
+    override suspend fun addPlantMedia(plantId: Long, media: File) {
         val new_name = "${genPlantMediaId()}.${media.extension}"
         plantDao.insertPlantMedia(plantId, new_name)
         val destFile = File(
@@ -137,12 +208,12 @@ class PlantRepository(
         media.copyTo(destFile, overwrite = true)
     }
 
-    suspend fun deletePlantMedia(file: File) {
+    override suspend fun deletePlantMedia(file: File) {
         plantDao.deletePlantMedia(file.name)
         FileUtil.delete(file)
     }
 
-    fun getPlantMediaFlow(plantId: Long): Flow<List<File>> {
+    override fun getPlantMediaFlow(plantId: Long): Flow<List<File>> {
         val plantMediaDirPath: String = getPlantsMediaDirPath(plantId)
         return plantDao.getPlantMediaFlow(plantId)
             .map { mediaNames ->
@@ -153,22 +224,22 @@ class PlantRepository(
             }
     }
 
-    suspend fun setApiId(plantId: Long, id: Long?) {
+    override suspend fun setApiId(plantId: Long, id: Long?) {
         plantDao.updateApiId(plantId, id)
     }
 
-    suspend fun setSensorAddress(id: Long, address: String?) {
+    override suspend fun setSensorAddress(id: Long, address: String?) {
         plantDao.updateSensorAddress(id, address)
     }
 
-    suspend fun updatePlant(
+    override suspend fun updatePlant(
         id: Long,
-        name: String? = null,
-        description: String? = null,
-        species: String? = null,
-        isIndoor: Boolean? = null,
-        plantedOn: LocalDate? = null,
-        wateringInterval: WateringInterval? = null,
+        name: String?,
+        description: String?,
+        species: String?,
+        isIndoor: Boolean?,
+        plantedOn: LocalDate?,
+        wateringInterval: WateringInterval?,
     ) {
         plantDao.getPlantFlow(id).first()?.let { plant ->
             plantDao.updatePlant(
@@ -187,7 +258,7 @@ class PlantRepository(
 }
 
 class AppRepository(
-    val plantRepository: PlantRepository,
+    val plantRepository: PlantRepositoryImpl,
     val userActivityRepository: UserActivityRepository,
     val weatherRepository: WeatherRepository,
     val settingsRepository: SettingsRepository
@@ -206,30 +277,34 @@ class AppRepository(
             name = "Storczyk Tadek",
             description = "Fajny jest",
             species = "Storczykus",
-            plantedOn = LocalDate.of(2025,12,1),
+            plantedOn = LocalDate.of(2025, 12, 1),
             isIndoor = true,
             wateringInterval = WateringInterval.WEEK,
         )
         plantRepository.addPlantMedia(id, cactusImageFile)
         plantRepository.addPlantMedia(id, cactusImageFile)
-        plantRepository.plantDao.insertWateringEntry(WateringEntry(id,LocalDate.of(2025,12,28)))
-        plantRepository.plantDao.insertWateringEntry(WateringEntry(id,LocalDate.of(2026,1,1)))
+        plantRepository.plantDao.insertWateringEntry(WateringEntry(id, LocalDate.of(2025, 12, 28)))
+        plantRepository.plantDao.insertWateringEntry(WateringEntry(id, LocalDate.of(2026, 1, 1)))
 
-        plantRepository.setSchedule(id,setOf(DayOfWeek.MONDAY,DayOfWeek.TUESDAY), WateringInterval.WEEK)
+        plantRepository.setSchedule(
+            id,
+            setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY),
+            WateringInterval.WEEK
+        )
 
         id = plantRepository.insertPlant(
             name = "Kaktus Maksiu",
             description = "Fajny jest",
             species = "Cactus cactus",
-            plantedOn = LocalDate.of(2025,12,1),
+            plantedOn = LocalDate.of(2025, 12, 1),
             isIndoor = true,
             wateringInterval = WateringInterval.TWO_WEEKS
         )
         plantRepository.addPlantMedia(id, cactusImageFile)
         plantRepository.addPlantMedia(id, cactusImageFile)
-        plantRepository.plantDao.insertWateringEntry(WateringEntry(id,LocalDate.of(2025,12,20)))
+        plantRepository.plantDao.insertWateringEntry(WateringEntry(id, LocalDate.of(2025, 12, 20)))
 
-        settingsRepository.setLocation(51.0,17.0)
+        settingsRepository.setLocation(51.0, 17.0)
     }
 
     suspend fun setDefaultSettings() {

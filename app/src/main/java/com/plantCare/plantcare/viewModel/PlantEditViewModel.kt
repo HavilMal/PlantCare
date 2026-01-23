@@ -9,8 +9,10 @@ import com.plantCare.plantcare.common.capitalize
 import com.plantCare.plantcare.database.PlantRepository
 import com.plantCare.plantcare.database.WateringInterval
 import com.plantCare.plantcare.service.PlantDetailsRepository
+import com.plantCare.plantcare.service.PlantDetailsRepositoryImpl
 import com.plantCare.plantcare.service.PlantSearchResult
 import com.plantCare.plantcare.service.SensorService
+import com.plantCare.plantcare.service.SensorServiceImpl
 import com.plantCare.plantcare.ui.screens.plantEditScreen.SensorButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -21,8 +23,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek

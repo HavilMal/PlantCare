@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.Plant
-import com.plantCare.plantcare.database.PlantRepository
+import com.plantCare.plantcare.database.PlantRepositoryImpl
 import com.plantCare.plantcare.database.UserActivityRepository
 import com.plantCare.plantcare.database.WateringRepository
 import com.plantCare.plantcare.database.WeatherRepository
@@ -42,7 +42,7 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     private val wateringRepository: WateringRepository,
     private val weatherRepository: WeatherRepository,
-    private val plantRepository: PlantRepository,
+    private val plantRepository: PlantRepositoryImpl,
     private val userActivityRepository: UserActivityRepository
 ) : ViewModel() {
 

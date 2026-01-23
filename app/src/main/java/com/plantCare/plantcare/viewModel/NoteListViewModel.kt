@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.Note
-import com.plantCare.plantcare.database.NotesRepository
+import com.plantCare.plantcare.database.NotesRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ data class NoteListUiState(
 
 @HiltViewModel
 class NoteListViewModel @Inject constructor(
-    private val notesRepository: NotesRepository,
+    private val notesRepository: NotesRepositoryImpl,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val plantId: Long = savedStateHandle["plantId"]!!

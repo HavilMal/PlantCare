@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.Plant
-import com.plantCare.plantcare.database.PlantRepository
+import com.plantCare.plantcare.database.PlantRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ data class ListUiState(
 
 @HiltViewModel
 class ListViewModel @Inject constructor(
-    plantRepository: PlantRepository,
+    plantRepository: PlantRepositoryImpl,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 

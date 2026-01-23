@@ -1,10 +1,8 @@
 package com.plantCare.plantcare.viewModel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.AppSettingNotificationMode
-import com.plantCare.plantcare.database.NotesRepository
 import com.plantCare.plantcare.database.SettingsRepository
 import com.plantCare.plantcare.database.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
