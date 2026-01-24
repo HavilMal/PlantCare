@@ -29,8 +29,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunner = "com.plantCare.plantcare.testTools.HiltTestRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -118,6 +117,4 @@ dependencies {
 
     implementation(libs.accompanist.permissions)
     implementation("org.osmdroid:osmdroid-android:6.1.20")
-
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.57.2")
 }
