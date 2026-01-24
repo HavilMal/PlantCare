@@ -303,7 +303,7 @@ interface PlantDao {
         updatePlant(plant.copy(wateringInterval = interval))
         deleteScheduleForPlant(plantId)
         days.forEach { it ->
-            val startingDate = plant.createdOn.with(it)
+            val startingDate = plant.plantedOn.with(it)
             insertWateringSchedule(WateringSchedule(plantId, it, startingDate))
         }
     }

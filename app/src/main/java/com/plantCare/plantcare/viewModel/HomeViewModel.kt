@@ -65,7 +65,7 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            userActivityRepository.getUserCurrentStreak().collect { streak ->
+            userActivityRepository.getUserCurrentStreakToday().collect { streak ->
                 homeFlow.update {
                     it.copy(userCurrentStreak = streak)
                 }
@@ -83,7 +83,7 @@ class HomeViewModel @Inject constructor(
 //        }
 //    }
     suspend fun waterPlant(plantId: Long){
-        wateringRepository.insertWateringEntry(plantId)
+        wateringRepository.insertWateringEntryToday(plantId)
         updateStreakData()
     }
 
@@ -95,7 +95,7 @@ class HomeViewModel @Inject constructor(
             records.forEach { r ->
                 Log.d("devom",r.toString())
             }
-            userActivityRepository.updateUserStreakData()
+            userActivityRepository.updateUserStreakDataToday()
         }
     }
 }
