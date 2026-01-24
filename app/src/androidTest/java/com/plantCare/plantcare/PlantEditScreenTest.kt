@@ -1,8 +1,10 @@
 package com.plantCare.plantcare
 
+import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
@@ -22,10 +24,12 @@ import com.plantCare.plantcare.viewModel.NoteEditViewModel
 import com.plantCare.plantcare.viewModel.PlantEditViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.DayOfWeek
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -45,16 +49,20 @@ class PlantEditScreenTest {
 
     lateinit var viewModel: PlantEditViewModel
     lateinit var sensorService: FakeSensorService
+    lateinit var plantRepository: FakePlantRepository
+    lateinit var plantDetailRepository: FakePlantDetailRepository
 
     @Before
     fun init() {
         hiltRule.inject()
 
         sensorService = FakeSensorService()
+        plantRepository = FakePlantRepository()
+        plantDetailRepository = FakePlantDetailRepository()
 
         viewModel = PlantEditViewModel(
-            plantRepository = FakePlantRepository(),
-            plantDetailsRepository = FakePlantDetailRepository(),
+            plantRepository = plantRepository,
+            plantDetailsRepository = plantDetailRepository,
             sensorService = sensorService,
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -71,7 +79,7 @@ class PlantEditScreenTest {
             PlantEditScreen(viewModel = viewModel)
         }
 
-        composeTestRule.onNodeWithContentDescription("save").performClick()
+        composeTestRule.onNodeWithContentDescription("save", ignoreCase = true).performClick()
         composeTestRule.onNodeWithText("Plant name can't be empty.").assertIsDisplayed()
     }
 
@@ -81,47 +89,57 @@ class PlantEditScreenTest {
             PlantEditScreen(viewModel = viewModel)
         }
 
-        composeTestRule.onNodeWithContentDescription("save").performClick()
+        composeTestRule.onNodeWithContentDescription("save", ignoreCase = true).performClick()
         composeTestRule.onNodeWithText("Plant species can't be empty.").assertIsDisplayed()
     }
 
     @Test
     fun sensor_button_scan_no_sensor_timeout() {
+        sensorService.hasSensor = false
+        sensorService.timeoutMillis = 1000L
+
         composeTestRule.setContent {
             PlantEditScreen(viewModel = viewModel)
         }
 
-        sensorService.hasSensor = false
-        sensorService.timeoutMillis = 1000L
-        composeTestRule.mainClock.autoAdvance = false
-
+        composeTestRule.onNodeWithText("Add Sensor").assertIsDisplayed()
         composeTestRule.onNodeWithText("Add Sensor").performClick()
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.onNodeWithText("Scanning").assertIsDisplayed()
 
         composeTestRule.mainClock.advanceTimeBy(10000)
-        composeTestRule.mainClock.advanceTimeByFrame()
+
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+            composeTestRule
+                .onAllNodesWithText("Add Sensor")
+                .fetchSemanticsNodes().isNotEmpty()
+        }
 
         composeTestRule.onNodeWithText("Add Sensor").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Failed to find sensor", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Failed to find sensor", substring = true)
+            .assertIsDisplayed()
     }
 
     @Test
     fun sensor_button_scan_has_sensor() {
+        sensorService.hasSensor = true
+        sensorService.timeoutMillis = 1000L
+
         composeTestRule.setContent {
             PlantEditScreen(viewModel = viewModel)
         }
-
-        sensorService.hasSensor = true
-        sensorService.timeoutMillis = 1000L
-        composeTestRule.mainClock.autoAdvance = false
 
         composeTestRule.onNodeWithText("Add Sensor").performClick()
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.onNodeWithText("Scanning").assertIsDisplayed()
 
         composeTestRule.mainClock.advanceTimeBy(10000)
-        composeTestRule.mainClock.advanceTimeByFrame()
+
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+            composeTestRule
+                .onAllNodesWithText("Remove Sensor")
+                .fetchSemanticsNodes().isNotEmpty()
+        }
 
         composeTestRule.onNodeWithText("Remove Sensor").assertIsDisplayed()
     }
