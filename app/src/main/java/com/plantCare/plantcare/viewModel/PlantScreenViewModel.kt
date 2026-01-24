@@ -1,18 +1,17 @@
 package com.plantCare.plantcare.viewModel
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plantCare.plantcare.database.Note
-import com.plantCare.plantcare.database.NotesRepository
+import com.plantCare.plantcare.database.NotesRepositoryImpl
 import com.plantCare.plantcare.database.Plant
 import com.plantCare.plantcare.database.PlantDetails
-import com.plantCare.plantcare.database.PlantRepository
-import com.plantCare.plantcare.service.PlantDetailsRepository
+import com.plantCare.plantcare.database.PlantRepositoryImpl
+import com.plantCare.plantcare.service.PlantDetailsRepositoryImpl
 import com.plantCare.plantcare.service.SensorData
-import com.plantCare.plantcare.service.SensorService
+import com.plantCare.plantcare.service.SensorServiceImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,10 +62,10 @@ data class PlantScreenUiState(
 @SuppressLint("MissingPermission")
 @HiltViewModel
 class PlantScreenViewModel @Inject constructor(
-    private val plantRepository: PlantRepository,
-    private val notesRepository: NotesRepository,
-    private val detailsRepository: PlantDetailsRepository,
-    private val sensorService: SensorService,
+    private val plantRepository: PlantRepositoryImpl,
+    private val notesRepository: NotesRepositoryImpl,
+    private val detailsRepository: PlantDetailsRepositoryImpl,
+    private val sensorService: SensorServiceImpl,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val plantId: Long = checkNotNull(savedStateHandle.get<Long>("plantId"))
