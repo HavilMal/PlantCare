@@ -1,6 +1,5 @@
 package com.plantCare.plantcare.service
 
-import android.util.Log
 import com.google.gson.JsonObject
 import com.plantCare.plantcare.database.PlantDao
 import com.plantCare.plantcare.database.PlantDetails
@@ -12,8 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -23,17 +20,25 @@ data class PlantSearchResult(
     val scientificName: String,
 )
 
+interface PlantDetailsRepository {
+    suspend fun findPlant(plantName: String): List<PlantSearchResult>?
 
-class PlantDetailsRepository(
+    fun getPlantDetails(plantId: Long): Flow<PlantDetails?>
+
+    fun updatePlantDetails(plantId: Long): Flow<PlantDetails?>
+}
+
+
+class PlantDetailsRepositoryImpl(
     private val plantService: PlantService,
     private val plantDetailsDao: PlantDetailsDao,
     private val plantDao: PlantDao,
-) {
+) : PlantDetailsRepository {
     private val apiIdLimit = 3000
     private val cacheDuration = 31
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    suspend fun findPlant(plantName: String): List<PlantSearchResult>? {
+    override suspend fun findPlant(plantName: String): List<PlantSearchResult>? {
         val response: JsonObject
         try {
             response = plantService.findPlant(plantName)
@@ -60,7 +65,7 @@ class PlantDetailsRepository(
         return result
     }
 
-    fun getPlantDetails(plantId: Long): Flow<PlantDetails?> =
+    override fun getPlantDetails(plantId: Long): Flow<PlantDetails?> =
         flow {
             val savedDetails = plantDetailsDao.getDetails(plantId).first()
             if (savedDetails != null) {
@@ -81,7 +86,7 @@ class PlantDetailsRepository(
             return@flow
         }
 
-    fun updatePlantDetails(plantId: Long): Flow<PlantDetails?> =
+    override fun updatePlantDetails(plantId: Long): Flow<PlantDetails?> =
         flow {
             val plantApiId = plantDao.getApiId(plantId)
 

@@ -44,7 +44,7 @@ class SensorServiceTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    private lateinit var sensorService: SensorService
+    private lateinit var sensorService: SensorServiceImpl
 
     @Before
     fun setup() {
@@ -57,7 +57,7 @@ class SensorServiceTest {
         every { bluetoothAdapter.state } returns BluetoothAdapter.STATE_ON
         every { bluetoothAdapter.getRemoteDevice(any<String>()) } returns device
 
-        sensorService = SensorService(context)
+        sensorService = SensorServiceImpl(context)
     }
 
     @After

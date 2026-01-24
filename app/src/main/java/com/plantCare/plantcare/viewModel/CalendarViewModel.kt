@@ -3,7 +3,7 @@ package com.plantCare.plantcare.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.plantCare.plantcare.database.PlantRepository
+import com.plantCare.plantcare.database.PlantRepositoryImpl
 import com.plantCare.plantcare.database.UserActivityRepository
 import com.plantCare.plantcare.database.WateringRepository
 import com.plantCare.plantcare.database.WeatherRepository
@@ -33,7 +33,7 @@ data class CalendarUiState(
 
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
-    val plantRepository: PlantRepository,
+    val plantRepository: PlantRepositoryImpl,
     val weatherRepository: WeatherRepository,
     val wateringRepository: WateringRepository,
     val userActivityRepository: UserActivityRepository

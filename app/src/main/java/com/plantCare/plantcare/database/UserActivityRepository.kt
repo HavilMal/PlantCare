@@ -11,7 +11,7 @@ class UserActivityRepository(
     val userActivityDao: UserActivityDao,
     val weatherRepository: WeatherRepository,
     val wateringRepository: WateringRepository,
-    val plantRepository: PlantRepository
+    val plantRepository: PlantRepositoryImpl
 ) {
     suspend fun insertUserStreakRecord(streakStatus: StreakStatus, date: LocalDate){
         userActivityDao.insertDailyRecord(UserDailyRecord(date,streakStatus))

@@ -2,6 +2,8 @@ package com.plantCare.plantcare.di
 
 import android.content.Context
 import com.plantCare.plantcare.service.SensorService
+import com.plantCare.plantcare.service.SensorServiceImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,9 +13,18 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ServiceModule {
-    @Provides
+abstract class ServiceModule {
+
+    @Binds
     @Singleton
-    fun provideSensorService(@ApplicationContext context: Context): SensorService =
-        SensorService(context)
+    abstract fun bindSensorService(
+        sensorService: SensorServiceImpl
+    ) : SensorService
+
+    companion object {
+        @Provides
+        @Singleton
+        fun provideSensorService(@ApplicationContext context: Context): SensorServiceImpl =
+            SensorServiceImpl(context)
+    }
 }

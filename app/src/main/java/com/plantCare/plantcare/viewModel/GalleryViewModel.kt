@@ -3,7 +3,7 @@ package com.plantCare.plantcare.viewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.plantCare.plantcare.database.PlantRepository
+import com.plantCare.plantcare.database.PlantRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ data class GalleryState(
 
 @HiltViewModel
 class GalleryViewModel @Inject constructor(
-    private val plantRepository: PlantRepository,
+    private val plantRepository: PlantRepositoryImpl,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val plantId: Long = savedStateHandle["plantId"]!!
