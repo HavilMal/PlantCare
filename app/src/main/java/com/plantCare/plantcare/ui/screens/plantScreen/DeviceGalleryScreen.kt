@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.plantCare.plantcare.common.NavigationController
 import com.plantCare.plantcare.viewModel.DeviceGalleryScreenViewModel
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -27,8 +25,9 @@ fun DeviceGalleryScreen(
         ActivityResultContracts.PickMultipleVisualMedia(maxItems = 50)
     ) { uris ->
         if (uris.isNotEmpty()) {
-            viewModel.saveMedia(uris)
-            navController?.popBackStack()
+            viewModel.saveMedia(uris) {
+                navController?.popBackStack()
+            }
         } else {
             navController?.popBackStack()
         }
