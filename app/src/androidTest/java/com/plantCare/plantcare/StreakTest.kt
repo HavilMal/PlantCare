@@ -8,6 +8,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.plantCare.plantcare.database.AppDatabase
 import com.plantCare.plantcare.database.PlantRepository
+import com.plantCare.plantcare.database.PlantRepositoryImpl
 import com.plantCare.plantcare.database.SettingsRepository
 import com.plantCare.plantcare.database.UserActivityRepository
 import com.plantCare.plantcare.database.WateringInterval
@@ -63,7 +64,7 @@ class StreakTest {
             settingsRepository = settingsRepository
         )
 
-        plantRepository = PlantRepository(context, plantDao)
+        plantRepository = PlantRepositoryImpl(context, plantDao)
         wateringRepository = WateringRepository(wateringDao)
         userActivityRepository = UserActivityRepository(
             userActivityDao,
